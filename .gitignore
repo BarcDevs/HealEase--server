@@ -1,0 +1,35 @@
+# dependencies
+/node_modules
+package-lock.json
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# logger
+logs
+
+# production
+build
+dist
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+
+# misc
+.DS_Store
+*.pem
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# ide
+.idea
+
