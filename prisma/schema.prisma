@@ -7,17 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
-  id                      String    @id() @default(uuid()) @map("_id")
-  name                    String
-  email                   String
-  imageUrl                String?
+  id        String  @id() @default(uuid()) @map("_id")
+  firstName String
+  lastName  String
+  username  String
+  email     String  @unique
+  image     String?
+  role      Role    @default(USER)
+
+  posts        Post[]
+  replies      Reply[]
+  followedTags Tag[]
+  // followedCategories      String[]
+  // followedAuthors         User[]
+
+  // excluded from client
   password                String
   resetPasswordOTP        Int?
   resetPasswordExpiration DateTime?
-  password_updated_at     DateTime?
+  password_updated_at     DateTime  @default(now())
   created_at              DateTime  @default(now())
-  updated_at              DateTime  @default(now())
+  active                  Boolean   @default(true)
+  deleted_at              DateTime?
 
-  @@unique([email])
+  @@index([email, created_at, active])
+}
+
+model Post {
+  id        String    @id() @default(uuid()) @map("_id")
+  title     String
+  body      String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  votes     Json
+  replies   Reply[]
+  views     Int
+  category  String
+  tags      Tag[]
+}
+
+model Reply {
+  id        String    @id() @default(uuid()) @map("_id")
+  body      String
+  author    User      @relation(fields: [authorId], references: [id])
+  authorId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+  votes     Json
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    String
+}
+
+model Tag {
+  id          String   @id() @default(uuid()) @map("_id")
+  name        String
+  description String?
+  posts       Post[]
+  followers   User[]
+  createdAt   DateTime @default(now())
 }

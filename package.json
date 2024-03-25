@@ -21,7 +21,8 @@
         "lint:fix": "npm run lint:check -- --fix",
         "prepare": "husky install",
         "prisma:generate": "npx prisma generate",
-        "prisma:migrate": "npx prisma migrate dev --name init"
+        "prisma:migrate": "npx prisma migrate dev --name init",
+        "prisma:studio": "npx prisma studio"
     },
     "keywords": [],
     "author": "",
