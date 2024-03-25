@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response, Request } from 'express'
 import jwt from 'jsonwebtoken'
 import { UserType } from '../types/UserType'
 import { AuthError } from '../errors/AuthError'
