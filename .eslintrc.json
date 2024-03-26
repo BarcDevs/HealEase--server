@@ -23,6 +23,8 @@
         "@typescript-eslint/no-unused-vars": "warn",
         "import/no-import-module-exports": "off",
         "import/no-extraneous-dependencies": "off",
-        "class-methods-use-this": "off"
+        "class-methods-use-this": "off",
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": "warn"
     }
 }

@@ -1,9 +1,10 @@
 import { NewUserType, ServerUserType } from '../types/data/UserType'
 import Prisma from '../utils/PrismaClient'
-import { AuthError } from '../errors/AuthError'
+import { catchModel } from '../utils/catch'
+import { ErrorPrefixes } from '../constants/errorPrefixes'
 
-const getUserById = async (id: string): Promise<ServerUserType | null> => {
-    try {
+const getUserById = catchModel(
+    async (id: string): Promise<ServerUserType | null> => {
         const user = await Prisma.user.findUnique({
             where: {
                 id,
@@ -13,16 +14,12 @@ const getUserById = async (id: string): Promise<ServerUserType | null> => {
         if (!user) return null
 
         return user as ServerUserType
-    } catch (error) {
-        const err = error as Error
-        throw new Error(`[AUTHENTICATION ERROR]: ${err.message}`)
-    }
-}
+    },
+    ErrorPrefixes.FETCH,
+)
 
-const getUserByEmail = async (
-    email: string,
-): Promise<ServerUserType | null> => {
-    try {
+const getUserByEmail = catchModel(
+    async (email: string): Promise<ServerUserType | null> => {
         const user = await Prisma.user.findUnique({
             where: {
                 email,
@@ -32,72 +29,58 @@ const getUserByEmail = async (
         if (!user) return null
 
         return user as ServerUserType
-    } catch (error) {
-        const err = error as Error
-        throw new AuthError(err.message)
-    }
-}
+    },
+    ErrorPrefixes.FETCH,
+)
 
-const createUser = (newUser: NewUserType): Promise<ServerUserType> => {
-    try {
-        return Prisma.user.create({
+const createUser = catchModel(
+    (newUser: NewUserType): Promise<ServerUserType> =>
+        Prisma.user.create({
             data: newUser,
-        }) as Promise<ServerUserType>
-    } catch (error) {
-        const err = error as Error
-        throw new Error(`[REGISTRATION ERROR]: ${err.message}`)
-    }
-}
+        }) as Promise<ServerUserType>,
+    ErrorPrefixes.REGISTRATION,
+)
 
-const updateUser = (
-    userId: string,
-    newUserData: Partial<NewUserType>,
-): Promise<ServerUserType> => {
-    try {
-        return Prisma.user.update({
+const updateUser = catchModel(
+    (
+        userId: string,
+        newUserData: Partial<NewUserType>,
+    ): Promise<ServerUserType> =>
+        Prisma.user.update({
             where: {
                 id: userId,
             },
             data: newUserData,
-        }) as Promise<ServerUserType>
-    } catch (error) {
-        const err = error as Error
-        throw new Error(`[UPDATE ERROR]: ${err.message}`)
-    }
-}
+        }) as Promise<ServerUserType>,
+    ErrorPrefixes.UPDATE,
+)
 
-export const setUserOTP = (
-    userId: string,
-    data: {
-        resetPasswordOTP: number | null
-        resetPasswordExpiration: Date | null
-        password_updated_at?: Date
-    },
-): Promise<ServerUserType> => {
-    try {
-        return Prisma.user.update({
+export const setUserOTP = catchModel(
+    (
+        userId: string,
+        data: {
+            resetPasswordOTP: number | null
+            resetPasswordExpiration: Date | null
+            password_updated_at?: Date
+        },
+    ): Promise<ServerUserType> =>
+        Prisma.user.update({
             where: {
                 id: userId,
             },
             data,
-        }) as Promise<ServerUserType>
-    } catch (error) {
-        const err = error as Error
-        throw new Error(`[UPDATE ERROR]: ${err.message}`)
-    }
-}
+        }) as Promise<ServerUserType>,
+    ErrorPrefixes.UPDATE,
+)
 
-const deleteUser = (id: string): Promise<ServerUserType> => {
-    try {
-        return Prisma.user.delete({
+const deleteUser = catchModel(
+    (id: string): Promise<ServerUserType> =>
+        Prisma.user.delete({
             where: {
                 id,
             },
-        }) as Promise<ServerUserType>
-    } catch (error) {
-        const err = error as Error
-        throw new Error(`[DELETE ERROR]: ${err.message}`)
-    }
-}
+        }) as Promise<ServerUserType>,
+    ErrorPrefixes.DELETE,
+)
 
 export { getUserById, getUserByEmail, createUser, updateUser, deleteUser }
