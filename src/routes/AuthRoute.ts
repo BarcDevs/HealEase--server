@@ -12,12 +12,6 @@ import { cacheMiddleware } from '../middlewares/cache'
 import { isAuthenticated } from '../middlewares/isAuthenticated'
 import { csrfMiddleware } from '../middlewares/csrf'
 
-declare module 'express-serve-static-core' {
-    interface Request {
-        locals: Record<string, unknown>
-    }
-}
-
 const router = Router()
 
 router.route('/login').get(login)
