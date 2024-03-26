@@ -11,7 +11,7 @@ import { resetPasswordSchema } from '../schemas/auth/resetPasswordSchema'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { ValidationError } from '../errors/ValidationError'
 import { ResponseType } from '../types/ResponseType'
-import { UserType } from '../types/UserType'
+import { ServerUserType, UserType } from '../types/data/UserType'
 
 const login = async (req: Request, res: Response) => {
     const { email, password } = req.body
@@ -136,7 +136,10 @@ const confirmEmail = async (req: Request, res: Response) => {
         throw new ValidationError(errorMessage, errorProperty as string)
     }
 
-    const user: UserType | null = await authServices.getUser('email', email)
+    const user: ServerUserType | null = await authServices.getUser(
+        'email',
+        email,
+    )
 
     const OTPValid =
         user &&
@@ -169,7 +172,10 @@ const resetPassword = async (req: Request, res: Response) => {
         throw new ValidationError(errorMessage, errorProperty as string)
     }
 
-    const user: UserType | null = await authServices.getUser('email', email)
+    const user: ServerUserType | null = await authServices.getUser(
+        'email',
+        email,
+    )
 
     if (
         !user ||

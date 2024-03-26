@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request } from 'express'
 import jwt from 'jsonwebtoken'
-import { UserType } from '../types/UserType'
+import { UserType } from '../types/data/UserType'
 import { AuthError } from '../errors/AuthError'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { authConfig } from '../../config'

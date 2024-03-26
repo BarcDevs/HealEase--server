@@ -6,10 +6,10 @@ import { AuthError } from '../errors/AuthError'
 import { sendEmail } from '../utils/emailSender'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { authConfig } from '../../config'
-import { UserType } from '../types/UserType'
+import { ServerUserType } from '../types/data/UserType'
 
 const getUser = async (by: 'email' | 'id', value: string) => {
-    let user: UserType | null
+    let user: ServerUserType | null
     switch (by) {
         case 'email':
             user = await authModel.getUserByEmail(value)
@@ -36,7 +36,7 @@ const generateResetPasswordOTP = (): { OTP: number; OTPExpiration: Date } => {
 }
 
 const removeResetPasswordOTP = async (userId: string): Promise<void> => {
-    await authModel.updateUser(userId, {
+    await authModel.setUserOTP(userId, {
         resetPasswordOTP: null,
         resetPasswordExpiration: null,
         password_updated_at: new Date(Date.now()),
@@ -53,13 +53,13 @@ const verifyResetPasswordOTP = (
 }
 
 const sendEmailWithOTP = async (email: string): Promise<boolean> => {
-    const user: UserType | null = await authModel.getUserByEmail(email)
+    const user: ServerUserType | null = await authModel.getUserByEmail(email)
 
     if (!user) return false
 
     const { OTP, OTPExpiration } = generateResetPasswordOTP()
 
-    await authModel.updateUser(user.id, {
+    await authModel.setUserOTP(user.id, {
         resetPasswordOTP: OTP,
         resetPasswordExpiration: OTPExpiration,
     })
@@ -73,7 +73,7 @@ const sendEmailWithOTP = async (email: string): Promise<boolean> => {
     return true
 }
 
-const createToken = (user: UserType): string => {
+const createToken = (user: ServerUserType): string => {
     const payload = { id: user.id, email: user.email }
     const options = { expiresIn: authConfig.expiresIn }
 
@@ -98,7 +98,7 @@ const comparePassword = (password: string, hashedPassword: string): boolean =>
     bcrypt.compareSync(password, hashedPassword)
 
 const login = async (email: string, password: string): Promise<string> => {
-    const user: UserType | null = await getUser('email', email)
+    const user: ServerUserType | null = await getUser('email', email)
 
     if (!user || !comparePassword(password, user.password)) {
         throw new AuthError('User not found!')
@@ -107,8 +107,8 @@ const login = async (email: string, password: string): Promise<string> => {
     return createToken(user)
 }
 
-const register = async (newUser: UserType): Promise<UserType> => {
-    const userExists: UserType | null = await authModel.getUserByEmail(
+const register = async (newUser: ServerUserType): Promise<ServerUserType> => {
+    const userExists: ServerUserType | null = await authModel.getUserByEmail(
         newUser.email,
     )
 
@@ -130,7 +130,7 @@ const register = async (newUser: UserType): Promise<UserType> => {
 const resetPassword = async (
     userId: string,
     newPassword: string,
-): Promise<UserType> =>
+): Promise<ServerUserType> =>
     authModel.updateUser(userId, { password: hashPassword(newPassword) })
 
 export {
