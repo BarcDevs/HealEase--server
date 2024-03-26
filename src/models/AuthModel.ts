@@ -1,6 +1,8 @@
 import { NewUserType, ServerUserType } from '../types/data/UserType'
 import Prisma from '../utils/PrismaClient'
+// @ts-ignore
 import { catchModel } from '../utils/catch'
+// @ts-ignore
 import { ErrorPrefixes } from '../constants/errorPrefixes'
 
 const getUserById = catchModel(
@@ -8,6 +10,7 @@ const getUserById = catchModel(
         const user = await Prisma.user.findUnique({
             where: {
                 id,
+                active: true,
             },
         })
 
@@ -23,6 +26,7 @@ const getUserByEmail = catchModel(
         const user = await Prisma.user.findUnique({
             where: {
                 email,
+                active: true,
             },
         })
 
@@ -49,6 +53,7 @@ const updateUser = catchModel(
         Prisma.user.update({
             where: {
                 id: userId,
+                active: true,
             },
             data: newUserData,
         }) as Promise<ServerUserType>,
@@ -67,10 +72,24 @@ export const setUserOTP = catchModel(
         Prisma.user.update({
             where: {
                 id: userId,
+                active: true,
             },
             data,
         }) as Promise<ServerUserType>,
     ErrorPrefixes.UPDATE,
+)
+
+const disableUser = catchModel(
+    (id: string): Promise<ServerUserType> =>
+        Prisma.user.update({
+            where: {
+                id,
+            },
+            data: {
+                active: false,
+            },
+        }) as Promise<ServerUserType>,
+    ErrorPrefixes.DELETE,
 )
 
 const deleteUser = catchModel(
@@ -83,4 +102,11 @@ const deleteUser = catchModel(
     ErrorPrefixes.DELETE,
 )
 
-export { getUserById, getUserByEmail, createUser, updateUser, deleteUser }
+export {
+    getUserById,
+    getUserByEmail,
+    createUser,
+    updateUser,
+    disableUser,
+    deleteUser,
+}
