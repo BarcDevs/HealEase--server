@@ -29,8 +29,8 @@ CREATE TABLE "Post" (
     "authorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "votes" JSONB NOT NULL,
-    "views" INTEGER NOT NULL,
+    "votes" JSONB NOT NULL DEFAULT '{"upvotedBy": [], "downvotedBy": [], "upvotes": 0, "downvotes": 0}',
+    "views" INTEGER NOT NULL DEFAULT 0,
     "category" TEXT NOT NULL,
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
@@ -43,7 +43,7 @@ CREATE TABLE "Reply" (
     "authorId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
-    "votes" JSONB NOT NULL,
+    "votes" JSONB NOT NULL DEFAULT '{"upvotedBy": [], "downvotedBy": [], "upvotes": 0, "downvotes": 0}',
     "postId" TEXT NOT NULL,
 
     CONSTRAINT "Reply_pkey" PRIMARY KEY ("id")
@@ -76,6 +76,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE INDEX "User_email_created_at_active_idx" ON "User"("email", "created_at", "active");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Tag_name_key" ON "Tag"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_PostToTag_AB_unique" ON "_PostToTag"("A", "B");
