@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import Csrf from 'csrf'
-import * as authModel from '../modules/AuthModel'
+import * as authModel from '../models/AuthModel'
 import { AuthError } from '../errors/AuthError'
 import { sendEmail } from '../utils/emailSender'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
