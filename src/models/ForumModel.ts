@@ -10,11 +10,11 @@ export const getPosts = async (
 ): Promise<PostType[]> => {
     const postQuery = query ? postQueryBuilder(query) : {}
 
-    return Prisma.post.findMany({
+    return (await Prisma.post.findMany({
         take: query?.limit || 10,
         skip: (query?.page ? query.page - 1 : 0) * (query?.limit || 10),
         ...postQuery,
-    }) as Promise<PostType[]>
+    })) as PostType[]
 }
 
 export const getPostsCount = async (
@@ -30,7 +30,7 @@ export const getPostsCount = async (
 }
 
 export const getPost = async (id: string): Promise<PostType | null> =>
-    Prisma.post.findUnique({
+    (await Prisma.post.findUnique({
         where: {
             id,
             author: {
@@ -38,12 +38,12 @@ export const getPost = async (id: string): Promise<PostType | null> =>
             },
         },
         include: postInclude('single'),
-    }) as Promise<PostType | null>
+    })) as PostType | null
 
 export const createPost = async (post: NewPostType): Promise<PostType> => {
     const { authorId, tags, ...postData } = post
 
-    return Prisma.post.create({
+    return (await Prisma.post.create({
         data: {
             ...postData,
             author: {
@@ -56,7 +56,7 @@ export const createPost = async (post: NewPostType): Promise<PostType> => {
             },
         } as PrismaTypes.PostCreateInput,
         include: postInclude('single'),
-    }) as unknown as Promise<PostType>
+    })) as unknown as PostType
 }
 
 export const updatePost = async (
@@ -67,7 +67,7 @@ export const updatePost = async (
     const prevTags = post.tags ? await getTagsByPostId(id) : undefined
     const removeTags = prevTags?.filter((tag) => !post.tags?.includes(tag.name))
 
-    return Prisma.post.update({
+    return (await Prisma.post.update({
         where: {
             id,
         },
@@ -79,7 +79,7 @@ export const updatePost = async (
             },
         },
         include: postInclude('single'),
-    }) as unknown as Promise<PostType>
+    })) as unknown as PostType
 }
 
 export const deletePost = async (id: string) =>
@@ -90,23 +90,23 @@ export const deletePost = async (id: string) =>
     })
 
 export const getTags = async (limit: 10, page: 0): Promise<TagType[]> =>
-    Prisma.tag.findMany({
+    (await Prisma.tag.findMany({
         take: limit,
         skip: page * limit,
-    }) as Promise<TagType[]>
+    })) as TagType[]
 
 export const getPopularTags = async (limit = 10): Promise<TagType[]> =>
-    Prisma.tag.findMany({
+    (await Prisma.tag.findMany({
         orderBy: {
             posts: {
                 _count: 'desc',
             },
         } as PrismaTypes.TagOrderByWithRelationInput,
         take: limit,
-    }) as Promise<TagType[]>
+    })) as TagType[]
 
 export const getTagsByPostId = async (id: string): Promise<TagType[]> =>
-    Prisma.tag.findMany({
+    (await Prisma.tag.findMany({
         where: {
             posts: {
                 some: {
@@ -114,4 +114,4 @@ export const getTagsByPostId = async (id: string): Promise<TagType[]> =>
                 },
             },
         },
-    }) as Promise<TagType[]>
+    })) as TagType[]
