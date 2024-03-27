@@ -2,7 +2,7 @@ export enum PostFilter {
     NEWEST = 'newest',
     POPULAR = 'popular',
     HOT = 'hot',
-    UNANSWERED = 'unanswered',
+    UNANSWERED = 'unanswered'
 }
 
 export type PostQuery = {
@@ -12,4 +12,11 @@ export type PostQuery = {
     search?: string
     page?: number
     limit?: number
+}
+
+export type TagQuery = {
+    filter?: 'popular'
+    search?: string
+    limit?: number
+    page?: number
 }
