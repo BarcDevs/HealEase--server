@@ -2,10 +2,11 @@ import { Express } from 'express'
 
 import authRoute from '../AuthRoute'
 import { errorHandler } from '../../middlewares/errorHandler'
+import { RequestLocals } from '../../types/RequestLocals'
 
 declare module 'express-serve-static-core' {
     interface Request {
-        locals: Record<string, unknown>
+        locals: RequestLocals
     }
 }
 
