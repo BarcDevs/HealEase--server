@@ -62,12 +62,9 @@ export const createPost = async (post: NewPostType): Promise<PostType> => {
 export const updatePost = async (
     id: string,
     post: UpdatePostType,
-): Promise<PostType> => {
-    // eslint-disable-next-line no-use-before-define
-    const prevTags = post.tags ? await getTagsByPostId(id) : undefined
-    const removeTags = prevTags?.filter((tag) => !post.tags?.includes(tag.name))
-
-    return (await Prisma.post.update({
+    removeTags?: TagType[],
+): Promise<PostType> =>
+    (await Prisma.post.update({
         where: {
             id,
         },
@@ -80,7 +77,6 @@ export const updatePost = async (
         },
         include: postInclude('single'),
     })) as unknown as PostType
-}
 
 export const deletePost = async (id: string) =>
     Prisma.post.delete({
@@ -89,7 +85,7 @@ export const deletePost = async (id: string) =>
         },
     })
 
-export const getTags = async (limit: 10, page: 0): Promise<TagType[]> =>
+export const getTags = async (limit = 10, page = 0): Promise<TagType[]> =>
     (await Prisma.tag.findMany({
         take: limit,
         skip: page * limit,
