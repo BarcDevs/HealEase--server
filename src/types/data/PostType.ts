@@ -31,7 +31,10 @@ export type NewPostType = {
 
 export type UpdatePostType = Partial<
     Omit<NewPostType, 'authorId'> & {
-        votes: Votes | string
+        vote?: {
+            userId: string
+            vote: 'up' | 'down'
+        }
         removeTags?: string[]
     }
 >
