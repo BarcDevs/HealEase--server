@@ -85,10 +85,22 @@ export const deletePost = async (id: string) =>
         }
     })
 
-export const getTags = async (limit = 10, page = 0): Promise<TagType[]> =>
+export const getReply = async (id: string): Promise<ReplyType | null> =>
+    (await Prisma.reply.findUnique({
+        where: {
+            id
+        }
+    })) as ReplyType | null
+
+export const getTags = async (
+    search = '',
+    limit = 10,
+    page = 0
+): Promise<TagType[]> =>
     (await Prisma.tag.findMany({
         take: limit,
-        skip: page * limit
+        skip: page * limit,
+        ...(search ? { where: { name: { contains: search } } } : {})
     })) as TagType[]
 
 export const getPopularTags = async (limit = 10): Promise<TagType[]> =>
