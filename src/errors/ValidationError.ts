@@ -1,6 +1,7 @@
 import { ValidationResult } from 'joi'
 import { CustomError } from './CustomError'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
+import { errorFactory } from './factory'
 
 class ValidationError extends CustomError {
     statusCode = HttpStatusCodes.FORBIDDEN
@@ -9,7 +10,7 @@ class ValidationError extends CustomError {
 
     constructor(
         message: string,
-        private property?: string,
+        private property?: string
     ) {
         super(message)
 
@@ -17,13 +18,16 @@ class ValidationError extends CustomError {
     }
 
     static catchValidationErrors = <T>(
-        validatedRes: ValidationResult<T>,
+        validatedRes: ValidationResult<T>
     ): T => {
         if (!validatedRes.error) return validatedRes.value as T
         const errorMessage = validatedRes.error!.message
         const errorProperty = validatedRes.error!.details[0].path[0]
 
-        throw new ValidationError(errorMessage, errorProperty as string)
+        throw errorFactory.validation.generic(
+            errorMessage,
+            errorProperty as string
+        )
     }
 
     serializeErrors() {
@@ -32,8 +36,8 @@ class ValidationError extends CustomError {
                 statusType: this.statusType,
                 statusCode: this.statusCode,
                 error: this.message,
-                property: this.property,
-            },
+                property: this.property
+            }
         ]
     }
 }
