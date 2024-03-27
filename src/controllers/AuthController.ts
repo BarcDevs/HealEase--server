@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { ValidationResult } from 'joi'
 
 import { AuthError } from '../errors/AuthError'
-import * as authServices from '../services/auth'
+import * as authServices from '../services/authService'
 import { loginSchema } from '../schemas/auth/loginSchema'
 import { signupSchema } from '../schemas/auth/signupSchema'
 import { forgetPasswordSchema } from '../schemas/auth/forgetPasswordSchema'
