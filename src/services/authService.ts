@@ -6,7 +6,8 @@ import { AuthError } from '../errors/AuthError'
 import { sendEmail } from '../utils/emailSender'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { authConfig } from '../../config'
-import { ServerUserType } from '../types/data/UserType'
+import { NewUserType, ServerUserType, UserType } from '../types/data/UserType'
+import { excludedUserFields } from '../constants/excludedUserFields'
 
 const getUser = async (by: 'email' | 'id', value: string) => {
     let user: ServerUserType | null
@@ -25,13 +26,21 @@ const getUser = async (by: 'email' | 'id', value: string) => {
     return user
 }
 
+const getCookiesOptions = () => ({
+    httpOnly: true,
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    sameSite: 'strict' as const,
+    secure: false,
+    maxAge: 1000 * 60 * 60 * 24
+})
+
 const generateResetPasswordOTP = (): { OTP: number; OTPExpiration: Date } => {
     const OTP = Math.floor(100000 + Math.random() * 900000)
     const OTPExpiration = new Date(Date.now() + authConfig.otp_expiration) // 10 minutes
 
     return {
         OTP,
-        OTPExpiration,
+        OTPExpiration
     }
 }
 
@@ -39,14 +48,14 @@ const removeResetPasswordOTP = async (userId: string): Promise<void> => {
     await authModel.setUserOTP(userId, {
         resetPasswordOTP: null,
         resetPasswordExpiration: null,
-        password_updated_at: new Date(Date.now()),
+        password_updated_at: new Date(Date.now())
     })
 }
 
 const verifyResetPasswordOTP = (
     resetPasswordOTP: number,
     resetPasswordExpiration: Date,
-    OTP: number,
+    OTP: number
 ): boolean => {
     const now = new Date()
     return now < resetPasswordExpiration && resetPasswordOTP === +OTP
@@ -61,13 +70,13 @@ const sendEmailWithOTP = async (email: string): Promise<boolean> => {
 
     await authModel.setUserOTP(user.id, {
         resetPasswordOTP: OTP,
-        resetPasswordExpiration: OTPExpiration,
+        resetPasswordExpiration: OTPExpiration
     })
 
     sendEmail(
         email,
         'Confirm Email',
-        `here is your OTP for confirm email: ${OTP}`,
+        `here is your OTP for confirm email: ${OTP}`
     )
 
     return true
@@ -88,7 +97,7 @@ const generateCSRFToken = () => {
 
     return {
         csrfSecret,
-        csrfToken,
+        csrfToken
     }
 }
 
@@ -107,9 +116,9 @@ const login = async (email: string, password: string): Promise<string> => {
     return createToken(user)
 }
 
-const register = async (newUser: ServerUserType): Promise<ServerUserType> => {
+const register = async (newUser: NewUserType): Promise<ServerUserType> => {
     const userExists: ServerUserType | null = await authModel.getUserByEmail(
-        newUser.email,
+        newUser.email
     )
 
     if (userExists)
@@ -117,7 +126,7 @@ const register = async (newUser: ServerUserType): Promise<ServerUserType> => {
             'User already exists!',
             'email',
             'Conflict',
-            HttpStatusCodes.CONFLICT,
+            HttpStatusCodes.CONFLICT
         )
 
     const PasswordHash = hashPassword(newUser.password)
@@ -129,9 +138,19 @@ const register = async (newUser: ServerUserType): Promise<ServerUserType> => {
 
 const resetPassword = async (
     userId: string,
-    newPassword: string,
+    newPassword: string
 ): Promise<ServerUserType> =>
     authModel.updateUser(userId, { password: hashPassword(newPassword) })
+
+const generateRandomUsername = () =>
+    `user${Math.floor(Math.random() * 100000000)}`
+
+const sanitizeUserData = (user: ServerUserType): UserType =>
+    Object.fromEntries(
+        Object.entries(user).filter(
+            ([key]) => !excludedUserFields.includes(key as keyof ServerUserType)
+        )
+    ) as UserType
 
 export {
     getUser,
@@ -145,4 +164,7 @@ export {
     hashPassword,
     comparePassword,
     generateCSRFToken,
+    getCookiesOptions,
+    generateRandomUsername,
+    sanitizeUserData
 }

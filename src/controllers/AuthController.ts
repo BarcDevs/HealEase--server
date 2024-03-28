@@ -1,144 +1,113 @@
 import { Request, Response } from 'express'
-import { ValidationResult } from 'joi'
-
-import { AuthError } from '../errors/AuthError'
 import * as authServices from '../services/authService'
+import {
+    generateRandomUsername,
+    getCookiesOptions,
+    sanitizeUserData
+} from '../services/authService'
 import { loginSchema } from '../schemas/auth/loginSchema'
 import { signupSchema } from '../schemas/auth/signupSchema'
 import { forgetPasswordSchema } from '../schemas/auth/forgetPasswordSchema'
 import { confirmEmailSchema } from '../schemas/auth/confirmEmailSchema'
 import { resetPasswordSchema } from '../schemas/auth/resetPasswordSchema'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
-import { ValidationError } from '../errors/ValidationError'
 import { ResponseType } from '../types/ResponseType'
 import { ServerUserType, UserType } from '../types/data/UserType'
+import { successResponse } from '../responses/success'
+import { ValidationError } from '../errors/ValidationError'
+import { errorFactory } from '../errors/factory'
 
 const login = async (req: Request, res: Response) => {
-    const { email, password } = req.body
-
-    const validated: ValidationResult = loginSchema.validate(req.body)
-
-    if (validated.error) {
-        const errorMessage = validated.error.message
-        const errorProperty = validated.error.details[0].path[0]
-
-        throw new ValidationError(errorMessage, errorProperty as string)
-    }
+    const { email, password } = ValidationError.catchValidationErrors(
+        loginSchema.validate(req.body)
+    )
 
     const token = await authServices.login(email, password)
     const { csrfSecret, csrfToken: _csrf } = authServices.generateCSRFToken()
 
-    const cookiesOptions = {
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        sameSite: 'strict' as const,
-        secure: false,
-        maxAge: 1000 * 60 * 60 * 24,
-    }
+    const cookiesOptions = getCookiesOptions()
 
     res.cookie('accessToken', token, cookiesOptions)
     res.cookie('_csrf', csrfSecret, cookiesOptions)
 
-    const response: ResponseType<{ token: string; _csrf: string }> = {
-        message: 'user logged in!',
-        data: { token, _csrf },
-    }
-    res.status(HttpStatusCodes.OK).json(response)
+    successResponse<{ token: string; _csrf: string }>(
+        res,
+        { token, _csrf },
+        'user logged in!'
+    )
 }
 
 const signup = async (req: Request, res: Response) => {
-    const validated: ValidationResult = signupSchema.validate(req.body)
+    const validated = ValidationError.catchValidationErrors(
+        signupSchema.validate(req.body)
+    )
 
-    if (validated.error) {
-        const errorMessage = validated.error.message
-        const errorProperty = validated.error.details[0].path[0]
-
-        throw new ValidationError(errorMessage, errorProperty as string)
-    }
-
-    const newUserCreated: UserType = await authServices.register(req.body)
+    const newUserCreated: ServerUserType = await authServices.register({
+        ...validated,
+        username: validated.username || generateRandomUsername()
+    })
 
     const response: ResponseType<{ user: UserType }> = {
         message: 'User created!',
         data: {
-            user: newUserCreated,
-        },
+            user: newUserCreated
+        }
     }
     res.status(HttpStatusCodes.CREATED).json(response)
+
+    successResponse<{ user: UserType }>(
+        res,
+        { user: sanitizeUserData(newUserCreated) },
+        'user created!'
+    )
 }
 
 const logout = async (_req: Request, res: Response) => {
     // remove cookie
     res.clearCookie('accessToken')
 
-    res.status(HttpStatusCodes.OK).json({
-        message: 'user logged out!',
-    })
+    successResponse(res, {}, 'user logged out!')
 }
 
 const me = async (req: Request, res: Response) => {
-    const { userId } = req.locals
+    const { userId } = req.locals || {}
 
-    const user: UserType | null = await authServices.getUser(
-        'id',
-        userId as string,
+    const user: ServerUserType | null = userId
+        ? await authServices.getUser('id', userId)
+        : null
+
+    if (!user) throw errorFactory.auth.unauthorized()
+
+    successResponse<{ user: UserType }>(
+        res,
+        { user: sanitizeUserData(user) },
+        'user info!'
     )
-
-    if (!user)
-        throw new AuthError(
-            'Unauthorized! please login first!',
-            undefined,
-            'Unauthorized',
-            HttpStatusCodes.UNAUTHORIZED,
-        )
-
-    const response: ResponseType<{ user: UserType }> = {
-        message: 'User info!',
-        data: {
-            user,
-        },
-    }
-    res.status(HttpStatusCodes.OK).json(response)
 }
 
 const forgotPassword = async (req: Request, res: Response) => {
-    const { email } = req.params
-
-    const validated: ValidationResult = forgetPasswordSchema.validate({
-        email,
-    })
-
-    if (validated.error) {
-        const errorMessage = validated.error.message
-        const errorProperty = validated.error.details[0].path[0]
-
-        throw new ValidationError(errorMessage, errorProperty as string)
-    }
+    const { email } = ValidationError.catchValidationErrors(
+        forgetPasswordSchema.validate(req.body)
+    )
 
     // send email to user with OTP for confirm email
     await authServices.sendEmailWithOTP(email)
 
-    res.status(HttpStatusCodes.OK).json({
-        message:
-            'We have sent you an email with an OTP to confirm your email! Please check your email.',
-    })
+    successResponse(
+        res,
+        {},
+        'We have sent you an email with an OTP to confirm your email! Please check your email.'
+    )
 }
 
 const confirmEmail = async (req: Request, res: Response) => {
-    const { OTP, email } = req.body
-
-    const validated: ValidationResult = confirmEmailSchema.validate(req.body)
-
-    if (validated.error) {
-        const errorMessage = validated.error.message
-        const errorProperty = validated.error.details[0].path[0]
-
-        throw new ValidationError(errorMessage, errorProperty as string)
-    }
+    const { OTP, email } = ValidationError.catchValidationErrors(
+        confirmEmailSchema.validate(req.body)
+    )
 
     const user: ServerUserType | null = await authServices.getUser(
         'email',
-        email,
+        email
     )
 
     const OTPValid =
@@ -146,35 +115,30 @@ const confirmEmail = async (req: Request, res: Response) => {
         authServices.verifyResetPasswordOTP(
             user.resetPasswordOTP!,
             user.resetPasswordExpiration!,
-            OTP,
+            OTP
         )
 
-    if (!OTPValid) throw new ValidationError('OTP is not valid!', 'OTP')
+    if (!OTPValid) throw errorFactory.validation.otpError()
 
-    const response: ResponseType<{ user: UserType }> = {
-        message: 'Your email is confirmed!',
-        data: {
-            user,
-        },
-    }
-    res.status(HttpStatusCodes.CREATED).json(response)
+    successResponse<{
+        user: UserType
+    }>(
+        res,
+        { user: sanitizeUserData(user) },
+        'Your email is confirmed!',
+        HttpStatusCodes.CREATED
+    )
 }
 
 const resetPassword = async (req: Request, res: Response) => {
-    const { email, newPassword, userOTP } = req.body
-
-    const validated: ValidationResult = resetPasswordSchema.validate(req.body)
-
-    if (validated.error) {
-        const errorMessage = validated.error.message
-        const errorProperty = validated.error.details[0].path[0]
-
-        throw new ValidationError(errorMessage, errorProperty as string)
-    }
+    const { email, newPassword, userOTP } =
+        ValidationError.catchValidationErrors(
+            resetPasswordSchema.validate(req.body)
+        )
 
     const user: ServerUserType | null = await authServices.getUser(
         'email',
-        email,
+        email
     )
 
     if (
@@ -182,27 +146,19 @@ const resetPassword = async (req: Request, res: Response) => {
         !authServices.verifyResetPasswordOTP(
             user.resetPasswordOTP!,
             user.resetPasswordExpiration!,
-            userOTP,
+            userOTP
         )
-    ) {
-        throw new AuthError(
-            'There is an error occurred! Please try again.',
-            undefined,
-            'Reset Password',
-        )
-    }
+    )
+        throw errorFactory.auth.resetPassword()
 
     await authServices.resetPassword(user.id, newPassword)
-
     await authServices.removeResetPasswordOTP(user.id)
 
-    const response: ResponseType<{ user: UserType }> = {
-        message: 'Password changed successfully!',
-        data: {
-            user,
-        },
-    }
-    res.status(HttpStatusCodes.OK).json(response)
+    successResponse<{ user: UserType }>(
+        res,
+        { user: sanitizeUserData(user) },
+        'Password has changed successfully!'
+    )
 }
 
 export {
@@ -212,5 +168,5 @@ export {
     me,
     forgotPassword,
     resetPassword,
-    confirmEmail,
+    confirmEmail
 }

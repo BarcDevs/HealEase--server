@@ -2,7 +2,8 @@ import { AuthError } from '../AuthError'
 import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 
 export class AuthFactory {
-    static generic = (message: string) => new AuthError(message)
+    static generic = (message?: string) =>
+        new AuthError(message ?? 'An error occurred! Please try again.')
 
     static credentials = (message?: string) =>
         new AuthError(
@@ -18,5 +19,20 @@ export class AuthFactory {
             undefined,
             'Unauthorized',
             HttpStatusCodes.UNAUTHORIZED
+        )
+
+    static forbidden = (message?: string) =>
+        new AuthError(
+            `Forbidden! ${message ?? 'please login first!'}`,
+            undefined,
+            'Forbidden',
+            HttpStatusCodes.FORBIDDEN
+        )
+
+    static resetPassword = (message?: string) =>
+        new AuthError(
+            `Could not reset password! ${message ?? 'please try again!'}`,
+            undefined,
+            'Reset Password'
         )
 }
