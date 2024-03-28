@@ -2,15 +2,16 @@ import { Router } from 'express'
 import { isAuthenticated } from '../middlewares/isAuthenticated'
 import { csrfMiddleware } from '../middlewares/csrf'
 import {
-    createPost,
-    createReply,
     getPost,
     getPosts,
-    getReply,
-    getTags,
-    getTag,
+    createPost,
     updatePost,
-    updateReply
+    deletePost,
+    getReply,
+    createReply,
+    updateReply,
+    getTags,
+    getTag
 } from '../controllers/FormController'
 
 const router = Router()
@@ -24,7 +25,7 @@ router
     .route('/posts/:postId')
     .get(getPost)
     .put(isAuthenticated, csrfMiddleware, updatePost)
-    .delete(isAuthenticated, csrfMiddleware, updatePost)
+    .delete(isAuthenticated, csrfMiddleware, deletePost)
 
 router
     .route('/posts/:postId/reply')
