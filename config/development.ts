@@ -1,8 +1,10 @@
 export default {
     env: 'development',
     server: {
-        port: 3000,
-        url: 'http://localhost:4000',
-        origin: 'http://localhost:5173'
-    }
+        port: 4000,
+        host: `localhost`,
+        protocol: `http`,
+        origin: 'http://localhost:5173',
+        apiVersion: 'v1'
+    },
 }
