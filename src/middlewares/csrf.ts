@@ -9,7 +9,7 @@ export const csrfMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
-    const { csrfToken } = req.body
+    const { csrfToken } = req.locals || {}
     const { _csrf } = req.cookies
 
     const isCSRFValid = csrfProtection.verify(_csrf, csrfToken || '')
