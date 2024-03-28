@@ -99,7 +99,15 @@ export const getTags = async (
     (await Prisma.tag.findMany({
         take: limit,
         skip: page * limit,
-        ...(search ? { where: { name: { contains: search } } } : {})
+        ...(search ? { where: { name: { contains: search } } } : {}),
+        include: {
+            _count: {
+                select: {
+                    posts: true,
+                    followers: true
+                }
+            }
+        }
     })) as TagType[]
 
 export const getTag = async (id: string): Promise<TagType | null> =>
