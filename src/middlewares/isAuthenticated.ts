@@ -1,21 +1,20 @@
-import { NextFunction, Response, Request } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { UserType } from '../types/data/UserType'
-import { AuthError } from '../errors/AuthError'
-import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { authConfig } from '../../config'
+import { errorFactory } from '../errors/factory'
 
 export const isAuthenticated = (
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
 ) => {
     try {
         const { accessToken } = req.cookies
 
         const { id } = jwt.verify(
             accessToken,
-            authConfig.jwtSecret!,
+            authConfig.jwtSecret!
         ) as Partial<UserType>
 
         req.locals = { userId: id }
@@ -24,11 +23,6 @@ export const isAuthenticated = (
     } catch (error) {
         res.clearCookie('accessToken')
 
-        throw new AuthError(
-            'User not authenticated!',
-            undefined,
-            'Unauthorized',
-            HttpStatusCodes.UNAUTHORIZED,
-        )
+        throw errorFactory.auth.unauthorized()
     }
 }
