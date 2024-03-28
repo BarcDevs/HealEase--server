@@ -9,7 +9,6 @@ import { updatePostSchema } from '../schemas/forum/updatePostSchema'
 import { errorFactory } from '../errors/factory'
 import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
 import { TagType } from '../types/data/TagType'
-import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
 export const getPosts = async (
     req: Request,
@@ -89,10 +88,7 @@ export const updatePost = async (
 
     if (!userId) throw errorFactory.auth.unauthorized()
 
-    if (!(await forumService.validateOwner('post', postId, userId)))
-        throw errorFactory.auth.unauthorized(
-            'you are not the author of this post!'
-        )
+    await forumService.validateOwner('post', postId, userId)
 
     const data = await forumService.updatePost(postId, validatedData)
     return successResponse<PostType>(res, data, `Post ${postId} updated`)
@@ -108,10 +104,7 @@ export const deletePost = async (
 
     if (!userId) throw errorFactory.auth.unauthorized()
 
-    if (!(await forumService.validateOwner('post', postId, userId)))
-        throw errorFactory.auth.unauthorized(
-            'you are not the author of this post!'
-        )
+    await forumService.validateOwner('post', postId, userId)
 
     await forumService.deletePost(postId)
     return successResponse(res, {}, `post ${postId} deleted!`)
