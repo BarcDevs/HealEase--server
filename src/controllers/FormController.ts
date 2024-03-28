@@ -30,7 +30,7 @@ export const getPosts = async (
         // todo throw next() error with generic error class
         return res.status(404).json({ message: 'posts not found' })
 
-    return successResponse<PostType[]>(res, data)
+    return successResponse<PostType[]>(res, data, `${data.length} posts found`)
 }
 
 export const createPost = async (
@@ -52,7 +52,7 @@ export const createPost = async (
         ...validatedData,
         authorId: userId
     })
-    return successResponse<PostType>(res, data)
+    return successResponse<PostType>(res, data, 'Post created successfully')
 }
 
 export const getPost = async (
@@ -60,16 +60,17 @@ export const getPost = async (
     res: Response,
     next: NextFunction
 ) => {
+    const { postId } = req.params
     const data = (await forumService.getPosts(
         undefined,
-        req.params.postId
+        postId
     )) as PostType | null
 
     if (!data)
         // todo throw next() error with generic error class
         return res.status(404).json({ message: 'post not found' })
 
-    return successResponse<PostType>(res, data)
+    return successResponse<PostType>(res, data, `Post ${postId} found`)
 }
 
 export const updatePost = async (
@@ -94,7 +95,7 @@ export const updatePost = async (
         )
 
     const data = await forumService.updatePost(postId, validatedData)
-    return successResponse<PostType>(res, data)
+    return successResponse<PostType>(res, data, `Post ${postId} updated`)
 }
 
 export const deletePost = async (
@@ -113,12 +114,7 @@ export const deletePost = async (
         )
 
     await forumService.deletePost(postId)
-    return successResponse(
-        res,
-        {},
-        `post ${postId} deleted!`,
-        HttpStatusCodes.NO_CONTENT
-    )
+    return successResponse(res, {}, `post ${postId} deleted!`)
 }
 
 export const createReply = async (
@@ -152,7 +148,7 @@ export const getTags = async (
 
     const data = await forumService.getTags(validatedQuery)
 
-    return successResponse<TagType[]>(res, data)
+    return successResponse<TagType[]>(res, data, `${data.length} tags found`)
 }
 
 export const getTag = async (
@@ -166,5 +162,5 @@ export const getTag = async (
 
     if (!data) throw Error('not found')
 
-    return successResponse<TagType>(res, data)
+    return successResponse<TagType>(res, data, `tag ${tagId} found`)
 }
