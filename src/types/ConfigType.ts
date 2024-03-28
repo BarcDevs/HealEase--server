@@ -5,6 +5,7 @@ type ServerConfig = {
     port: number
     host: string
     protocol: string
+    apiVersion: string
 }
 
 type AppConfig = {

@@ -8,7 +8,8 @@ export default {
         host: `localhost`,
         protocol: `http`,
         url: '{protocol}://{host}:{port}',
-        origin: 'http://localhost:5173'
+        origin: 'http://localhost:5173',
+        apiVersion: 'v1'
     },
     auth: {
         jwtSecret: 'JWT_SECRET',

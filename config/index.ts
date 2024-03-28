@@ -7,7 +7,8 @@ const serverConfig: ServerConfig = {
     url: config.get<string>('server.url'),
     port: config.get<number>('server.port'),
     host: config.get<string>('server.host'),
-    protocol: config.get<string>('server.protocol')
+    protocol: config.get<string>('server.protocol'),
+    apiVersion: config.get<string>('server.apiVersion')
 }
 
 const appConfig: AppConfig = {
