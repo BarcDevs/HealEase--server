@@ -5,8 +5,6 @@ import * as forumService from '../services/forumService'
 import { PostType } from '../types/data/PostType'
 import { successResponse } from '../responses/success'
 import { newPostSchema } from '../schemas/forum/newPostSchema'
-import { AuthError } from '../errors/AuthError'
-import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { updatePostSchema } from '../schemas/forum/updatePostSchema'
 import { errorFactory } from '../errors/factory'
 import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
@@ -47,13 +45,7 @@ export const createPost = async (
     )
     const { userId } = req.locals || {}
 
-    if (!userId)
-        throw new AuthError(
-            'Unauthorized! please login first!',
-            undefined,
-            'Unauthorized',
-            HttpStatusCodes.UNAUTHORIZED
-        ) // todo AuthError builder
+    if (!userId) throw errorFactory.auth.unauthorized()
 
     const data = await forumService.createPost({
         ...validatedData,
@@ -85,7 +77,10 @@ export const updatePost = async (
     next: NextFunction
 ) => {
     const validatedData = ValidationError.catchValidationErrors(
-        updatePostSchema.validate(req.body)
+        updatePostSchema.validate({
+            ...req.body,
+            tags: req.body.tags.split(',')
+        })
     )
     const { postId } = req.params
     const { userId } = req.locals || {}
