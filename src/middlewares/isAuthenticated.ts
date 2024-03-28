@@ -17,7 +17,10 @@ export const isAuthenticated = (
             authConfig.jwtSecret!
         ) as Partial<UserType>
 
-        req.locals = { userId: id }
+        req.locals = {
+            ...req.locals,
+            userId: id
+        }
 
         next()
     } catch (error) {
