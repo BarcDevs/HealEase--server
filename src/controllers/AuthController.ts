@@ -38,27 +38,20 @@ const login = async (req: Request, res: Response) => {
 }
 
 const signup = async (req: Request, res: Response) => {
-    const validated = ValidationError.catchValidationErrors(
+    const userData = ValidationError.catchValidationErrors(
         signupSchema.validate(req.body)
     )
 
     const newUserCreated: ServerUserType = await authServices.register({
-        ...validated,
-        username: validated.username || generateRandomUsername()
+        ...userData,
+        username: userData.username || generateRandomUsername()
     })
-
-    const response: ResponseType<{ user: UserType }> = {
-        message: 'User created!',
-        data: {
-            user: newUserCreated
-        }
-    }
-    res.status(HttpStatusCodes.CREATED).json(response)
 
     successResponse<{ user: UserType }>(
         res,
         { user: sanitizeUserData(newUserCreated) },
-        'user created!'
+        'user created!',
+        HttpStatusCodes.CREATED
     )
 }
 

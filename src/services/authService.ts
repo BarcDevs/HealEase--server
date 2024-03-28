@@ -143,7 +143,7 @@ const resetPassword = async (
     authModel.updateUser(userId, { password: hashPassword(newPassword) })
 
 const generateRandomUsername = () =>
-    `user${Math.floor(Math.random() * 100000000)}`
+    `user${Math.floor(Math.random() * 100000000000)}`
 
 const sanitizeUserData = (user: ServerUserType): UserType =>
     Object.fromEntries(
