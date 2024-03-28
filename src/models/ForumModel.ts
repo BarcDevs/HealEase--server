@@ -102,6 +102,16 @@ export const getTags = async (
         ...(search ? { where: { name: { contains: search } } } : {})
     })) as TagType[]
 
+export const getTag = async (id: string): Promise<TagType | null> =>
+    (await Prisma.tag.findUnique({
+        where: {
+            id
+        },
+        include: {
+            posts: true // todo limit posts
+        }
+    })) as TagType | null
+
 export const getPopularTags = async (limit = 10): Promise<TagType[]> =>
     (await Prisma.tag.findMany({
         orderBy: {

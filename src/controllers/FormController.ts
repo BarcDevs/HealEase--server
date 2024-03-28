@@ -129,3 +129,17 @@ export const getTags = async (
 
     return successResponse<TagType[]>(res, data)
 }
+
+export const getTag = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { tagId } = req.params
+
+    const data = await forumService.getTag(tagId)
+
+    if (!data) throw Error('not found')
+
+    return successResponse<TagType>(res, data)
+}

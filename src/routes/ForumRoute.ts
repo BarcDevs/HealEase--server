@@ -8,6 +8,7 @@ import {
     getPosts,
     getReply,
     getTags,
+    getTag,
     updatePost,
     updateReply
 } from '../controllers/FormController'
@@ -36,5 +37,7 @@ router
     .delete(isAuthenticated, csrfMiddleware, updateReply)
 
 router.route('/tags').get(getTags)
+
+router.route('/tags/:tagId').get(getTag)
 
 export default router

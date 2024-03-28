@@ -40,3 +40,5 @@ export const getTags = async (
         : options.filter === 'popular'
           ? forumModel.getPopularTags(options.limit)
           : forumModel.getTags(options.search, options.limit, options.page)
+
+export const getTag = async (id: string) => forumModel.getTag(id)
