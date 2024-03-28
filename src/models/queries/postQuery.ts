@@ -22,8 +22,8 @@ export const postInclude = (type: 'single' | 'multiple') => ({
         select: {
             id: true,
             username: true,
-            firstName: type === 'single',
-            lastName: type === 'single',
+            firstName: true,
+            lastName: true,
             image: true
         }
     },
