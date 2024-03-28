@@ -7,7 +7,7 @@ import { TagType } from '../types/data/TagType'
 import { ReplyType } from '../types/data/ReplyType'
 
 export const getPosts = async (query?: PostQuery): Promise<PostType[]> => {
-    const postQuery = query ? postQueryBuilder(query) : {}
+    const postQuery = postQueryBuilder(query)
 
     return (await Prisma.post.findMany({
         take: query?.limit || 10,
