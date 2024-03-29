@@ -1,5 +1,6 @@
 import joi from 'joi'
 import { NewUserType } from '../../types/data/UserType'
+import { PASSWORD_FORMAT } from './passwordFormat'
 
 export const signupSchema = joi.object<NewUserType>({
     firstName: joi.string().alphanum().required(),
@@ -9,5 +10,5 @@ export const signupSchema = joi.object<NewUserType>({
         .string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
         .required(),
-    password: joi.string().alphanum().min(8).required()
+    password: joi.string().regex(PASSWORD_FORMAT).min(8).required()
 })
