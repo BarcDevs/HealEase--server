@@ -32,7 +32,7 @@ const extractCsrfToken = (req: Request) => {
     }
 }
 
-const sanitize = (data: unknown): unknown => {
+const sanitize = (data: string | object): string | object => {
     if (!data) return data
     if (typeof data === 'string') return DOMPurify.sanitize(data)
 
@@ -41,7 +41,7 @@ const sanitize = (data: unknown): unknown => {
     if (typeof data === 'object') {
         return Object.entries(data as Record<string, unknown>).reduce(
             (acc, [key, value]) => {
-                acc[key] = sanitize(value)
+                acc[key] = sanitize(value as string | object)
                 return acc
             },
             {} as Record<string, unknown>
@@ -55,7 +55,9 @@ export const sanitizeData = (
     _res: Response,
     next: NextFunction
 ) => {
-    req.body = sanitize(req.body)
+    Object.keys(req.body).forEach((key) => {
+        req.body[key] = sanitize(req.body[key])
+    })
 
     extractCsrfToken(req)
 
