@@ -6,17 +6,17 @@ const transporter = nodemailer.createTransport({
     secure: emailConfig.secure,
     port: emailConfig.port,
     auth: {
-        user: emailConfig.emailUser,
-        pass: emailConfig.emailPass,
-    },
+        user: emailConfig.emailUser!,
+        pass: emailConfig.emailPass!
+    }
 })
 
 const sendEmail = (email: string, subject: string, text: string) => {
     const mailOptions = {
-        from: emailConfig.emailUser,
+        from: emailConfig.emailUser!,
         to: email,
         subject,
-        text,
+        text
     }
 
     transporter.sendMail(mailOptions, (error, info) => {
