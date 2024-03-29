@@ -16,9 +16,9 @@ export const getPosts = async (
     next: NextFunction
 ) => {
     const validatedQuery =
-        req.body &&
+        req.params &&
         ValidationError.catchValidationErrors(
-            postQuerySchema.validate(req.body)
+            postQuerySchema.validate(req.params)
         )
 
     const data = (await forumService.getPosts(validatedQuery)) as
