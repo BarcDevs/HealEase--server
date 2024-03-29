@@ -7,6 +7,7 @@ const serverConfig: ServerConfig = {
     url: config.get<string>('server.url'),
     port: config.get<number>('server.port'),
     host: config.get<string>('server.host'),
+    origin: config.get<string>('server.origin'),
     protocol: config.get<string>('server.protocol'),
     apiVersion: config.get<string>('server.apiVersion')
 }

@@ -9,13 +9,19 @@ import cookieParser from 'cookie-parser'
 import { loggerMiddleware } from './loggerMiddleWare'
 import { sanitizeData } from './sanitaization'
 import { rateLimiter } from './rate-limiting'
+import { serverConfig } from '../../config'
 
 export const declareMiddlewares = (app: Express) => {
     // Middlewares
     app.use(cookieParser())
     app.use(helmet())
     app.use(compression())
-    app.use(cors())
+    app.use(
+        cors({
+            credentials: true,
+            origin: [serverConfig.origin]
+        })
+    )
     app.use(morgan('dev'))
     app.use(express.json())
     app.use(express.urlencoded({ extended: false }))

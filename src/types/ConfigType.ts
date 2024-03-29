@@ -4,6 +4,7 @@ type ServerConfig = {
     url: string
     port: number
     host: string
+    origin: string
     protocol: string
     apiVersion: string
 }
