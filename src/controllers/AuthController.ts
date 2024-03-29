@@ -55,6 +55,15 @@ const signup = async (req: Request, res: Response) => {
     )
 }
 
+const getCsrfToken = async (req: Request, res: Response) => {
+    const { csrfSecret, csrfToken: _csrf } = authServices.generateCSRFToken()
+    const cookiesOptions = getCookiesOptions()
+
+    res.cookie('_csrf', csrfSecret, cookiesOptions)
+
+    successResponse<{ _csrf: string }>(res, { _csrf }, 'CSRF token generated!')
+}
+
 const logout = async (_req: Request, res: Response) => {
     // remove cookie
     res.clearCookie('accessToken')
@@ -161,5 +170,6 @@ export {
     me,
     forgotPassword,
     resetPassword,
-    confirmEmail
+    confirmEmail,
+    getCsrfToken
 }

@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
     confirmEmail,
     forgotPassword,
+    getCsrfToken,
     login,
     logout,
     me,
@@ -17,6 +18,8 @@ const router = Router()
 router.route('/login').post(login)
 
 router.route('/signup').post(signup)
+
+router.route('/csrf').get(isAuthenticated, getCsrfToken)
 
 router.route('/logout').get(logout)
 
