@@ -2,16 +2,25 @@ import { PostQuery, TagQuery } from '../types/query'
 import * as forumModel from '../models/ForumModel'
 import { getTagsByPostId } from '../models/ForumModel'
 import { NewPostType, UpdatePostType } from '../types/data/PostType'
+import { errorFactory } from '../errors/factory'
 
 export const validateOwner = async (
     schema: 'post' | 'reply',
     id: string,
     userId: string
 ) => {
-    if (schema === 'post')
-        return (await forumModel.getPost(id))?.author?.id === userId
-    return (await forumModel.getReply(id))?.author?.id === userId
+    const data =
+        schema === 'post'
+            ? await forumModel.getPost(id)
+            : await forumModel.getReply(id)
+
+    if (!data) throw new Error(`${schema} not found`)
+    if (data.authorId !== userId)
+        throw errorFactory.auth.unauthorized(
+            `you are not the author of this ${schema}!`
+        )
 }
+
 export const getPosts = async (query?: PostQuery, id?: string) => {
     if (id) return forumModel.getPost(id)
     return forumModel.getPosts(query)
