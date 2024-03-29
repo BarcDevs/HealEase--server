@@ -6,7 +6,7 @@ import {
     logout,
     me,
     resetPassword,
-    signup,
+    signup
 } from '../controllers/AuthController'
 import { cacheMiddleware } from '../middlewares/cache'
 import { isAuthenticated } from '../middlewares/isAuthenticated'
@@ -14,7 +14,7 @@ import { csrfMiddleware } from '../middlewares/csrf'
 
 const router = Router()
 
-router.route('/login').get(login)
+router.route('/login').post(login)
 
 router.route('/signup').post(signup)
 
