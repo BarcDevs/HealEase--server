@@ -20,10 +20,34 @@ const extractCsrfToken = (req: Request) => {
         }
 
         // remove csrf token from body
-        req.body = Object.fromEntries(
-            Object.entries(req.body).filter(([key]) => key !== 'csrfToken')
+        req.body = Object.entries(req.body).reduce(
+            (acc, [key, value]) => {
+                if (key !== 'csrfToken') {
+                    acc[key] = value
+                }
+                return acc
+            },
+            {} as Record<string, unknown>
         )
     }
+}
+
+const sanitize = (data: unknown): unknown => {
+    if (!data) return data
+    if (typeof data === 'string') return DOMPurify.sanitize(data)
+
+    if (Array.isArray(data)) return data.map(sanitize)
+
+    if (typeof data === 'object') {
+        return Object.entries(data as Record<string, unknown>).reduce(
+            (acc, [key, value]) => {
+                acc[key] = sanitize(value)
+                return acc
+            },
+            {} as Record<string, unknown>
+        )
+    }
+    return data
 }
 
 export const sanitizeData = (
@@ -31,16 +55,14 @@ export const sanitizeData = (
     _res: Response,
     next: NextFunction
 ) => {
+    req.body = sanitize(req.body)
+
     extractCsrfToken(req)
 
     if (isBodyEmpty(req)) {
         req.body = null
         return next()
     }
-
-    Object.keys(req.body).forEach((key) => {
-        req.body[key] = DOMPurify.sanitize(req.body[key])
-    })
 
     return next()
 }

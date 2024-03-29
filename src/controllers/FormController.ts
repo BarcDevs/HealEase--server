@@ -38,10 +38,7 @@ export const createPost = async (
     next: NextFunction
 ) => {
     const validatedData = ValidationError.catchValidationErrors(
-        newPostSchema.validate({
-            ...req.body,
-            tags: req.body.tags.split(',')
-        })
+        newPostSchema.validate(req.body)
     )
     const { userId } = req.locals || {}
 
@@ -78,10 +75,7 @@ export const updatePost = async (
     next: NextFunction
 ) => {
     const validatedData = ValidationError.catchValidationErrors(
-        updatePostSchema.validate({
-            ...req.body,
-            tags: req.body.tags.split(',')
-        })
+        updatePostSchema.validate(req.body)
     )
     const { postId } = req.params
     const { userId } = req.locals || {}
