@@ -13,8 +13,8 @@
     "scripts": {
         "start": "NODE_ENV=default nodemon src/app.ts",
         "start:dev": "NODE_ENV=development nodemon src/app.ts",
-        "start:prod": "NODE_ENV=production nodemon build/index.bundle.js",
-        "build": "npm run prisma:generate && npm run prisma:migrate && webpack",
+        "start:prod": "NODE_ENV=production node build/index.bundle.js",
+        "prod": "npm run prisma:generate && npm run prisma:deploy && webpack",
         "test": "NODE_ENV=test jest --watchAll --detectOpenHandles --forceExit --coverage",
         "format": "prettier --write 09",
         "lint:check": "eslint 09",
@@ -22,6 +22,7 @@
         "prepare": "husky install",
         "prisma:generate": "npx prisma generate",
         "prisma:migrate": "npx prisma migrate dev --name init",
+        "prisma:deploy": "npx prisma migrate deploy",
         "prisma:studio": "npx prisma studio"
     },
     "keywords": [],
