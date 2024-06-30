@@ -1,11 +1,11 @@
 import { PostType } from './PostType'
-import { ExcludedUserType } from './UserType'
 import { Votes } from './Votes'
+import { UserType } from './UserType'
 
 export type ReplyType = {
     id: string
     body: string
-    author: Partial<ExcludedUserType>
+    author: Partial<UserType>
     authorId: string
     createdAt: Date
     updatedAt?: Date
