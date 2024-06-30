@@ -5,6 +5,7 @@ import 'express-async-errors'
 import { declareMiddlewares } from './middlewares'
 import { declareRoutes } from './routes/declare_routes'
 import { appConfig, serverConfig } from '../config'
+import exposeProductionApp from './middlewares/exposeProductionApp'
 
 dotenv.config()
 
@@ -16,6 +17,7 @@ const app: Express = express()
 declareMiddlewares(app)
 
 declareRoutes(app)
+exposeProductionApp(app)
 
 app.listen(port, host, () => {
     const serverUrl = url

@@ -1,4 +1,4 @@
-import express, { Express } from 'express'
+import { Express } from 'express'
 
 import { errorHandler } from '../../middlewares/errorHandler'
 import { RequestLocals } from '../../types/RequestLocals'
@@ -14,7 +14,7 @@ declare module 'express-serve-static-core' {
 }
 
 export const declareRoutes = (app: Express) => {
-    app.get('/', getServerStatus)
+    app.get('/api/status', getServerStatus)
 
     app.use(`/api/${serverConfig.apiVersion}/forum`, forumRoute)
     app.use(`/api/${serverConfig.apiVersion}/auth`, authRoute)
