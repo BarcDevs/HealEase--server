@@ -23,7 +23,8 @@
         "prisma:generate": "npx prisma generate",
         "prisma:migrate": "npx prisma migrate dev --name init",
         "prisma:deploy": "npx prisma migrate deploy",
-        "prisma:studio": "npx prisma studio"
+        "prisma:studio": "npx prisma studio",
+        "install": "npm i --legacy-peer-deps"
     },
     "keywords": [],
     "author": "",
