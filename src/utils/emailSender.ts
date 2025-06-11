@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer'
 import { emailConfig } from '../../config'
 
 const transporter = nodemailer.createTransport({
+    host: emailConfig.host,
     service: emailConfig.service,
     secure: emailConfig.secure,
     port: emailConfig.port,

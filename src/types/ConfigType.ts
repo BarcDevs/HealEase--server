@@ -14,6 +14,7 @@ type AppConfig = {
 }
 
 type EmailConfig = {
+    host: string
     service: string
     port: number
     secure: boolean

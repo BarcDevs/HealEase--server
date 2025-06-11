@@ -17,7 +17,8 @@ export default {
         otp_expiration: 1000 * 60 * 10
     },
     email: {
-        service: 'gmail.com',
+        host: 'sandbox.smtp.mailtrap.io',
+        service: 'Mailtrap',
         port: 465,
         secure: false,
         emailUser: 'EMAIL_USER',
