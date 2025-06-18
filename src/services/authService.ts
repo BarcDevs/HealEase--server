@@ -84,7 +84,9 @@ const sendEmailWithOTP = async (email: string): Promise<boolean> => {
 
 const createToken = (user: ServerUserType): string => {
     const payload = { id: user.id, email: user.email }
-    const options = { expiresIn: authConfig.expiresIn }
+    const options: jwt.SignOptions = {
+        expiresIn: authConfig.expiresIn as jwt.SignOptions['expiresIn']
+    }
 
     return jwt.sign(payload, authConfig.jwtSecret!, options)
 }
