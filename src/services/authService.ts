@@ -10,6 +10,8 @@ import { authConfig } from '../../config'
 import { NewUserType, ServerUserType, UserType } from '../types/data/UserType'
 import { excludedUserFields } from '../constants/excludedUserFields'
 
+const csrfProtection = new Csrf()
+
 const getUser = async (by: 'email' | 'id', value: string) => {
     let user: ServerUserType | null
     switch (by) {
@@ -93,8 +95,6 @@ const createToken = (user: ServerUserType): string => {
 }
 
 const generateCSRFToken = () => {
-    const csrfProtection = new Csrf()
-
     const csrfSecret = csrfProtection.secretSync()
     const csrfToken = csrfProtection.create(csrfSecret)
 

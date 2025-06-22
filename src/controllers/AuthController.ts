@@ -24,10 +24,13 @@ const login = async (req: Request, res: Response) => {
     const token = await authServices.login(email, password)
     const { csrfSecret, csrfToken: _csrf } = authServices.generateCSRFToken()
 
-    const cookiesOptions = getCookiesOptions()
+    const cookiesOptions = getCookiesOptions(remember)
 
     res.cookie('accessToken', token, cookiesOptions)
-    res.cookie('_csrf', csrfSecret, cookiesOptions)
+    res.cookie('csrfToken', csrfSecret, {
+        ...cookiesOptions,
+        maxAge: 60 * 60 * 1000
+    })
 
     successResponse<{ token: string; _csrf: string }>(
         res,
@@ -56,7 +59,7 @@ const signup = async (req: Request, res: Response) => {
 
 const getCsrfToken = async (req: Request, res: Response) => {
     const { csrfSecret, csrfToken: _csrf } = authServices.generateCSRFToken()
-    const cookiesOptions = getCookiesOptions()
+    const cookiesOptions = getCookiesOptions(false)
 
     res.cookie('_csrf', csrfSecret, cookiesOptions)
 
