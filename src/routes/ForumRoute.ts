@@ -12,7 +12,7 @@ import {
     updateReply,
     getTags,
     getTag
-} from '../controllers/FormController'
+} from '../controllers/ForumController'
 
 const router = Router()
 
