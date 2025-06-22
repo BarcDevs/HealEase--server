@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import Csrf from 'csrf'
+import { CookieOptions } from 'express'
 import * as authModel from '../models/AuthModel'
 import { AuthError } from '../errors/AuthError'
 import { sendEmail } from '../utils/emailSender'
@@ -26,13 +27,13 @@ const getUser = async (by: 'email' | 'id', value: string) => {
     return user
 }
 
-const getCookiesOptions = () => ({
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-    sameSite: 'strict' as const,
-    secure: false,
-    maxAge: 1000 * 60 * 60 * 24
-})
+const getCookiesOptions = (remember: boolean) =>
+    ({
+        httpOnly: true,
+        sameSite: 'strict' as const,
+        secure: false,
+        maxAge: remember ? authConfig.expiresIn : 1000 * 60 * 60
+    }) as CookieOptions
 
 const generateResetPasswordOTP = (): { OTP: number; OTPExpiration: Date } => {
     const OTP = Math.floor(100000 + Math.random() * 900000)

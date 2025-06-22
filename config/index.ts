@@ -18,7 +18,7 @@ const appConfig: AppConfig = {
 
 const authConfig: AuthConfig = {
     jwtSecret: config.get<string>('auth.jwtSecret'),
-    expiresIn: config.get<string>('auth.expiresIn'),
+    expiresIn: config.get<number>('auth.expiresIn'),
     otp_expiration: config.get<number>('auth.otp_expiration')
 }
 

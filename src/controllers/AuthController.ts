@@ -17,7 +17,7 @@ import { ValidationError } from '../errors/ValidationError'
 import { errorFactory } from '../errors/factory'
 
 const login = async (req: Request, res: Response) => {
-    const { email, password } = ValidationError.catchValidationErrors(
+    const { email, password, remember } = ValidationError.catchValidationErrors(
         loginSchema.validate(req.body)
     )
 

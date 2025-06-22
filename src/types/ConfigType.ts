@@ -24,7 +24,7 @@ type EmailConfig = {
 
 type AuthConfig = {
     jwtSecret: string
-    expiresIn: string
+    expiresIn: number
     otp_expiration: number
 }
 
