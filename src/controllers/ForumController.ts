@@ -9,6 +9,8 @@ import { updatePostSchema } from '../schemas/forum/updatePostSchema'
 import { errorFactory } from '../errors/factory'
 import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
 import { TagType } from '../types/data/TagType'
+import { ReplyType } from '../types/data/ReplyType'
+import { newReplySchema } from '../schemas/forum/newReplySchema'
 
 export const getPosts = async (
     req: Request,
@@ -108,7 +110,22 @@ export const createReply = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {}
+) => {
+    const validatedData = ValidationError.catchValidationErrors(
+        newReplySchema.validate(req.body)
+    )
+    const { userId } = req.locals || {}
+    const { postId } = req.params
+
+    if (!userId) throw errorFactory.auth.unauthorized()
+
+    const data = await forumService.createReply({
+        ...validatedData,
+        postId,
+        authorId: userId
+    })
+    return successResponse<ReplyType>(res, data, 'Reply created successfully')
+}
 
 export const getReply = async (
     req: Request,

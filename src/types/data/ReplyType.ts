@@ -13,3 +13,9 @@ export type ReplyType = {
     post?: PostType
     postId?: string
 }
+
+export type NewReplyType = {
+    body: string
+    authorId: string
+    postId?: string
+}

@@ -3,6 +3,7 @@ import * as forumModel from '../models/ForumModel'
 import { getTagsByPostId } from '../models/ForumModel'
 import { NewPostType, UpdatePostType } from '../types/data/PostType'
 import { errorFactory } from '../errors/factory'
+import { NewReplyType } from '../types/data/ReplyType'
 
 export const validateOwner = async (
     schema: 'post' | 'reply',
@@ -51,3 +52,6 @@ export const getTags = async (
           : forumModel.getTags(options.search, options.limit, options.page)
 
 export const getTag = async (id: string) => forumModel.getTag(id)
+
+export const createReply = async (reply: NewReplyType) =>
+    forumModel.createReply(reply)

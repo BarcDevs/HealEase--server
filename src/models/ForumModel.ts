@@ -4,7 +4,7 @@ import Prisma from '../utils/PrismaClient'
 import { connectTags, postInclude, postQueryBuilder } from './queries/postQuery'
 import { NewPostType, PostType, UpdatePostType } from '../types/data/PostType'
 import { TagType } from '../types/data/TagType'
-import { ReplyType } from '../types/data/ReplyType'
+import { NewReplyType, ReplyType } from '../types/data/ReplyType'
 
 export const getPosts = async (query?: PostQuery): Promise<PostType[]> => {
     const postQuery = postQueryBuilder(query)
@@ -140,3 +140,23 @@ export const getTagsByPostId = async (id: string): Promise<TagType[]> =>
             }
         }
     })) as TagType[]
+
+export const createReply = async (reply: NewReplyType): Promise<ReplyType> => {
+    const { authorId, postId, body } = reply
+
+    return (await Prisma.reply.create({
+        data: {
+            body,
+            author: {
+                connect: {
+                    id: authorId
+                }
+            },
+            post: {
+                connect: {
+                    id: postId
+                }
+            }
+        } as PrismaTypes.ReplyCreateInput
+    })) as unknown as ReplyType
+}
