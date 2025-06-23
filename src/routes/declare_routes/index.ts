@@ -6,6 +6,7 @@ import { getServerStatus } from '../../controllers/ServerController'
 import { serverConfig } from '../../../config'
 import authRoute from '../AuthRoute'
 import forumRoute from '../ForumRoute'
+import bulkRoute from '../bukActionsRoute'
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -20,6 +21,8 @@ export const declareRoutes = (app: Express) => {
 
     app.use(baseRoute('forum'), forumRoute)
     app.use(baseRoute('auth'), authRoute)
+
+    app.use(`/api/${serverConfig.apiVersion}/bulk`, bulkRoute)
 
     app.use('*', errorHandler)
 }
