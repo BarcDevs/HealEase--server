@@ -13,11 +13,13 @@ declare module 'express-serve-static-core' {
     }
 }
 
+const baseRoute = (route: string) => `/api/${serverConfig.apiVersion}/${route}`
+
 export const declareRoutes = (app: Express) => {
     app.get('/api/status', getServerStatus)
 
-    app.use(`/api/${serverConfig.apiVersion}/forum`, forumRoute)
-    app.use(`/api/${serverConfig.apiVersion}/auth`, authRoute)
+    app.use(baseRoute('forum'), forumRoute)
+    app.use(baseRoute('auth'), authRoute)
 
     app.use('*', errorHandler)
 }
