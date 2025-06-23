@@ -27,7 +27,7 @@ const login = async (req: Request, res: Response) => {
     const cookiesOptions = getCookiesOptions(remember)
 
     res.cookie('accessToken', token, cookiesOptions)
-    res.cookie('csrfToken', csrfSecret, {
+    res.cookie('_csrf', csrfSecret, {
         ...cookiesOptions,
         maxAge: 60 * 60 * 1000
     })
