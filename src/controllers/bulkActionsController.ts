@@ -3,6 +3,7 @@ import { NewPostType, PostType } from '../types/data/PostType'
 import { errorFactory } from '../errors/factory'
 import * as forumService from '../services/forumService'
 import { successResponse } from '../responses/success'
+import { NewReplyType, ReplyType } from '../types/data/ReplyType'
 
 export const bulkCreatePosts = async (
     req: Request,
@@ -30,5 +31,37 @@ export const bulkCreatePosts = async (
         res,
         createdPosts,
         'Posts created successfully'
+    )
+}
+
+export const bulkCreateReplies = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const replies = req.body as Array<NewReplyType>
+
+    if (!Array.isArray(replies) || replies.length === 0) {
+        throw new Error('Invalid or empty replies array')
+    }
+
+    const createdReplies = await Promise.all(
+        replies.map(async (reply) => {
+            if (!reply.authorId || !reply.postId) {
+                throw errorFactory.auth.unauthorized(
+                    'Reply is missing authorId or postId'
+                )
+            }
+
+            return forumService.createReply({
+                ...reply
+            })
+        })
+    )
+
+    return successResponse<ReplyType[]>(
+        res,
+        createdReplies,
+        'Replies created successfully'
     )
 }
