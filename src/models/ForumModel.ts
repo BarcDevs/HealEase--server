@@ -84,10 +84,25 @@ export const deletePost = async (id: string) =>
         }
     })
 
-export const getReply = async (id: string): Promise<ReplyType | null> =>
+export const getReply = async (
+    replyId: string,
+    postId: string
+): Promise<ReplyType | null> =>
     (await Prisma.reply.findUnique({
         where: {
-            id
+            id: replyId,
+            postId
+        },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    username: true,
+                    firstName: true,
+                    lastName: true,
+                    image: true
+                }
+            }
         }
     })) as ReplyType | null
 

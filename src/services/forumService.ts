@@ -8,12 +8,16 @@ import { NewReplyType } from '../types/data/ReplyType'
 export const validateOwner = async (
     schema: 'post' | 'reply',
     id: string,
-    userId: string
+    userId: string,
+    postId?: string
 ) => {
+    if (schema === 'reply' && !postId)
+        throw new Error('postId is required for getting a reply')
+
     const data =
         schema === 'post'
             ? await forumModel.getPost(id)
-            : await forumModel.getReply(id)
+            : await forumModel.getReply(id, postId!)
 
     if (!data) throw new Error(`${schema} not found`)
     if (data.authorId !== userId)
@@ -55,3 +59,6 @@ export const getTag = async (id: string) => forumModel.getTag(id)
 
 export const createReply = async (reply: NewReplyType) =>
     forumModel.createReply(reply)
+
+export const getReplies = async (postId: string, replyId: string) =>
+    forumModel.getReply(replyId, postId)

@@ -131,7 +131,19 @@ export const getReply = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {}
+) => {
+    const { replyId, postId } = req.params
+    const data = (await forumService.getReplies(
+        postId,
+        replyId
+    )) as ReplyType | null
+
+    if (!data)
+        // todo throw next() error with generic error class
+        return res.status(404).json({ message: 'reply not found' })
+
+    return successResponse<ReplyType>(res, data, `Reply ${replyId} found`)
+}
 
 export const updateReply = async (
     req: Request,
