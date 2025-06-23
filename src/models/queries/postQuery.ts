@@ -109,18 +109,24 @@ export const postQueryBuilder = (
         include: postInclude('multiple'),
 
         // sort by given sort method
-        orderBy: (query?.filter === PostFilter.HOT
+        orderBy: (query?.filter === PostFilter.NEWEST
             ? {
                   replies: {
-                      _count: 'desc'
+                      createdAt: 'desc'
                   }
               }
-            : query?.filter === PostFilter.POPULAR
+            : query?.filter === PostFilter.HOT
               ? {
-                    views: 'desc'
+                    replies: {
+                        _count: 'desc'
+                    }
                 }
-              : {
-                    createdAt: 'desc'
-                }) as PrismaTypes.PostOrderByWithRelationInput
+              : query?.filter === PostFilter.POPULAR
+                ? {
+                      views: 'desc'
+                  }
+                : {
+                      createdAt: 'desc'
+                  }) as PrismaTypes.PostOrderByWithRelationInput
     }
 }
