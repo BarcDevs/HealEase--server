@@ -2,7 +2,7 @@ import { CustomError } from './CustomError'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
 class AuthError extends CustomError {
-    statusCode = HttpStatusCodes.NOT_FOUND
+    statusCode = HttpStatusCodes.UNAUTHORIZED
 
     statusType = 'Authentication Error'
 
@@ -10,7 +10,7 @@ class AuthError extends CustomError {
         message: string,
         private property?: string,
         statusType?: string,
-        statusCode?: number,
+        statusCode?: number
     ) {
         super(message)
         this.statusType = statusType ?? this.statusType
@@ -25,8 +25,8 @@ class AuthError extends CustomError {
                 statusType: this.statusType,
                 statusCode: this.statusCode,
                 error: this.message,
-                property: this.property,
-            },
+                property: this.property
+            }
         ]
     }
 }
