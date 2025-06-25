@@ -4,6 +4,7 @@ import { getTagsByPostId } from '../models/ForumModel'
 import { NewPostType, UpdatePostType } from '../types/data/PostType'
 import { errorFactory } from '../errors/factory'
 import { NewReplyType } from '../types/data/ReplyType'
+import { capitalizeText } from '../utils/capitalizeText'
 
 export const validateOwner = async (
     schema: 'post' | 'reply',
@@ -19,7 +20,8 @@ export const validateOwner = async (
             ? await forumModel.getPost(id)
             : await forumModel.getReply(id, postId!)
 
-    if (!data) throw new Error(`${schema} not found`)
+    if (!data) throw errorFactory.generic.notFound(capitalizeText(schema))
+
     if (data.authorId !== userId)
         throw errorFactory.auth.unauthorized(
             `you are not the author of this ${schema}!`
