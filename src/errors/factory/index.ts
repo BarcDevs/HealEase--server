@@ -2,7 +2,7 @@ import { AuthFactory } from './AuthFactory'
 import { ValidationFactory } from './ValidationFactory'
 import { GenericFactory } from './GenericFactory'
 
-class ErrorFactory {
+export class ErrorFactory {
     auth = AuthFactory
 
     validation = ValidationFactory
