@@ -18,18 +18,16 @@ export const getPosts = async (
     next: NextFunction
 ) => {
     const validatedQuery =
-        req.params &&
+        req.query &&
         ValidationError.catchValidationErrors(
-            postQuerySchema.validate(req.params)
+            postQuerySchema.validate(req.query)
         )
 
     const data = (await forumService.getPosts(validatedQuery)) as
         | PostType[]
         | null
 
-    if (!data)
-        // todo throw next() error with generic error class
-        return res.status(404).json({ message: 'posts not found' })
+    if (!data) throw errorFactory.generic.notFound('Posts')
 
     return successResponse<PostType[]>(res, data, `${data.length} posts found`)
 }
@@ -64,9 +62,7 @@ export const getPost = async (
         postId
     )) as PostType | null
 
-    if (!data)
-        // todo throw next() error with generic error class
-        return res.status(404).json({ message: 'post not found' })
+    if (!data) throw errorFactory.generic.notFound('Post')
 
     return successResponse<PostType>(res, data, `Post ${postId} found`)
 }
@@ -138,9 +134,7 @@ export const getReply = async (
         replyId
     )) as ReplyType | null
 
-    if (!data)
-        // todo throw next() error with generic error class
-        return res.status(404).json({ message: 'reply not found' })
+    if (!data) throw errorFactory.generic.notFound('Reply')
 
     return successResponse<ReplyType>(res, data, `Reply ${replyId} found`)
 }
@@ -164,6 +158,8 @@ export const getTags = async (
 
     const data = await forumService.getTags(validatedQuery)
 
+    if (!data) throw errorFactory.generic.notFound('Tags')
+
     return successResponse<TagType[]>(res, data, `${data.length} tags found`)
 }
 
@@ -176,7 +172,7 @@ export const getTag = async (
 
     const data = await forumService.getTag(tagId)
 
-    if (!data) throw Error('not found')
+    if (!data) throw errorFactory.generic.notFound(`Tag ${tagId}`)
 
-    return successResponse<TagType>(res, data, `tag ${tagId} found`)
+    return successResponse<TagType>(res, data, `Tag ${tagId} found`)
 }

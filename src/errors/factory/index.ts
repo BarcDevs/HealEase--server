@@ -1,12 +1,15 @@
 import { AuthFactory } from './AuthFactory'
 import { ValidationFactory } from './ValidationFactory'
+import { GenericFactory } from './GenericFactory'
 
 class ErrorFactory {
     auth = AuthFactory
 
     validation = ValidationFactory
 
-    static genericError(message: string) {
+    generic = GenericFactory
+
+    static GenericError(message: string) {
         return new Error(message)
     }
 }
