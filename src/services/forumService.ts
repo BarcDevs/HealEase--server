@@ -62,8 +62,8 @@ export const getTag = async (id: string) => forumModel.getTag(id)
 export const createReply = async (reply: NewReplyType) =>
     forumModel.createReply(reply)
 
-export const getReplies = async (postId: string, replyId: string) =>
-    forumModel.getReply(replyId, postId)
+export const getReplies = async (postId: string) =>
+    forumModel.getReplies(postId)
 
 export const deleteReply = async (replyId: string, postId: string) =>
     forumModel.deleteReply(replyId, postId)

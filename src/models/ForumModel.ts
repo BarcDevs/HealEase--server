@@ -106,6 +106,39 @@ export const getReply = async (
         }
     })) as ReplyType | null
 
+export const getReplies = async (postId: string): Promise<ReplyType[] | null> =>
+    (await Prisma.reply.findMany({
+        where: {
+            postId
+        },
+        include: {
+            author: {
+                select: {
+                    id: true,
+                    username: true,
+                    firstName: true,
+                    lastName: true,
+                    image: true
+                }
+            }
+        }
+    })) as ReplyType[]
+
+export const updateReply = async (
+    replyId: string,
+    postId: string,
+    reply: UpdateReplyType
+): Promise<ReplyType> =>
+    (await Prisma.reply.update({
+        where: {
+            id: replyId,
+            postId
+        },
+        data: {
+            ...reply
+        }
+    })) as unknown as ReplyType
+
 export const deleteReply = async (replyId: string, postId: string) =>
     Prisma.reply.delete({
         where: {

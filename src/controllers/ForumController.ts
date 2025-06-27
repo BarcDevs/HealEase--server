@@ -11,6 +11,7 @@ import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
 import { TagType } from '../types/data/TagType'
 import { ReplyType } from '../types/data/ReplyType'
 import { newReplySchema } from '../schemas/forum/newReplySchema'
+import { updateReplySchema } from '../schemas/forum/updateReplySchema'
 
 export const getPosts = async (
     req: Request,
@@ -123,25 +124,42 @@ export const createReply = async (
     return successResponse<ReplyType>(res, data, 'Reply created successfully')
 }
 
-export const getReply = async (
+export const getReplies = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    const { replyId, postId } = req.params
+    const { postId } = req.params
 
-    const data = (await forumService.getReplies(postId, replyId)) as ReplyType
+    const data = (await forumService.getReplies(postId)) as ReplyType[]
 
-    if (!data) throw errorFactory.generic.notFound('Reply')
+    if (!data) throw errorFactory.generic.notFound('Replies')
 
-    return successResponse<ReplyType>(res, data, `Reply ${replyId} found`)
+    return successResponse<ReplyType[]>(
+        res,
+        data,
+        `${data.length} Replies for post ${postId} found`
+    )
 }
 
 export const updateReply = async (
     req: Request,
     res: Response,
     next: NextFunction
-) => {}
+) => {
+    const validatedData = ValidationError.catchValidationErrors(
+        updateReplySchema.validate(req.body)
+    )
+    const { replyId, postId } = req.params
+    const { userId } = req.locals || {}
+
+    if (!userId) throw errorFactory.auth.unauthorized()
+
+    await forumService.validateOwner('reply', postId, userId, replyId)
+
+    const data = await forumService.updateReply(replyId, postId, validatedData)
+    return successResponse<ReplyType>(res, data, `Reply ${replyId} updated`)
+}
 
 export const deleteReply = async (
     req: Request,

@@ -7,7 +7,7 @@ import {
     createPost,
     updatePost,
     deletePost,
-    getReply,
+    getReplies,
     createReply,
     updateReply,
     getTags,
@@ -30,11 +30,11 @@ router
 
 router
     .route('/posts/:postId/reply')
+    .get(getReplies)
     .post(isAuthenticated, extractCsrfToken, csrfMiddleware, createReply)
 
 router
     .route('/posts/:postId/reply/:replyId')
-    .get(getReply)
     .put(isAuthenticated, extractCsrfToken, csrfMiddleware, updateReply)
     .delete(isAuthenticated, extractCsrfToken, csrfMiddleware, deleteReply)
 
