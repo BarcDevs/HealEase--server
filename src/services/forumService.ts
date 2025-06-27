@@ -33,7 +33,7 @@ export const getPosts = async (query?: PostQuery, id?: string) => {
     return forumModel.getPosts(query)
 }
 
-export const getPostsCount = (query?: PostQuery) =>
+export const getPostsCount = async (query?: PostQuery) =>
     forumModel.getPostsCount(query)
 
 export const createPost = async (post: NewPostType) =>
