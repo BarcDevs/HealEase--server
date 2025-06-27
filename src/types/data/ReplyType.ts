@@ -1,6 +1,6 @@
-import { PostType } from './PostType'
 import { Votes } from './Votes'
 import { UserType } from './UserType'
+import { PostType } from './PostType'
 
 export type ReplyType = {
     id: string
@@ -19,3 +19,12 @@ export type NewReplyType = {
     authorId: string
     postId?: string
 }
+
+export type UpdateReplyType = Partial<
+    Omit<NewReplyType, 'authorId'> & {
+        vote?: {
+            userId: string
+            vote: 'up' | 'down'
+        }
+    }
+>

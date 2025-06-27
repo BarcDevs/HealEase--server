@@ -3,7 +3,7 @@ import * as forumModel from '../models/ForumModel'
 import { getTagsByPostId } from '../models/ForumModel'
 import { NewPostType, UpdatePostType } from '../types/data/PostType'
 import { ErrorFactory, errorFactory } from '../errors/factory'
-import { NewReplyType } from '../types/data/ReplyType'
+import { NewReplyType, UpdateReplyType } from '../types/data/ReplyType'
 import { capitalizeText } from '../utils/capitalizeText'
 
 export const validateOwner = async (
@@ -64,6 +64,12 @@ export const createReply = async (reply: NewReplyType) =>
 
 export const getReplies = async (postId: string) =>
     forumModel.getReplies(postId)
+
+export const updateReply = async (
+    replyId: string,
+    postId: string,
+    reply: UpdateReplyType
+) => forumModel.updateReply(replyId, postId, reply)
 
 export const deleteReply = async (replyId: string, postId: string) =>
     forumModel.deleteReply(replyId, postId)
