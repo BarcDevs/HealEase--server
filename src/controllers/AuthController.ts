@@ -74,7 +74,7 @@ const logout = async (_req: Request, res: Response) => {
 }
 
 const me = async (req: Request, res: Response) => {
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
 
     const user: ServerUserType | null = userId
         ? await authServices.getUser('id', userId)

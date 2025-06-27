@@ -39,7 +39,7 @@ export const createPost = async (req: Request, res: Response) => {
     const validatedData = ValidationError.catchValidationErrors(
         newPostSchema.validate(req.body)
     )
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
 
     if (!userId) throw errorFactory.auth.unauthorized()
 
@@ -65,7 +65,7 @@ export const updatePost = async (req: Request, res: Response) => {
         updatePostSchema.validate(req.body)
     )
     const { postId } = req.params
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
 
     if (!userId) throw errorFactory.auth.unauthorized()
 
@@ -78,7 +78,7 @@ export const updatePost = async (req: Request, res: Response) => {
 
 export const deletePost = async (req: Request, res: Response) => {
     const { postId } = req.params
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
 
     if (!userId) throw errorFactory.auth.unauthorized()
 
@@ -95,7 +95,7 @@ export const createReply = async (req: Request, res: Response) => {
     const validatedData = ValidationError.catchValidationErrors(
         newReplySchema.validate(req.body)
     )
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
     const { postId } = req.params
 
     if (!userId) throw errorFactory.auth.unauthorized()
@@ -127,7 +127,7 @@ export const updateReply = async (req: Request, res: Response) => {
         updateReplySchema.validate(req.body)
     )
     const { replyId, postId } = req.params
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
 
     if (!userId) throw errorFactory.auth.unauthorized()
 
@@ -140,7 +140,7 @@ export const updateReply = async (req: Request, res: Response) => {
 
 export const deleteReply = async (req: Request, res: Response) => {
     const { replyId, postId } = req.params
-    const { userId } = req.locals || {}
+    const { userId } = req || {}
 
     if (!userId) throw errorFactory.auth.unauthorized()
 

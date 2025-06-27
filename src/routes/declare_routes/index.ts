@@ -1,7 +1,6 @@
 import { Express } from 'express'
 
 import { errorHandler } from '../../middlewares/errorHandler'
-import { RequestLocals } from '../../types/RequestLocals'
 import { getServerStatus } from '../../controllers/ServerController'
 import { serverConfig } from '../../../config'
 import authRoute from '../AuthRoute'
@@ -10,7 +9,8 @@ import bulkRoute from '../bukActionsRoute'
 
 declare module 'express-serve-static-core' {
     interface Request {
-        locals: RequestLocals
+        userId?: string
+        csrfToken?: string
     }
 }
 

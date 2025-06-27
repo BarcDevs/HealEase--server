@@ -9,10 +9,7 @@ export const extractCsrfToken = (
     res: Response,
     next: NextFunction
 ) => {
-    req.locals = {
-        ...(req.locals || {}),
-        csrfToken: req.headers['x-csrf-token'] || req.body?.csrfToken || ''
-    }
+    req.csrfToken = req.headers['x-csrf-token'] as string
 
     next()
 }
@@ -22,7 +19,7 @@ export const csrfMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
-    const { csrfToken } = req.locals || {}
+    const { csrfToken } = req
     const { _csrf } = req.cookies
 
     const isCSRFValid = csrfProtection.verify(_csrf, csrfToken || '')
