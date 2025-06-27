@@ -1,23 +1,25 @@
-import { NextFunction, Request, Response } from 'express'
-import { postQuerySchema } from '../schemas/forum/postQuerySchema'
-import { ValidationError } from '../errors/ValidationError'
-import * as forumService from '../services/forumService'
-import { PostType } from '../types/data/PostType'
+import { Request, Response } from 'express'
+
 import { successResponse } from '../responses/success'
+
+import * as forumService from '../services/forumService'
+
+import { errorFactory } from '../errors/factory'
+import { ValidationError } from '../errors/ValidationError'
+
+import { postQuerySchema } from '../schemas/forum/postQuerySchema'
 import { newPostSchema } from '../schemas/forum/newPostSchema'
 import { updatePostSchema } from '../schemas/forum/updatePostSchema'
-import { errorFactory } from '../errors/factory'
 import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
-import { TagType } from '../types/data/TagType'
-import { ReplyType } from '../types/data/ReplyType'
 import { newReplySchema } from '../schemas/forum/newReplySchema'
 import { updateReplySchema } from '../schemas/forum/updateReplySchema'
 
-export const getPosts = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+import { PostType } from '../types/data/PostType'
+import { TagType } from '../types/data/TagType'
+import { ReplyType } from '../types/data/ReplyType'
+
+// region Posts
+export const getPosts = async (req: Request, res: Response) => {
     const validatedQuery =
         req.query &&
         ValidationError.catchValidationErrors(
@@ -33,11 +35,7 @@ export const getPosts = async (
     return successResponse<PostType[]>(res, data, `${data.length} posts found`)
 }
 
-export const createPost = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const createPost = async (req: Request, res: Response) => {
     const validatedData = ValidationError.catchValidationErrors(
         newPostSchema.validate(req.body)
     )
@@ -52,27 +50,17 @@ export const createPost = async (
     return successResponse<PostType>(res, data, 'Post created successfully')
 }
 
-export const getPost = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const getPost = async (req: Request, res: Response) => {
     const { postId } = req.params
-    const data = (await forumService.getPosts(
-        undefined,
-        postId
-    )) as PostType | null
+
+    const data = (await forumService.getPosts(undefined, postId)) as PostType
 
     if (!data) throw errorFactory.generic.notFound('Post')
 
     return successResponse<PostType>(res, data, `Post ${postId} found`)
 }
 
-export const updatePost = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const updatePost = async (req: Request, res: Response) => {
     const validatedData = ValidationError.catchValidationErrors(
         updatePostSchema.validate(req.body)
     )
@@ -84,14 +72,11 @@ export const updatePost = async (
     await forumService.validateOwner('post', postId, userId)
 
     const data = await forumService.updatePost(postId, validatedData)
+
     return successResponse<PostType>(res, data, `Post ${postId} updated`)
 }
 
-export const deletePost = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const deletePost = async (req: Request, res: Response) => {
     const { postId } = req.params
     const { userId } = req.locals || {}
 
@@ -100,14 +85,13 @@ export const deletePost = async (
     await forumService.validateOwner('post', postId, userId)
 
     await forumService.deletePost(postId)
+
     return successResponse(res, {}, `Post ${postId} deleted!`)
 }
+// endregion
 
-export const createReply = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+// region Replies
+export const createReply = async (req: Request, res: Response) => {
     const validatedData = ValidationError.catchValidationErrors(
         newReplySchema.validate(req.body)
     )
@@ -124,11 +108,7 @@ export const createReply = async (
     return successResponse<ReplyType>(res, data, 'Reply created successfully')
 }
 
-export const getReplies = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const getReplies = async (req: Request, res: Response) => {
     const { postId } = req.params
 
     const data = (await forumService.getReplies(postId)) as ReplyType[]
@@ -142,11 +122,7 @@ export const getReplies = async (
     )
 }
 
-export const updateReply = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const updateReply = async (req: Request, res: Response) => {
     const validatedData = ValidationError.catchValidationErrors(
         updateReplySchema.validate(req.body)
     )
@@ -158,14 +134,11 @@ export const updateReply = async (
     await forumService.validateOwner('reply', postId, userId, replyId)
 
     const data = await forumService.updateReply(replyId, postId, validatedData)
+
     return successResponse<ReplyType>(res, data, `Reply ${replyId} updated`)
 }
 
-export const deleteReply = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const deleteReply = async (req: Request, res: Response) => {
     const { replyId, postId } = req.params
     const { userId } = req.locals || {}
 
@@ -174,14 +147,13 @@ export const deleteReply = async (
     await forumService.validateOwner('reply', postId, userId, replyId)
 
     await forumService.deleteReply(replyId, postId)
+
     return successResponse(res, {}, `Reply ${replyId} deleted`)
 }
+// endregion
 
-export const getTags = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+// region Tags
+export const getTags = async (req: Request, res: Response) => {
     const validatedQuery =
         req.query &&
         ValidationError.catchValidationErrors(
@@ -195,11 +167,7 @@ export const getTags = async (
     return successResponse<TagType[]>(res, data, `${data.length} tags found`)
 }
 
-export const getTag = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
+export const getTag = async (req: Request, res: Response) => {
     const { tagId } = req.params
 
     const data = await forumService.getTag(tagId)
@@ -208,3 +176,4 @@ export const getTag = async (
 
     return successResponse<TagType>(res, data, `Tag ${tagId} found`)
 }
+// endregion
