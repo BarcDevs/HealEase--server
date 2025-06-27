@@ -85,8 +85,8 @@ export const deletePost = async (id: string) =>
     })
 
 export const getReply = async (
-    replyId: string,
-    postId: string
+    postId: string,
+    replyId: string
 ): Promise<ReplyType | null> =>
     (await Prisma.reply.findUnique({
         where: {
@@ -105,6 +105,14 @@ export const getReply = async (
             }
         }
     })) as ReplyType | null
+
+export const deleteReply = async (replyId: string, postId: string) =>
+    Prisma.reply.delete({
+        where: {
+            id: replyId,
+            postId
+        }
+    })
 
 export const getTags = async (
     search = '',

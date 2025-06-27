@@ -99,7 +99,7 @@ export const deletePost = async (
     await forumService.validateOwner('post', postId, userId)
 
     await forumService.deletePost(postId)
-    return successResponse(res, {}, `post ${postId} deleted!`)
+    return successResponse(res, {}, `Post ${postId} deleted!`)
 }
 
 export const createReply = async (
@@ -129,10 +129,8 @@ export const getReply = async (
     next: NextFunction
 ) => {
     const { replyId, postId } = req.params
-    const data = (await forumService.getReplies(
-        postId,
-        replyId
-    )) as ReplyType | null
+
+    const data = (await forumService.getReplies(postId, replyId)) as ReplyType
 
     if (!data) throw errorFactory.generic.notFound('Reply')
 
@@ -144,6 +142,22 @@ export const updateReply = async (
     res: Response,
     next: NextFunction
 ) => {}
+
+export const deleteReply = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { replyId, postId } = req.params
+    const { userId } = req.locals || {}
+
+    if (!userId) throw errorFactory.auth.unauthorized()
+
+    await forumService.validateOwner('reply', postId, userId, replyId)
+
+    await forumService.deleteReply(replyId, postId)
+    return successResponse(res, {}, `Reply ${replyId} deleted`)
+}
 
 export const getTags = async (
     req: Request,

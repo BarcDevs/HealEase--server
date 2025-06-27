@@ -11,7 +11,8 @@ import {
     createReply,
     updateReply,
     getTags,
-    getTag
+    getTag,
+    deleteReply
 } from '../controllers/ForumController'
 
 const router = Router()
@@ -35,7 +36,7 @@ router
     .route('/posts/:postId/reply/:replyId')
     .get(getReply)
     .put(isAuthenticated, extractCsrfToken, csrfMiddleware, updateReply)
-    .delete(isAuthenticated, extractCsrfToken, csrfMiddleware, updateReply)
+    .delete(isAuthenticated, extractCsrfToken, csrfMiddleware, deleteReply)
 
 router.route('/tags').get(getTags)
 

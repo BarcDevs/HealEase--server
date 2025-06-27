@@ -2,23 +2,23 @@ import { PostQuery, TagQuery } from '../types/query'
 import * as forumModel from '../models/ForumModel'
 import { getTagsByPostId } from '../models/ForumModel'
 import { NewPostType, UpdatePostType } from '../types/data/PostType'
-import { errorFactory } from '../errors/factory'
+import { ErrorFactory, errorFactory } from '../errors/factory'
 import { NewReplyType } from '../types/data/ReplyType'
 import { capitalizeText } from '../utils/capitalizeText'
 
 export const validateOwner = async (
     schema: 'post' | 'reply',
-    id: string,
+    postId: string,
     userId: string,
-    postId?: string
+    replyId?: string
 ) => {
-    if (schema === 'reply' && !postId)
-        throw new Error('postId is required for getting a reply')
+    if (schema === 'reply' && !replyId)
+        throw ErrorFactory.GenericError('replyId is missing')
 
     const data =
         schema === 'post'
-            ? await forumModel.getPost(id)
-            : await forumModel.getReply(id, postId!)
+            ? await forumModel.getPost(postId)
+            : await forumModel.getReply(postId, replyId!)
 
     if (!data) throw errorFactory.generic.notFound(capitalizeText(schema))
 
@@ -64,3 +64,6 @@ export const createReply = async (reply: NewReplyType) =>
 
 export const getReplies = async (postId: string, replyId: string) =>
     forumModel.getReply(replyId, postId)
+
+export const deleteReply = async (replyId: string, postId: string) =>
+    forumModel.deleteReply(replyId, postId)
