@@ -1,14 +1,20 @@
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import Csrf from 'csrf'
-import { CookieOptions } from 'express'
-import * as authModel from '../models/AuthModel'
-import { AuthError } from '../errors/AuthError'
-import { sendEmail } from '../utils/emailSender'
-import { HttpStatusCodes } from '../constants/httpStatusCodes'
+import type { CookieOptions } from 'express'
+import jwt from 'jsonwebtoken'
 import { authConfig } from '../../config'
-import { NewUserType, ServerUserType, UserType } from '../types/data/UserType'
 import { excludedUserFields } from '../constants/excludedUserFields'
+import { HttpStatusCodes } from '../constants/httpStatusCodes'
+import { AuthError } from '../errors/AuthError'
+
+import * as authModel from '../models/AuthModel'
+
+import type {
+    NewUserType,
+    ServerUserType,
+    UserType
+} from '../types/data/UserType'
+import { sendEmail } from '../utils/emailSender'
 
 const csrfProtection = new Csrf()
 

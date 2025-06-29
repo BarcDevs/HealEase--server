@@ -1,5 +1,10 @@
+import type {
+    NextFunction,
+    Request,
+    Response,
+    Send
+} from 'express'
 import NodeCache from 'node-cache'
-import { NextFunction, Request, Response, Send } from 'express'
 
 const cache = new NodeCache({ stdTTL: 60 * 10, checkperiod: 80 })
 

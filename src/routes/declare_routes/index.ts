@@ -1,8 +1,8 @@
-import { Express } from 'express'
+import type { Express } from 'express'
 
-import { errorHandler } from '../../middlewares/errorHandler'
-import { getServerStatus } from '../../controllers/ServerController'
 import { serverConfig } from '../../../config'
+import { getServerStatus } from '../../controllers/ServerController'
+import { errorHandler } from '../../middlewares/errorHandler'
 import authRoute from '../AuthRoute'
 import forumRoute from '../ForumRoute'
 import bulkRoute from '../bukActionsRoute'

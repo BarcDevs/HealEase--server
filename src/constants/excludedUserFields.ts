@@ -1,4 +1,4 @@
-import { ServerUserType } from '../types/data/UserType'
+import type { ServerUserType } from '../types/data/UserType'
 
 export const excludedUserFields: (keyof ServerUserType)[] = [
     'password',

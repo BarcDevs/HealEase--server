@@ -1,5 +1,8 @@
-import { Prisma as PrismaTypes } from '@prisma/client'
-import { PostFilter, PostQuery } from '../../types/query'
+import type { Prisma as PrismaTypes } from '@prisma/client'
+import type { PostQuery } from '../../types/query'
+
+// eslint-disable-next-line no-duplicate-imports
+import { PostFilter } from '../../types/query'
 
 export const postInclude = (type: 'single' | 'multiple') => ({
     // add replies count

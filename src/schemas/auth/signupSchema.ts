@@ -1,6 +1,6 @@
 import joi from 'joi'
-import { NewUserType } from '../../types/data/UserType'
 import { PASSWORD_FORMAT } from './passwordFormat'
+import type { NewUserType } from '../../types/data/UserType'
 
 export const signupSchema = joi.object<NewUserType>({
     firstName: joi.string().alphanum().required(),

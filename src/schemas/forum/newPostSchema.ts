@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { NewPostType } from '../../types/data/PostType'
+import type { NewPostType } from '../../types/data/PostType'
 
 export const newPostSchema = joi.object<Omit<NewPostType, 'authorId'>>({
     title: joi.string().required(),

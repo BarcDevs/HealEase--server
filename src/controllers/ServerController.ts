@@ -1,6 +1,9 @@
-import { NextFunction, Request, Response } from 'express'
-import { HttpStatusCodes } from '../constants/httpStatusCodes'
+import type {
+    Request,
+    Response
+} from 'express'
 import { serverConfig } from '../../config'
+import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
 export const getServerStatus = (
     _req: Request,

@@ -1,5 +1,9 @@
-import { NextFunction, Request, Response } from 'express'
 import Csrf from 'csrf'
+import type {
+    NextFunction,
+    Request,
+    Response
+} from 'express'
 import { errorFactory } from '../errors/factory'
 
 const csrfProtection = new Csrf()

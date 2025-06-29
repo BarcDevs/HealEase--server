@@ -1,4 +1,4 @@
-import { ICustomError } from '../interfaces/ICustomError'
+import type { ICustomError } from '../interfaces/ICustomError'
 
 export abstract class CustomError extends Error implements ICustomError {
     abstract statusCode: number

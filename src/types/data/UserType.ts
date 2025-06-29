@@ -1,8 +1,8 @@
-import { Role } from '@prisma/client'
-import { Prettify } from '../index'
-import { PostType } from './PostType'
-import { ReplyType } from './ReplyType'
-import { TagType } from './TagType'
+import type { Role } from '@prisma/client'
+import type { Prettify } from '../index'
+import type { PostType } from './PostType'
+import type { ReplyType } from './ReplyType'
+import type { TagType } from './TagType'
 
 export type UserType = {
     id: string

@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { UpdateReplyType } from '../../types/data/ReplyType'
+import type { UpdateReplyType } from '../../types/data/ReplyType'
 
 export const updateReplySchema = joi.object<UpdateReplyType>({
     body: joi.string(),

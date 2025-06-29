@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { TagQuery } from '../../types/query'
+import type { TagQuery } from '../../types/query'
 
 export const tagQuerySchema = joi.object<TagQuery>({
     limit: joi.number().integer().max(100),

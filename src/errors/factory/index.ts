@@ -1,6 +1,6 @@
 import { AuthFactory } from './AuthFactory'
-import { ValidationFactory } from './ValidationFactory'
 import { GenericFactory } from './GenericFactory'
+import { ValidationFactory } from './ValidationFactory'
 
 export class ErrorFactory {
     auth = AuthFactory

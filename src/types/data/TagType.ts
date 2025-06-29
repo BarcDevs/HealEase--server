@@ -1,5 +1,5 @@
-import { PostType } from './PostType'
-import { UserType } from './UserType'
+import type { PostType } from './PostType'
+import type { UserType } from './UserType'
 
 export interface TagType {
     id: string

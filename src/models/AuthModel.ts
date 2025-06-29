@@ -1,4 +1,7 @@
-import { NewUserType, ServerUserType } from '../types/data/UserType'
+import type {
+    NewUserType,
+    ServerUserType
+} from '../types/data/UserType'
 import Prisma from '../utils/PrismaClient'
 
 const getUserById = async (id: string): Promise<ServerUserType | null> => {

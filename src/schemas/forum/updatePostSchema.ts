@@ -1,5 +1,5 @@
 import joi from 'joi'
-import { UpdatePostType } from '../../types/data/PostType'
+import type { UpdatePostType } from '../../types/data/PostType'
 
 export const updatePostSchema = joi.object<Omit<UpdatePostType, 'removeTags'>>({
     title: joi.string(),

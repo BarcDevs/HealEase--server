@@ -1,4 +1,15 @@
-import { Request, Response } from 'express'
+import type { Request, Response } from 'express'
+
+import { HttpStatusCodes } from '../constants/httpStatusCodes'
+import { ValidationError } from '../errors/ValidationError'
+import { errorFactory } from '../errors/factory'
+import { successResponse } from '../responses/success'
+
+import { confirmEmailSchema } from '../schemas/auth/confirmEmailSchema'
+import { forgetPasswordSchema } from '../schemas/auth/forgetPasswordSchema'
+import { loginSchema } from '../schemas/auth/loginSchema'
+import { resetPasswordSchema } from '../schemas/auth/resetPasswordSchema'
+import { signupSchema } from '../schemas/auth/signupSchema'
 
 import * as authServices from '../services/authService'
 
@@ -11,20 +22,11 @@ import {
     verifyResetPasswordOTP
 } from '../services/authService'
 
-import { loginSchema } from '../schemas/auth/loginSchema'
-import { signupSchema } from '../schemas/auth/signupSchema'
-import { forgetPasswordSchema } from '../schemas/auth/forgetPasswordSchema'
-import { confirmEmailSchema } from '../schemas/auth/confirmEmailSchema'
-import { resetPasswordSchema } from '../schemas/auth/resetPasswordSchema'
 
-import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
-import { ServerUserType, UserType } from '../types/data/UserType'
+import type { ServerUserType, UserType } from '../types/data/UserType'
 
-import { successResponse } from '../responses/success'
 
-import { ValidationError } from '../errors/ValidationError'
-import { errorFactory } from '../errors/factory'
 
 // region Login and Signup
 export const login = async (

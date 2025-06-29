@@ -1,14 +1,14 @@
-import { Prisma as PrismaTypes } from '@prisma/client'
-import { PostQuery } from '../types/query'
+import type { Prisma as PrismaTypes } from '@prisma/client'
+import type { PostQuery } from '../types/query'
 import Prisma from '../utils/PrismaClient'
 import { connectTags, postInclude, postQueryBuilder } from './queries/postQuery'
-import { NewPostType, PostType, UpdatePostType } from '../types/data/PostType'
-import { TagType } from '../types/data/TagType'
-import {
+import type { NewPostType, PostType, UpdatePostType } from '../types/data/PostType'
+import type {
     NewReplyType,
     ReplyType,
     UpdateReplyType
 } from '../types/data/ReplyType'
+import type { TagType } from '../types/data/TagType'
 
 export const getPosts = async (query?: PostQuery): Promise<PostType[]> => {
     const postQuery = postQueryBuilder(query)

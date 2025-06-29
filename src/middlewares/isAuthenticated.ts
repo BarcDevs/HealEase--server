@@ -1,8 +1,12 @@
-import { NextFunction, Request, Response } from 'express'
+import type {
+    NextFunction,
+    Request,
+    Response
+} from 'express'
 import jwt from 'jsonwebtoken'
-import { UserType } from '../types/data/UserType'
 import { authConfig } from '../../config'
 import { errorFactory } from '../errors/factory'
+import type { UserType } from '../types/data/UserType'
 
 export const isAuthenticated = (
     req: Request,

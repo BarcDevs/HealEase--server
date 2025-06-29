@@ -1,19 +1,22 @@
 import { Router } from 'express'
-import { isAuthenticated } from '../middlewares/isAuthenticated'
-import { csrfMiddleware, extractCsrfToken } from '../middlewares/csrf'
 import {
+    createPost,
+    createReply,
+    deletePost,
+    deleteReply,
     getPost,
     getPosts,
-    createPost,
-    updatePost,
-    deletePost,
     getReplies,
-    createReply,
-    updateReply,
-    getTags,
     getTag,
-    deleteReply
+    getTags,
+    updatePost,
+    updateReply
 } from '../controllers/ForumController'
+import {
+    csrfMiddleware,
+    extractCsrfToken
+} from '../middlewares/csrf'
+import { isAuthenticated } from '../middlewares/isAuthenticated'
 
 const router = Router()
 

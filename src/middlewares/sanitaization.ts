@@ -1,5 +1,9 @@
-import { NextFunction, Request, Response } from 'express'
 import createDOMPurify from 'dompurify'
+import type {
+    NextFunction,
+    Request,
+    Response
+} from 'express'
 import jsdom from 'jsdom'
 
 const { JSDOM } = jsdom
