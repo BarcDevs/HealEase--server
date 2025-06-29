@@ -22,7 +22,7 @@
     "import"
   ],
   "rules": {
-    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-floating-promises": "warn",
     "@typescript-eslint/consistent-type-imports": "warn",
     "import/extensions": "off",
@@ -63,7 +63,7 @@
         "groups": [
           "builtin",
           "external",
-          "internal"
+          ["internal", "parent", "sibling", "index"]
         ]
       }
     ]
