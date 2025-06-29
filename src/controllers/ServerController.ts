@@ -7,10 +7,11 @@ import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
 export const getServerStatus = (
     _req: Request,
-    res: Response,
-    _next: NextFunction
+    res: Response
 ) => {
-    res.status(HttpStatusCodes.OK).json({
-        message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`
-    })
+    res
+        .status(HttpStatusCodes.OK)
+        .json({
+            message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`
+        })
 }
