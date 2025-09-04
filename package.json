@@ -78,6 +78,7 @@
     "@types/webpack-shell-plugin": "^0.5.7",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
+    "esbuild": "^0.25.9",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-node": "^4.1.0",
