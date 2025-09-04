@@ -14,7 +14,6 @@
     "start:dev": "NODE_ENV=development nodemon src/app.ts",
     "start:prod": "NODE_ENV=production node build/index.bundle.js",
     "prod": "npm run prisma:generate && npm run prisma:deploy && webpack",
-    "build": "node --max-old-space-size=8192 node_modules/.bin/tsc",
     "test": "NODE_ENV=test jest --watchAll --detectOpenHandles --forceExit --coverage",
     "format": "prettier --write 09",
     "lint:check": "eslint 09",
@@ -23,7 +22,10 @@
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev --name init",
     "prisma:deploy": "npx prisma migrate deploy",
-    "prisma:studio": "npx prisma studio"
+    "prisma:studio": "npx prisma studio",
+    "typecheck": "tsc --noEmit",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/server.js",
+    "postinstall": "npm run prisma:generate"
   },
   "keywords": [],
   "author": "",
