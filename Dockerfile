@@ -1,26 +1,29 @@
 # Use official Node.js LTS
 FROM node:20
 
-# Set working directory to the project root
+# Set working directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json first for caching
+# Upgrade npm to latest version
+RUN npm install -g npm@11.6.0
+
+# Copy package files first for caching
 COPY package*.json ./
 
-# Install dependencies
+# Install dependencies (postinstall scripts will not fail because schema exists)
 RUN npm install
 
-# Copy the rest of the source code, including prisma, src, config, esbuild.config.ts
+# Copy the rest of the project
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client explicitly (after copying source)
 RUN npx prisma generate --schema=prisma/schema.prisma
 
 # Build server with esbuild (adjust memory if needed)
 RUN node --max-old-space-size=4096 ./esbuild.config.js
 
-# Expose the port the server will run on (production port)
+# Expose the server port (make sure it matches your config)
 EXPOSE 8080
 
-# Run the server
+# Start the server
 CMD ["node", "dist/server.js"]
