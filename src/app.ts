@@ -1,11 +1,10 @@
-import config from 'config'
-import express, { Express } from 'express'
 import dotenv from 'dotenv'
+import express, { type Express } from 'express'
 import 'express-async-errors'
 import { declareMiddlewares } from './middlewares'
-import { declareRoutes } from './routes/declare_routes'
 import { appConfig, serverConfig } from '../config'
 import exposeProductionApp from './middlewares/exposeProductionApp'
+import { declareRoutes } from './routes/declare_routes'
 
 dotenv.config()
 
