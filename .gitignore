@@ -25,11 +25,12 @@ yarn-error.log*
 # misc
 .DS_Store
 *.pem
+.eslintcache
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-# ide
+# IDE
 .idea
 

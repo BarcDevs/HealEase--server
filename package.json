@@ -24,7 +24,7 @@
     "prisma:deploy": "npx prisma migrate deploy",
     "prisma:studio": "npx prisma studio",
     "typecheck": "tsc --noEmit",
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/server.js",
+    "build": "ts-node esbuild.config.ts",
     "postinstall": "npm run prisma:generate"
   },
   "keywords": [],

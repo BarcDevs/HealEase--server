@@ -1,7 +1,10 @@
 {
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
   "compilerOptions": {
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "dist"],
     "target": "es2022",
     "lib": [
       "ES2021.String",
