@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "lib": ["ES2021.String"],
+    "lib": ["ES2021.String", "ES2024"],
     "module": "CommonJS",
     "sourceMap": true,
     "outDir": "dist",
