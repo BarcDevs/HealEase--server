@@ -1,13 +1,24 @@
 {
   "compilerOptions": {
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "dist"],
     "target": "es2022",
-    "lib": ["ES2021.String", "ES2023"],
+    "lib": [
+      "ES2021.String",
+      "ES2023"
+    ],
     "module": "CommonJS",
     "sourceMap": true,
     "outDir": "dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./.tsbuildinfo",
+    "isolatedModules": true,
+    // temporary turning off strict types to reduce build memory usage
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false
   }
 }
