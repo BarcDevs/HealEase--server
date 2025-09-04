@@ -28,7 +28,7 @@ declareMiddlewares(app)
 declareRoutes(app)
 exposeProductionApp(app)
 
-app.listen(port, host, () => {
+app.listen(port || 3000, host, () => {
     const serverUrl = url
         .replace(/\{protocol}/g, protocol)
         .replace(/\{host}/g, host)
