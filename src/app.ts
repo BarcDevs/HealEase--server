@@ -8,8 +8,18 @@ import { declareRoutes } from './routes/declare_routes'
 
 dotenv.config()
 
-const { port, host, protocol, url } = serverConfig
+const {
+    host,
+    protocol,
+    url
+} = serverConfig
 const { start } = appConfig
+
+const port =
+    // add env port import for render deployment
+    process.env.PORT ?
+        Number(process.env.PORT) :
+        serverConfig.port
 
 const app: Express = express()
 
