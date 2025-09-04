@@ -14,6 +14,7 @@
     "start:dev": "NODE_ENV=development nodemon src/app.ts",
     "start:prod": "NODE_ENV=production node build/index.bundle.js",
     "prod": "npm run prisma:generate && npm run prisma:deploy && webpack",
+    "build": "node --max-old-space-size=8192 node_modules/.bin/tsc",
     "test": "NODE_ENV=test jest --watchAll --detectOpenHandles --forceExit --coverage",
     "format": "prettier --write 09",
     "lint:check": "eslint 09",
