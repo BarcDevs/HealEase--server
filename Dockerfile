@@ -1,29 +1,39 @@
-# Use official Node.js LTS
-FROM node:20
+# ---- Base image
+FROM node:20-slim
 
-# Set working directory
-WORKDIR /usr/src/app
+# ---- Env & workdir
+ENV NODE_ENV=production
+WORKDIR /HealEase--server
 
-# Upgrade npm to latest version
-RUN npm install -g npm@11.6.0
-
-# Copy package files first for caching
+# ---- Faster, reproducible installs (skip lifecycle scripts now)
 COPY package*.json ./
+RUN npm ci --ignore-scripts
 
-# Install dependencies (postinstall scripts will not fail because schema exists)
-RUN npm install
+# ---- Ensure Prisma schema is present before generate
+# (copy only prisma first so Docker can cache the generate step if schema doesn't change)
+COPY prisma ./prisma
 
-# Copy the rest of the project
-COPY . .
+# If your schema uses env("DATABASE_URL") and generate complains, uncomment the next line with a dummy value:
+# ENV DATABASE_URL=postgresql://user:pass@localhost:5432/db?schema=public
 
-# Generate Prisma client explicitly (after copying source)
+# ---- Generate Prisma client explicitly (no postinstall)
 RUN npx prisma generate --schema=prisma/schema.prisma
 
-# Build server with esbuild (adjust memory if needed)
-RUN node --max-old-space-size=4096 ./esbuild.config.js
+# ---- Copy the rest of the source
+COPY . .
 
-# Expose the server port (make sure it matches your config)
+# ---- Build the server with esbuild (no TS memory blowups)
+RUN npx esbuild src/app.ts \
+  --bundle \
+  --platform=node \
+  --outfile=dist/server.js \
+  --sourcemap \
+  --external:aws-sdk \
+  --external:mock-aws-s3 \
+  --external:nock \
+  --external:*.html
+
+# ---- Port & start
 EXPOSE 8080
-
-# Start the server
+ENV PORT=8080
 CMD ["node", "dist/server.js"]

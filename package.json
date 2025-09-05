@@ -19,13 +19,13 @@
     "lint:check": "eslint 09",
     "lint:fix": "npm run lint:check -- --fix",
     "prepare": "husky install",
-    "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
     "prisma:migrate": "npx prisma migrate dev --name init",
     "prisma:deploy": "npx prisma migrate deploy",
     "prisma:studio": "npx prisma studio",
     "typecheck": "tsc --noEmit",
     "build": "ts-node esbuild.config.ts",
-    "postinstall": "npm run prisma:generate"
+    "postinstall": ""
   },
   "keywords": [],
   "author": "",
