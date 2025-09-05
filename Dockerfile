@@ -22,6 +22,10 @@ RUN npx prisma generate --schema=prisma/schema.prisma
 # ---- Copy the rest of the source
 COPY . .
 
+# Copy jsdom worker to dist
+RUN mkdir -p dist \
+    && cp node_modules/jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js dist/
+
 # ---- Build the server with esbuild (no TS memory blowups)
 RUN npx esbuild src/app.ts \
   --bundle \

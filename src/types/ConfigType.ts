@@ -28,4 +28,4 @@ type AuthConfig = {
     otp_expiration: number
 }
 
-export { EnvConfig, EmailConfig, ServerConfig, AppConfig, AuthConfig }
+export type { EnvConfig, EmailConfig, ServerConfig, AppConfig, AuthConfig }
