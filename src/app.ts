@@ -20,7 +20,7 @@ const port =
     // add env port import for render deployment
     (process.env.PORT ?
         Number(process.env.PORT) :
-        serverConfig.port) || 3000
+        serverConfig.port)
 
 const app: Express = express()
 
@@ -29,7 +29,7 @@ declareMiddlewares(app)
 declareRoutes(app)
 exposeProductionApp(app)
 
-app.listen(port || 3000, host, () => {
+app.listen(port, host, () => {
     const serverUrl = url
         .replace(/\{protocol}/g, protocol)
         .replace(/\{host}/g, host)
