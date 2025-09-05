@@ -11,7 +11,9 @@ build({
         'mock-aws-s3',
         'nock',
         'jsdom',
+        'jsdom/*',
         '@prisma/client',
-        'prisma'
+        'prisma',
+        './xhr-sync-worker.js'
     ]
 }).catch(() => process.exit(1))
