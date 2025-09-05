@@ -4,6 +4,7 @@ export default {
     port: 8080,
     protocol: 'https',
     origin: process.env.ORIGIN || 'https://localhost:5173',
+    host: '0.0.0.0'
   },
   auth: {
     expiresIn: '1d',
