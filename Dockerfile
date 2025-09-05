@@ -7,7 +7,7 @@ WORKDIR /HealEase--server
 
 # ---- Faster, reproducible installs (skip lifecycle scripts now)
 COPY package*.json ./
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 
 # ---- Ensure Prisma schema is present before generate
 # (copy only prisma first so Docker can cache the generate step if schema doesn't change)
