@@ -13,8 +13,9 @@ async function main () {
                 'aws-sdk',
                 'mock-aws-s3',
                 'nock',
-                '*.html',
-                './xhr-sync-worker.js'
+                'jsdom',
+                '@prisma/client',
+                'prisma'
             ]
         })
         console.log('Build completed successfully!')
