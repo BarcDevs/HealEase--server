@@ -18,7 +18,6 @@
     "format": "prettier --write 09",
     "lint:check": "eslint 09",
     "lint:fix": "npm run lint:check -- --fix",
-    "prepare": "husky install",
     "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
     "prisma:migrate": "npx prisma migrate dev --name init",
     "prisma:deploy": "npx prisma migrate deploy",

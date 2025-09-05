@@ -8,6 +8,7 @@ build({
     outfile: 'dist/server.js',
     external: [
         'aws-sdk',
+        'bcrypt',
         'mock-aws-s3',
         'nock',
         'jsdom',
