@@ -1,5 +1,5 @@
 import path from 'path'
-import express, { Express } from 'express'
+import express, { type Express } from 'express'
 import { env } from '../../config'
 
 function exposeProductionApp(app: Express) {
@@ -9,9 +9,6 @@ function exposeProductionApp(app: Express) {
     console.log('serving build resources at', buildDir)
 
     app.use('/', express.static(buildDir))
-    app.use((req, res) => {
-        res.sendFile(path.join(buildDir, 'index.html'))
-    })
 }
 
 export default exposeProductionApp
