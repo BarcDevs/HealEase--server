@@ -7,7 +7,7 @@ export default {
     host: '0.0.0.0'
   },
   auth: {
-    expiresIn: '1d',
+    expiresIn: '7d',
   },
   email: {
     port: 578,

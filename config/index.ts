@@ -1,5 +1,11 @@
 import config from 'config'
-import {AppConfig, AuthConfig, EmailConfig, EnvConfig, ServerConfig} from '../src/types/ConfigType'
+import type {
+    AppConfig,
+    AuthConfig,
+    EmailConfig,
+    EnvConfig,
+    ServerConfig
+} from '../src/types/ConfigType'
 
 const env: EnvConfig = config.get<string>('env')
 

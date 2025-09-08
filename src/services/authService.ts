@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import Csrf from 'csrf'
 import type { CookieOptions } from 'express'
 import jwt from 'jsonwebtoken'
+import ms from 'ms'
 import { authConfig } from '../../config'
 import { excludedUserFields } from '../constants/excludedUserFields'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
@@ -20,7 +21,7 @@ const csrfProtection = new Csrf()
 
 const getUser = async (by: 'email' | 'id', value: string) => {
     let user: ServerUserType | null
-    switch (by) {
+    switch ( by ) {
         case 'email':
             user = await authModel.getUserByEmail(value)
             break
@@ -36,12 +37,12 @@ const getUser = async (by: 'email' | 'id', value: string) => {
 }
 
 const getCookiesOptions = (remember: boolean) =>
-    ({
+    ( {
         httpOnly: true,
         sameSite: 'strict' as const,
         secure: false,
-        maxAge: remember ? authConfig.expiresIn : 1000 * 60 * 60
-    }) as CookieOptions
+        maxAge: remember ? ms(authConfig.expiresIn) : ms('1d')
+    } ) as CookieOptions
 
 const generateResetPasswordOTP = (): { OTP: number; OTPExpiration: Date } => {
     const OTP = Math.floor(100000 + Math.random() * 900000)
@@ -73,7 +74,7 @@ const verifyResetPasswordOTP = (
 const sendEmailWithOTP = async (email: string): Promise<boolean> => {
     const user: ServerUserType | null = await authModel.getUserByEmail(email)
 
-    if (!user) return false
+    if ( !user ) return false
 
     const { OTP, OTPExpiration } = generateResetPasswordOTP()
 
@@ -118,7 +119,7 @@ const comparePassword = (password: string, hashedPassword: string): boolean =>
 const login = async (email: string, password: string): Promise<string> => {
     const user: ServerUserType | null = await getUser('email', email)
 
-    if (!user || !comparePassword(password, user.password)) {
+    if ( !user || !comparePassword(password, user.password) ) {
         throw new AuthError('User not found!')
     }
 
@@ -130,7 +131,7 @@ const register = async (newUser: NewUserType): Promise<ServerUserType> => {
         newUser.email
     )
 
-    if (userExists)
+    if ( userExists )
         throw new AuthError(
             'User already exists!',
             'email',
