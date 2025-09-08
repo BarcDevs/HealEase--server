@@ -125,6 +125,9 @@ export const getReplies = async (postId: string): Promise<ReplyType[] | null> =>
                     image: true
                 }
             }
+        },
+        orderBy: {
+            createdAt: 'desc'
         }
     })) as ReplyType[]
 
