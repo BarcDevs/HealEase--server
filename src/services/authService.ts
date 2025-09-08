@@ -36,8 +36,7 @@ const getUser = async (by: 'email' | 'id', value: string) => {
     return user
 }
 
-const getCookiesOptions = (remember: boolean) =>
-    ( {
+const getCookiesOptions = (remember: boolean) => ( {
         httpOnly: true,
         sameSite: 'strict' as const,
         secure: false,
@@ -46,7 +45,8 @@ const getCookiesOptions = (remember: boolean) =>
 
 const generateResetPasswordOTP = (): { OTP: number; OTPExpiration: Date } => {
     const OTP = Math.floor(100000 + Math.random() * 900000)
-    const OTPExpiration = new Date(Date.now() + authConfig.otp_expiration) // 10 minutes
+    const OTPExpiration =
+        new Date(Date.now() + ms(authConfig.otp_expiration)) // 10 minutes
 
     return {
         OTP,

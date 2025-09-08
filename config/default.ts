@@ -13,8 +13,8 @@ export default {
     },
     auth: {
         jwtSecret: 'JWT_SECRET',
-        expiresIn: 1000 * 60 * 60 * 24,
-        otp_expiration: 1000 * 60 * 60 * 24
+        expiresIn: '1d',
+        otp_expiration: '10m'
     },
     email: {
         host: 'sandbox.smtp.mailtrap.io',
