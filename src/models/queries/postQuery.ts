@@ -4,7 +4,7 @@ import type { PostQuery } from '../../types/query'
 // eslint-disable-next-line no-duplicate-imports
 import { PostFilter } from '../../types/query'
 
-export const postInclude = (type: 'single' | 'multiple') => ({
+export const postInclude = (type: 'single' | 'multiple') => ( {
     // add replies count
     _count: {
         select: {
@@ -45,18 +45,18 @@ export const postInclude = (type: 'single' | 'multiple') => ({
             }
         }
     }
-})
+} )
 
-export const connectTags = (tags: string[]) => ({
-    connectOrCreate: tags.map((tag) => ({
+export const connectTags = (tags: string[]) => ( {
+    connectOrCreate: tags.map((tag) => ( {
         where: {
             name: tag
         },
         create: {
             name: tag
         }
-    }))
-})
+    } ))
+} )
 
 export const postQueryBuilder = (
     query?: PostQuery,
@@ -67,15 +67,15 @@ export const postQueryBuilder = (
     const searchText = query?.search?.trim()
     const searchQuery = searchText
         ? {
-              title: {
-                  contains: searchText,
-                  mode: 'insensitive'
-              },
-              body: {
-                  contains: searchText,
-                  mode: 'insensitive'
-              }
-          }
+            title: {
+                contains: searchText,
+                mode: 'insensitive'
+            },
+            body: {
+                contains: searchText,
+                mode: 'insensitive'
+            }
+        }
         : {}
 
     return {
@@ -99,11 +99,11 @@ export const postQueryBuilder = (
             ...searchQuery,
 
             // filter by unanswered
-            ...(query?.filter === PostFilter.UNANSWERED && {
+            ...( query?.filter === PostFilter.UNANSWERED && {
                 replies: {
                     none: true
                 }
-            }),
+            } ),
 
             // additional filter
             ...options?.where
@@ -112,24 +112,23 @@ export const postQueryBuilder = (
         include: postInclude('multiple'),
 
         // sort by given sort method
-        orderBy: (query?.filter === PostFilter.NEWEST
-            ? {
-                  replies: {
-                      createdAt: 'desc'
-                  }
-              }
-            : query?.filter === PostFilter.HOT
-              ? {
-                    replies: {
-                        _count: 'desc'
-                    }
-                }
-              : query?.filter === PostFilter.POPULAR
+        orderBy: (
+            query?.filter === PostFilter.NEWEST
                 ? {
-                      views: 'desc'
-                  }
-                : {
-                      createdAt: 'desc'
-                  }) as PrismaTypes.PostOrderByWithRelationInput
+                    createdAt: 'desc'
+                }
+                : query?.filter === PostFilter.HOT
+                    ? {
+                        replies: {
+                            _count: 'desc'
+                        }
+                    }
+                    : query?.filter === PostFilter.POPULAR
+                        ? {
+                            views: 'desc'
+                        }
+                        : {
+                            createdAt: 'desc'
+                        } ) as PrismaTypes.PostOrderByWithRelationInput
     }
 }
