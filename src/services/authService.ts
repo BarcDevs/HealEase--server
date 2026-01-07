@@ -3,7 +3,7 @@ import Csrf from 'csrf'
 import type { CookieOptions } from 'express'
 import jwt from 'jsonwebtoken'
 import ms from 'ms'
-import { authConfig } from '../../config'
+import { authConfig, env, serverConfig } from '../../config'
 import { excludedUserFields } from '../constants/excludedUserFields'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { AuthError } from '../errors/AuthError'
@@ -38,8 +38,8 @@ const getUser = async (by: 'email' | 'id', value: string) => {
 
 const getCookiesOptions = (remember: boolean) => ( {
         httpOnly: true,
-        sameSite: 'strict' as const,
-        secure: false,
+        sameSite: env === 'production' ? 'none' : 'lax',
+        secure: env === 'production',
         maxAge: remember ? ms(authConfig.expiresIn) : ms('1d')
     } ) as CookieOptions
 
