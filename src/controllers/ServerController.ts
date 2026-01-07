@@ -12,6 +12,11 @@ export const getServerStatus = (
     res
         .status(HttpStatusCodes.OK)
         .json({
-            message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`
+            message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`,
+            config: {
+                CORS_Origin: serverConfig.origin,
+                NODE_ENV: process.env.NODE_ENV,
+                ORIGIN_env: process.env.ORIGIN
+            }
         })
 }
