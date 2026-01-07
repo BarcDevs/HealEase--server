@@ -15,8 +15,7 @@ export const getServerStatus = (
             message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`,
             config: {
                 CORS_Origin: serverConfig.origin,
-                NODE_ENV: process.env.NODE_ENV,
-                ORIGIN_env: process.env.ORIGIN
+                NODE_ENV: process.env.NODE_ENV
             }
         })
 }
