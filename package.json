@@ -10,7 +10,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=default nodemon src/app.ts",
+    "start": "node dist/src/app.js",
+    "build": "npx prisma generate && tsc",
     "start:dev": "NODE_ENV=development nodemon src/app.ts",
     "start:prod": "NODE_ENV=production node build/index.bundle.js",
     "prod": "npm run prisma:generate && npm run prisma:deploy && webpack",
@@ -23,7 +24,6 @@
     "prisma:deploy": "npx prisma migrate deploy",
     "prisma:studio": "npx prisma studio",
     "typecheck": "tsc --noEmit",
-    "build": "ts-node esbuild.config.ts",
     "postinstall": ""
   },
   "keywords": [],
@@ -113,5 +113,10 @@
   },
   "optionalDependencies": {
     "win-node-env": "^0.6.1"
+  },
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src"
   }
 }
