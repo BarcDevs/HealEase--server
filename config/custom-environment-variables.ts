@@ -1,9 +1,16 @@
 export default {
-    auth: {
-        jwtSecret: 'JWT_SECRET'
+    server: {
+        port: 'PORT',
+        origin: 'ORIGIN'
+    },
+    database: {
+        url: 'DATABASE_URL'
+    },
+    jwt: {
+        secret: 'JWT_SECRET'
     },
     email: {
-        emailUser: 'EMAIL_USER',
-        emailPass: 'EMAIL_PASS'
+        user: 'EMAIL_USER',
+        password: 'EMAIL_PASSWORD'
     }
 }
