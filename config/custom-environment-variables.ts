@@ -1,4 +1,5 @@
 export default {
+    env: 'APP_ENV',
     server: {
         port: 'PORT',
         origin: 'ORIGIN',

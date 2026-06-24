@@ -1,5 +1,5 @@
 export default {
-    env: 'NODE_ENV',
+    env: 'development',
     app: {
         start: 'Server is running on {0}'
     },
