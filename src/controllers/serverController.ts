@@ -3,7 +3,7 @@ import type {
     Response
 } from 'express'
 
-import { env, serverConfig } from '../../config'
+import { env, googleOAuthConfig, serverConfig } from '../../config'
 import { version } from '../../package.json'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
@@ -18,7 +18,8 @@ export const getServerStatus = (
             version,
             config: {
                 CORS_Origin: serverConfig.origin,
-                NODE_ENV: env
+                NODE_ENV: env,
+                googleRedirectUri: googleOAuthConfig.redirectUri
             }
         })
 }
