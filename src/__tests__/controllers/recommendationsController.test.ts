@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Request, Response } from 'express'
 
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as recommendationsController from '../../controllers/recommendationsController'
 import * as recommendationsService from '../../services/recommendationsService'
 import {
@@ -38,7 +39,7 @@ describe('recommendationsController', () => {
             await recommendationsController.getRecommendations(req, res)
 
             expect(recommendationsService.getRecommendations).toHaveBeenCalledWith('user-1')
-            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.OK)
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: 'Recommendations retrieved'
@@ -78,7 +79,7 @@ describe('recommendationsController', () => {
 
             await recommendationsController.getRecommendations(req, res)
 
-            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 })

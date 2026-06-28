@@ -3,6 +3,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { sendEmail } from '../../utils/emailSender'
 import { prismaMock } from '../setup/jestSetup'
 import {
@@ -31,7 +32,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('user logged in!')
                 expect(response.body.data)
@@ -60,7 +61,7 @@ describe('Auth Routes', () => {
                         remember: true
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toHaveProperty('token')
             }
@@ -75,7 +76,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].error)
@@ -94,7 +95,7 @@ describe('Auth Routes', () => {
                         email: 'test@test.com'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].error)
@@ -114,7 +115,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -132,7 +133,7 @@ describe('Auth Routes', () => {
                         password: 'short'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -153,7 +154,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
                 expect(response.body.error[0].error)
@@ -175,7 +176,7 @@ describe('Auth Routes', () => {
                         password: 'WrongPassword123!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
             }
@@ -200,7 +201,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.message)
                 .toBe('user created!')
             expect(response.body.data)
@@ -230,7 +231,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
             }
         )
 
@@ -245,7 +246,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -264,7 +265,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -283,7 +284,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -302,7 +303,7 @@ describe('Auth Routes', () => {
                         email: 'john@test.com'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -322,7 +323,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -342,7 +343,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -365,7 +366,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(409)
+                expect(response.status).toBe(HttpStatusCodes.CONFLICT)
                 expect(response.body.error[0].statusType)
                     .toBe('Conflict')
                 expect(response.body.error[0].error)
@@ -394,7 +395,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(409)
+                expect(response.status).toBe(HttpStatusCodes.CONFLICT)
                 expect(response.body.error[0].statusType)
                     .toBe('Conflict')
                 expect(response.body.error[0].error)
@@ -411,7 +412,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/auth/logout`)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('user logged out!')
             }
@@ -423,7 +424,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/auth/logout`)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
 
                 const setCookieHeaders =
                     response.headers['set-cookie'] || []
@@ -459,7 +460,7 @@ describe('Auth Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('user info!')
                 expect(response.body.data)
@@ -479,7 +480,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(meEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Unauthorized')
             }
@@ -492,7 +493,7 @@ describe('Auth Routes', () => {
                     .get(meEndpoint)
                     .set('Cookie', ['accessToken='])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Unauthorized')
             }
@@ -505,7 +506,7 @@ describe('Auth Routes', () => {
                     .get(meEndpoint)
                     .set('Cookie', ['accessToken=invalid-token'])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Unauthorized')
             }
@@ -523,7 +524,7 @@ describe('Auth Routes', () => {
                         `accessToken=${expiredToken}`
                     ])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -554,7 +555,7 @@ describe('Auth Routes', () => {
                     .get(meEndpoint)
                     .set('Cookie', [`accessToken=${token1}`])
 
-                expect(response1.status).toBe(200)
+                expect(response1.status).toBe(HttpStatusCodes.OK)
                 expect(response1.body.data.user.id)
                     .toBe('user-1')
 
@@ -568,7 +569,7 @@ describe('Auth Routes', () => {
                     .get(meEndpoint)
                     .set('Cookie', [`accessToken=${token2}`])
 
-                expect(response2.status).toBe(200)
+                expect(response2.status).toBe(HttpStatusCodes.OK)
                 expect(response2.body.data.user.id)
                     .toBe('user-2')
                 expect(response2.body.data.user.email)
@@ -597,7 +598,7 @@ describe('Auth Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('CSRF token generated!')
                 expect(response.body.data)
@@ -613,7 +614,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(csrfEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -634,7 +635,7 @@ describe('Auth Routes', () => {
                         `/api/${serverConfig.apiVersion}/auth/forgot-password/test@test.com`
                     )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -649,7 +650,7 @@ describe('Auth Routes', () => {
                         `/api/${serverConfig.apiVersion}/auth/forgot-password/notfound@test.com`
                     )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -661,7 +662,7 @@ describe('Auth Routes', () => {
                         `/api/${serverConfig.apiVersion}/auth/forgot-password/invalid-email`
                     )
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -695,7 +696,7 @@ describe('Auth Routes', () => {
                         OTP
                     })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.data.user.email).toBe(
                     mockUser.email
                 )
@@ -725,7 +726,7 @@ describe('Auth Routes', () => {
                         OTP
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -752,7 +753,7 @@ describe('Auth Routes', () => {
                         OTP: 999999
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -770,7 +771,7 @@ describe('Auth Routes', () => {
                         OTP: 123456
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -783,7 +784,7 @@ describe('Auth Routes', () => {
                         OTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -796,7 +797,7 @@ describe('Auth Routes', () => {
                         email: 'test@test.com'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -810,7 +811,7 @@ describe('Auth Routes', () => {
                         OTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -840,7 +841,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message).toBe(
                     'Verification code sent to your new email address!'
                 )
@@ -857,7 +858,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -873,7 +874,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ password: 'Password123!' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -893,7 +894,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ newEmail: 'newemail@test.com' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -916,7 +917,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -942,7 +943,7 @@ describe('Auth Routes', () => {
                     password: 'WrongPassword123!'
                 })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
             }
@@ -967,7 +968,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-                expect(response.status).toBe(409)
+                expect(response.status).toBe(HttpStatusCodes.CONFLICT)
                 expect(response.body.error[0].statusType)
                     .toBe('Conflict')
             }
@@ -1003,7 +1004,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ OTP })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('Email updated successfully!')
                 expect(response.body.data.user.email)
@@ -1018,7 +1019,7 @@ describe('Auth Routes', () => {
                     .post(endpoint)
                     .send({ OTP: 123456 })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1034,7 +1035,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({})
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -1062,7 +1063,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ OTP: 999999 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -1090,7 +1091,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ OTP })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -1111,7 +1112,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ OTP: 123456 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -1151,7 +1152,7 @@ describe('Auth Routes', () => {
                         userOTP: OTP
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.user.email).toBe(
                     mockUser.email
                 )
@@ -1192,7 +1193,7 @@ describe('Auth Routes', () => {
                         userOTP: OTP
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1220,7 +1221,7 @@ describe('Auth Routes', () => {
                         userOTP: 999999
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1239,7 +1240,7 @@ describe('Auth Routes', () => {
                         userOTP: 123456
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1267,7 +1268,7 @@ describe('Auth Routes', () => {
                         userOTP: OTP
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1281,7 +1282,7 @@ describe('Auth Routes', () => {
                         userOTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1295,7 +1296,7 @@ describe('Auth Routes', () => {
                         userOTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1309,7 +1310,7 @@ describe('Auth Routes', () => {
                         newPassword: 'NewPassword456!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -1327,7 +1328,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/auth/forgot-password/test@test.com`)
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
 
@@ -1346,7 +1347,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
 
@@ -1362,7 +1363,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
     })

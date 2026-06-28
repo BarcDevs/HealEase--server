@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Request, Response } from 'express'
 
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as recoveryGoalController from '../../controllers/recoveryGoalController'
 import * as recoveryGoalService from '../../services/recoveryGoalService'
 import {
@@ -169,7 +170,7 @@ describe('RecoveryGoalController', () => {
                 USER_ID,
                 expect.objectContaining({ title: 'Sleep Better' })
             )
-            expect(res.status).toHaveBeenCalledWith(201)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.CREATED)
         })
     })
 
@@ -351,7 +352,7 @@ describe('RecoveryGoalController', () => {
                     ])
                 })
             )
-            expect(res.status).toHaveBeenCalledWith(201)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.CREATED)
         })
     })
 

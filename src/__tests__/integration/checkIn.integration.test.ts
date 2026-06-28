@@ -4,6 +4,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { createToken } from '../../lib/authCrypto'
 import Prisma from '../../utils/prismaClient'
 
@@ -54,7 +55,7 @@ describe('CheckIn Routes — Integration', () => {
                 .set('x-csrf-token', csrfToken)
                 .send(validCheckIn)
 
-            expect(res.status).toBe(201)
+            expect(res.status).toBe(HttpStatusCodes.CREATED)
             expect(res.body.data.moodScore).toBe(validCheckIn.moodScore)
             expect(res.body.data).toHaveProperty('id')
 
@@ -83,7 +84,7 @@ describe('CheckIn Routes — Integration', () => {
                 .set('x-csrf-token', t2)
                 .send({ ...validCheckIn, moodScore: 5 })
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             expect(res.body.data.moodScore).toBe(5)
         })
 
@@ -92,7 +93,7 @@ describe('CheckIn Routes — Integration', () => {
                 .post(CHECK_IN_URL)
                 .send(validCheckIn)
 
-            expect(res.status).toBe(401)
+            expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('returns 400 for invalid moodScore', async () => {
@@ -105,7 +106,7 @@ describe('CheckIn Routes — Integration', () => {
                 .set('x-csrf-token', csrfToken)
                 .send({ ...validCheckIn, moodScore: 11 })
 
-            expect(res.status).toBe(400)
+            expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
         })
     })
 
@@ -124,7 +125,7 @@ describe('CheckIn Routes — Integration', () => {
                 .get(CHECK_IN_URL)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             expect(Array.isArray(res.body.data)).toBe(true)
             expect(res.body.data).toHaveLength(1)
             expect(res.body.data[0].moodScore).toBe(validCheckIn.moodScore)
@@ -137,13 +138,13 @@ describe('CheckIn Routes — Integration', () => {
                 .get(CHECK_IN_URL)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             expect(res.body.data).toEqual([])
         })
 
         it('returns 401 without authentication', async () => {
             const res = await supertest(App).get(CHECK_IN_URL)
-            expect(res.status).toBe(401)
+            expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -165,7 +166,7 @@ describe('CheckIn Routes — Integration', () => {
                 .set('x-csrf-token', ut)
                 .send({ moodScore: 9 })
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             expect(res.body.data.moodScore).toBe(9)
         })
 
@@ -179,7 +180,7 @@ describe('CheckIn Routes — Integration', () => {
                 .set('x-csrf-token', csrfToken)
                 .send({ moodScore: 9 })
 
-            expect(res.status).toBe(404)
+            expect(res.status).toBe(HttpStatusCodes.NOT_FOUND)
         })
     })
 })

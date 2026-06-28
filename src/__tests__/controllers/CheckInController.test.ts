@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Request, Response } from 'express'
 
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as checkInController from '../../controllers/checkInController'
 import * as checkInService from '../../services/checkInService'
 import * as progressInsightsService from '../../services/progressInsightsService'
@@ -144,7 +145,7 @@ describe('CheckInController', () => {
             expect(checkInService.createCheckIn).toHaveBeenCalledWith(
                 expect.objectContaining({ userId: USER_ID })
             )
-            expect(res.status).toHaveBeenCalledWith(201)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.CREATED)
         })
 
         it('returns 200 on update (created=false)', async () => {
@@ -161,7 +162,7 @@ describe('CheckInController', () => {
 
             await checkInController.createCheckIn(req, res)
 
-            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 

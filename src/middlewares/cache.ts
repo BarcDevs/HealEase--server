@@ -6,6 +6,8 @@ import type {
 } from 'express'
 import NodeCache from 'node-cache'
 
+import { HttpStatusCodes } from '../constants/httpStatusCodes'
+
 const cache =
     new NodeCache({
         stdTTL: 60 * 10,
@@ -30,7 +32,7 @@ export const cacheMiddleware = (
             JSON.parse(cachedData as string)
 
         return res
-            .status(200)
+            .status(HttpStatusCodes.OK)
             .json(parsedCacheData)
     }
 

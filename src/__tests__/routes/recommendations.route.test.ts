@@ -3,6 +3,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as recommendationsService
     from '../../services/recommendationsService'
 import {
@@ -46,7 +47,7 @@ describe('Recommendations Routes', () => {
         it('should return 401 for unauthenticated request', async () => {
             const response = await supertest(App).get(endpoint)
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('should return 200 with processing status when no check-ins exist', async () => {
@@ -60,7 +61,7 @@ describe('Recommendations Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe('processing')
             expect(response.body.data.posts).toEqual([])
         })
@@ -76,7 +77,7 @@ describe('Recommendations Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe('ready')
             expect(response.body.data.posts).toHaveLength(1)
             expect(response.body.data.isStale).toBe(false)
@@ -97,7 +98,7 @@ describe('Recommendations Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.isStale).toBe(true)
         })
 
@@ -112,7 +113,7 @@ describe('Recommendations Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(500)
+            expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
         })
     })
 })

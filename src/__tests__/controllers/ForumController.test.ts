@@ -2,6 +2,7 @@
 import type { Request, Response } from 'express'
 
 import { FORUM_PAGINATION } from '../../constants/forum/pagination'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as forumController from '../../controllers/forumController'
 import * as forumService from '../../services/forumService'
 import {
@@ -55,7 +56,7 @@ describe('ForumController', () => {
 
             expect(forumService.getPosts).toHaveBeenCalled()
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: expect.stringContaining('posts found'),
@@ -153,7 +154,7 @@ describe('ForumController', () => {
                     })
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(201)
+                    .toHaveBeenCalledWith(HttpStatusCodes.CREATED)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: 'Post created successfully'
@@ -224,7 +225,7 @@ describe('ForumController', () => {
                 FORUM_PAGINATION.DEFAULT_REPLY_LIMIT
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
 
         it('should pass limit query to service', async () => {
@@ -297,7 +298,7 @@ describe('ForumController', () => {
                 { title: 'Updated Title' }
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
 
         it(
@@ -344,7 +345,7 @@ describe('ForumController', () => {
                 'test-post-id-123'
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
 
         it(
@@ -391,7 +392,7 @@ describe('ForumController', () => {
                     })
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(200)
+                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
             }
         )
 
@@ -437,7 +438,7 @@ describe('ForumController', () => {
                 undefined
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
 
         it('should pass limit and page to service', async () => {
@@ -473,7 +474,7 @@ describe('ForumController', () => {
 
             await forumController.getReplies(req, res)
 
-            expect(res.status).toHaveBeenCalledWith(200)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 
@@ -513,7 +514,7 @@ describe('ForumController', () => {
                 { body: 'Updated reply' }
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 
@@ -548,7 +549,7 @@ describe('ForumController', () => {
                 'test-post-id-123'
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 
@@ -820,7 +821,7 @@ describe('ForumController', () => {
 
             expect(forumService.getTags).toHaveBeenCalled()
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
 
         it(
@@ -861,7 +862,7 @@ describe('ForumController', () => {
                 'test-tag-id-123'
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
 
         it(

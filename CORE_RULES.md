@@ -15,6 +15,7 @@
 - Never use array index as key — use the current element as an index
 - Text: never use the `—` character. Only the simple hyphen `-` for all text, including classnames and config keys
 - Time values: Always use `src/constants/time.ts` (minuteInMs, hourInMs, etc.) instead of hardcoding milliseconds
+- HTTP status codes: Always use `HttpStatusCodes` from `@src/constants/httpStatusCodes.ts` — never raw numbers like `200`, `404`, `500`
 - Text blocks: Don't break unless really long (120-150 chars OK)
 - Condition operators at the end of a line if line-breaking
 - Use unified imports for modules that have many imports

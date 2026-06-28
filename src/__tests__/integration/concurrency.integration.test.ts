@@ -4,6 +4,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { createToken } from '../../lib/authCrypto'
 import Prisma from '../../utils/prismaClient'
 
@@ -68,8 +69,8 @@ describe('Concurrency — Integration', () => {
                     .send({ ...validCheckIn, moodScore: 8 })
             ])
 
-            expect([201, 200]).toContain(r1.status)
-            expect([201, 200]).toContain(r2.status)
+            expect([HttpStatusCodes.CREATED, HttpStatusCodes.OK]).toContain(r1.status)
+            expect([HttpStatusCodes.CREATED, HttpStatusCodes.OK]).toContain(r2.status)
 
             const profile = await Prisma.profile.findUnique({
                 where: { userId: dbUser.id },
@@ -124,8 +125,8 @@ describe('Concurrency — Integration', () => {
                     .send({ bio: 'Second update bio' })
             ])
 
-            expect([200]).toContain(r1.status)
-            expect([200]).toContain(r2.status)
+            expect([HttpStatusCodes.OK]).toContain(r1.status)
+            expect([HttpStatusCodes.OK]).toContain(r2.status)
 
             const profile = await Prisma.profile.findUnique({
                 where: { userId: dbUser.id }
@@ -145,7 +146,7 @@ describe('Concurrency — Integration', () => {
                 .set('x-csrf-token', hCreate.csrfToken)
                 .send({ title: 'Race post', body: 'Content', category: 'General', tags: [] })
 
-            expect(createRes.status).toBe(201)
+            expect(createRes.status).toBe(HttpStatusCodes.CREATED)
             const postId = createRes.body.data.id
 
             const h1 = buildCsrfHeaders(token)

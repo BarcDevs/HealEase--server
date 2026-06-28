@@ -3,6 +3,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { hashPassword } from '../../lib/authCrypto'
 import { prismaMock } from '../setup/jestSetup'
 import {
@@ -39,7 +40,7 @@ describe('User Routes', () => {
                 csrfToken
             ).send({ firstName: 'John' })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.message).toBe(
                 'User updated successfully'
             )
@@ -70,7 +71,7 @@ describe('User Routes', () => {
                 csrfToken
             ).send({ lastName: 'Doe' })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.user.lastName)
                 .toBe('Doe')
         })
@@ -99,7 +100,7 @@ describe('User Routes', () => {
                 csrfToken
             ).send({ username: 'newusername' })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.user.username)
                 .toBe('newusername')
         })
@@ -136,7 +137,7 @@ describe('User Routes', () => {
                     username: 'johndoe'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.user.firstName)
                     .toBe('John')
                 expect(response.body.data.user.lastName)
@@ -168,7 +169,7 @@ describe('User Routes', () => {
                 csrfToken
             ).send({ username: 'takenname' })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
             expect(response.body.error[0].error).toContain(
                 'Username already taken'
             )
@@ -190,7 +191,7 @@ describe('User Routes', () => {
                     csrfToken
                 ).send({ username: 'ab' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -214,7 +215,7 @@ describe('User Routes', () => {
                     csrfToken
                 ).send({ username: 'john@doe' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -246,7 +247,7 @@ describe('User Routes', () => {
                     csrfToken
                 ).send({ username: 'john_doe' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.user.username).toBe('john_doe')
             }
         )
@@ -257,7 +258,7 @@ describe('User Routes', () => {
                     .patch(updateUserEndpoint)
                     .send({ firstName: 'John' })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -295,7 +296,7 @@ describe('User Routes', () => {
                     newPassword: 'NewPassword456!'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message).toBe(
                     'Password updated successfully'
                 )
@@ -327,7 +328,7 @@ describe('User Routes', () => {
                     newPassword: 'NewPassword456!'
                 })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].error).toContain(
                     'Invalid current password'
                 )
@@ -354,7 +355,7 @@ describe('User Routes', () => {
                 newPassword: 'weak'
             })
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             expect(response.body.error[0].statusType)
                 .toBe('Validation Error')
             expect(response.body.error[0].property)
@@ -382,7 +383,7 @@ describe('User Routes', () => {
                     newPassword: '12345678'
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -409,7 +410,7 @@ describe('User Routes', () => {
                     newPassword: 'OnlyLetters'
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -433,7 +434,7 @@ describe('User Routes', () => {
                     newPassword: 'NewPassword456!'
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -459,7 +460,7 @@ describe('User Routes', () => {
                     currentPassword: 'OldPassword123!'
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -476,7 +477,7 @@ describe('User Routes', () => {
                         newPassword: 'NewPassword456!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -508,7 +509,7 @@ describe('User Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(204)
+            expect(response.status).toBe(HttpStatusCodes.NO_CONTENT)
             expect(prismaMock.user.findUnique)
                 .toHaveBeenCalledWith({
                     where: { id: mockUser.id },
@@ -555,7 +556,7 @@ describe('User Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(404)
+            expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             expect(response.body.error[0].error).toContain(
                 'not found'
             )
@@ -566,7 +567,7 @@ describe('User Routes', () => {
                 const response = await supertest(App)
                     .delete(deleteUserEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -588,7 +589,7 @@ describe('User Routes', () => {
                         `_csrf=${csrfSecret}`
                     ])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].error).toContain(
                     'CSRF'
                 )
@@ -614,7 +615,7 @@ describe('User Routes', () => {
                     ])
                     .set('x-csrf-token', 'invalid-token')
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].error).toContain(
                     'CSRF'
                 )

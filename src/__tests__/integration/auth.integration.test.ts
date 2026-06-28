@@ -3,6 +3,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { createToken } from '../../lib/authCrypto'
 import Prisma from '../../utils/prismaClient'
 
@@ -26,7 +27,7 @@ describe('Auth Routes — Integration', () => {
         it('creates user and profile in DB, returns 201', async () => {
             const res = await signup()
 
-            expect(res.status).toBe(201)
+            expect(res.status).toBe(HttpStatusCodes.CREATED)
             expect(res.body.data.user.email).toBe(testUser.email)
             expect(res.body.data.user).not.toHaveProperty('password')
 
@@ -43,7 +44,7 @@ describe('Auth Routes — Integration', () => {
             await signup()
             const res = await signup()
 
-            expect(res.status).toBe(409)
+            expect(res.status).toBe(HttpStatusCodes.CONFLICT)
             expect(res.body.error[0].error).toBe('User already exists!')
         })
 
@@ -52,7 +53,7 @@ describe('Auth Routes — Integration', () => {
                 .post(SIGNUP_URL)
                 .send({ email: testUser.email, password: testUser.password })
 
-            expect(res.status).toBe(400)
+            expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
             expect(res.body.error[0].statusType).toBe('Validation Error')
         })
     })
@@ -70,7 +71,7 @@ describe('Auth Routes — Integration', () => {
                     password: testUser.password
                 })
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             expect(res.body.data).toHaveProperty('token')
             expect(res.body.data).toHaveProperty('_csrf')
             const cookies = res.headers['set-cookie'].join('; ')
@@ -85,7 +86,7 @@ describe('Auth Routes — Integration', () => {
                     password: 'WrongPassword123!'
                 })
 
-            expect(res.status).toBe(401)
+            expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('returns 401 for non-existent email', async () => {
@@ -96,7 +97,7 @@ describe('Auth Routes — Integration', () => {
                     password: testUser.password
                 })
 
-            expect(res.status).toBe(401)
+            expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -112,14 +113,14 @@ describe('Auth Routes — Integration', () => {
                 .get(ME_URL)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             expect(res.body.data.user.email).toBe(testUser.email)
             expect(res.body.data.user).not.toHaveProperty('password')
         })
 
         it('returns 401 with no token', async () => {
             const res = await supertest(App).get(ME_URL)
-            expect(res.status).toBe(401)
+            expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -127,7 +128,7 @@ describe('Auth Routes — Integration', () => {
         it('clears auth cookies and returns 200', async () => {
             const res = await supertest(App).get(LOGOUT_URL)
 
-            expect(res.status).toBe(200)
+            expect(res.status).toBe(HttpStatusCodes.OK)
             const cookies = res.headers['set-cookie'].join('; ')
             expect(cookies).toContain('accessToken')
             expect(cookies).toContain('_csrf')

@@ -3,6 +3,7 @@ import type { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
 import { authConfig } from '../../../config'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { isAuthenticated } from '../../middlewares/isAuthenticated'
 import {
     createAuthToken,
@@ -21,7 +22,7 @@ jest.mock('../../errors/factory/ErrorFactory', () => ({
                     'Unauthorized! please login first!'
                 )
                 ;(error as Error & {statusCode: number})
-                    .statusCode = 401
+                    .statusCode = HttpStatusCodes.UNAUTHORIZED
                 return error
             })
         }

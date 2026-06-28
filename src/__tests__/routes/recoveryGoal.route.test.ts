@@ -8,6 +8,7 @@ import {
 } from '../../../prisma/generated/prisma/enums'
 import App from '../../app'
 import { recoveryGoalsConfig } from '../../config/recoveryGoals'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { dayInMs } from '../../constants/time'
 import { errorFactory } from '../../errors/factory/ErrorFactory'
 import { prismaMock } from '../setup/jestSetup'
@@ -116,7 +117,7 @@ describe('Recovery Goals Routes', () => {
                 targetDate: '2026-07-23T00:00:00Z'
             })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data.title).toBe('Build strength')
             expect(response.body.data.category).toBe('physical')
             expect(response.body.data.isPrimary).toBe(true)
@@ -147,7 +148,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'mental'
             })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data.isPrimary).toBe(false)
             expect(response.body.data.status).toBe(GoalStatus.ACTIVE)
         })
@@ -167,7 +168,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ category: 'physical' })
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
         })
 
         it('should reject invalid category', async () => {
@@ -188,7 +189,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'invalid'
             })
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
         })
 
         it('should require auth', async () => {
@@ -199,7 +200,7 @@ describe('Recovery Goals Routes', () => {
                     category: 'physical'
                 })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('should require CSRF', async () => {
@@ -214,7 +215,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'physical'
             })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('should reject creation when exceeding active goals limit', async () => {
@@ -248,7 +249,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'physical'
             })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should allow creation when goals are completed', async () => {
@@ -288,7 +289,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'physical'
             })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data.title).toBe('New Goal')
         })
 
@@ -329,7 +330,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'mental'
             })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data.title).toBe('New Goal')
         })
     })
@@ -358,7 +359,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toHaveLength(2)
             expect(response.body.data[0]).toHaveProperty('progress')
         })
@@ -374,7 +375,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toEqual([])
         })
 
@@ -394,7 +395,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toHaveLength(1)
             expect(response.body.data[0].status).toBe(GoalStatus.ACTIVE)
             expect(prismaMock.recoveryGoal.findMany).toHaveBeenCalledWith(
@@ -417,7 +418,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(prismaMock.recoveryGoal.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({
                     where: expect.objectContaining({
@@ -443,7 +444,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toHaveLength(2)
             expect(prismaMock.recoveryGoal.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -465,7 +466,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data[0].milestonesCount).toBe(0)
         })
 
@@ -488,13 +489,13 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data[0].milestonesCount).toBe(3)
         })
 
         it('should require auth', async () => {
             const response = await supertest(App).get(API_BASE)
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -523,7 +524,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goal.id).toBe('goal-123')
             expect(response.body.data.milestones).toHaveLength(2)
             expect(response.body.data.goal).toHaveProperty('progress')
@@ -540,12 +541,12 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(404)
+            expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
         })
 
         it('should require auth', async () => {
             const response = await supertest(App).get(`${API_BASE}/goal-123`)
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -575,7 +576,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ title: 'Updated title' })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.title).toBe('Updated title')
         })
 
@@ -605,7 +606,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.ABANDONED })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
         })
 
         it('should reject invalid status', async () => {
@@ -623,7 +624,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: 'invalid' })
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
         })
 
         it('should return 404 for non-existent goal', async () => {
@@ -643,7 +644,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ title: 'Updated' })
 
-            expect(response.status).toBe(404)
+            expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
         })
 
         it('should require CSRF', async () => {
@@ -655,7 +656,7 @@ describe('Recovery Goals Routes', () => {
                 token
             ).send({ title: 'Updated' })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('should pause an active goal', async () => {
@@ -686,7 +687,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.PAUSED })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe(GoalStatus.PAUSED)
             expect(response.body.data.pausedAt).not.toBeNull()
         })
@@ -719,7 +720,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.ACTIVE })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe(GoalStatus.ACTIVE)
         })
 
@@ -758,7 +759,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.ACTIVE })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe(GoalStatus.ACTIVE)
         })
 
@@ -784,7 +785,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.ACTIVE })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject invalid transition PAUSED→COMPLETED', async () => {
@@ -808,7 +809,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.COMPLETED })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject invalid transition COMPLETED→ABANDONED', async () => {
@@ -832,7 +833,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.ABANDONED })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject ACTIVE→COMPLETED when milestones are incomplete', async () => {
@@ -860,7 +861,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.COMPLETED })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should set abandonedAt when abandoning a paused goal', async () => {
@@ -892,7 +893,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ status: GoalStatus.ABANDONED })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe(GoalStatus.ABANDONED)
             expect(response.body.data.abandonedAt).not.toBeNull()
         })
@@ -921,7 +922,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toBeNull()
         })
 
@@ -942,7 +943,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(404)
+            expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
         })
 
         it('should require CSRF', async () => {
@@ -954,7 +955,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -1007,7 +1008,7 @@ describe('Recovery Goals Routes', () => {
                 title: 'No screens 1 hour before bed'
             })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data).toHaveLength(1)
             expect(response.body.data[0].title).toBe('No screens 1 hour before bed')
             expect(response.body.data[0].order).toBe(1)
@@ -1061,7 +1062,7 @@ describe('Recovery Goals Routes', () => {
                 description: 'First step'
             })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data).toHaveLength(1)
             expect(response.body.data[0].title).toBe('First milestone')
             expect(response.body.data[0].description).toBe('First step')
@@ -1095,7 +1096,7 @@ describe('Recovery Goals Routes', () => {
                 title: 'Milestone'
             })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject max 8 milestones', async () => {
@@ -1129,7 +1130,7 @@ describe('Recovery Goals Routes', () => {
                 title: 'M9'
             })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should require CSRF', async () => {
@@ -1143,7 +1144,7 @@ describe('Recovery Goals Routes', () => {
                 title: 'Milestone'
             })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -1179,7 +1180,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ title: 'Updated title' })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.title).toBe('Updated title')
         })
 
@@ -1211,7 +1212,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ description: 'Updated description' })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
         })
 
         it('should update order', async () => {
@@ -1242,7 +1243,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ order: 3 })
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
         })
 
         it('should reject non-active goal', async () => {
@@ -1273,7 +1274,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ title: 'Updated' })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject modification of completed milestone', async () => {
@@ -1303,7 +1304,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({ title: 'Updated' })
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should require CSRF', async () => {
@@ -1316,7 +1317,7 @@ describe('Recovery Goals Routes', () => {
                 token
             ).send({ title: 'Updated' })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -1348,7 +1349,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toBeNull()
         })
 
@@ -1356,7 +1357,7 @@ describe('Recovery Goals Routes', () => {
             const response = await supertest(App)
                 .delete(`${API_BASE}/goal-123/milestones/m-123`)
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('should require CSRF', async () => {
@@ -1369,7 +1370,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -1431,7 +1432,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.message)
                 .toContain('completed successfully')
         })
@@ -1464,7 +1465,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should require CSRF', async () => {
@@ -1479,7 +1480,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -1517,7 +1518,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.status).toBe(GoalStatus.COMPLETED)
             expect(response.body.data.progress).toBe(1)
         })
@@ -1542,7 +1543,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject if milestones incomplete', async () => {
@@ -1572,7 +1573,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should reject if no milestones', async () => {
@@ -1596,7 +1597,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(409)
+            expect(response.status).toBe(HttpStatusCodes.CONFLICT)
         })
 
         it('should require CSRF', async () => {
@@ -1608,7 +1609,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -1632,7 +1633,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goals).toHaveProperty('totalCreated')
             expect(response.body.data.goals).toHaveProperty('completed')
             expect(response.body.data.goals).toHaveProperty('completionRate')
@@ -1660,7 +1661,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goals.totalCreated).toBe(0)
             expect(response.body.data.goals.completed).toBe(0)
             expect(response.body.data.goals.completionRate).toBe(0)
@@ -1687,7 +1688,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goals.totalCreated).toBe(5)
         })
 
@@ -1710,14 +1711,14 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goals.totalCreated).toBe(4)
         })
 
         it('should require authentication', async () => {
             const response = await supertest(App).get(`${API_BASE}/stats`)
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('should calculate streak for consecutive days', async () => {
@@ -1740,7 +1741,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goals.streak).toBeGreaterThan(0)
         })
 
@@ -1767,7 +1768,7 @@ describe('Recovery Goals Routes', () => {
                 token
             )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.goals.completionRate).toBe(0.3)
             expect(response.body.data.milestones.completionRate).toBe(0.4)
         })

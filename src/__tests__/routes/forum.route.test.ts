@@ -4,6 +4,7 @@ import supertest from 'supertest'
 import { serverConfig } from '../../../config'
 import { Prisma } from '../../../prisma/generated/prisma/client'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { prismaMock } from '../setup/jestSetup'
 import {
     createAuthenticatedRequest,
@@ -40,7 +41,7 @@ describe('Forum Routes', () => {
                         .get(postsEndpoint)
 
                 expect(response.status)
-                    .toBe(200)
+                    .toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
@@ -62,7 +63,7 @@ describe('Forum Routes', () => {
                         page: 1
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -83,7 +84,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ tag: 'test-tag' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -100,7 +101,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ category: 'health' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -117,7 +118,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ search: 'Search' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -132,7 +133,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ filter: 'newest' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -149,7 +150,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ filter: 'popular' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -164,7 +165,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ filter: 'hot' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -183,7 +184,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ filter: 'unanswered' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -196,7 +197,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(postsEndpoint)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -209,7 +210,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ limit: 200 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -255,7 +256,7 @@ describe('Forum Routes', () => {
                     ]
                 })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.message)
                     .toBe('Post created successfully')
             }
@@ -273,7 +274,7 @@ describe('Forum Routes', () => {
                         tags: ['tag1']
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -295,7 +296,7 @@ describe('Forum Routes', () => {
                         tags: ['tag1']
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -320,7 +321,7 @@ describe('Forum Routes', () => {
                     tags: ['tag1']
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('title')
             }
@@ -347,7 +348,7 @@ describe('Forum Routes', () => {
                     tags: ['tag1']
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('body')
             }
@@ -374,7 +375,7 @@ describe('Forum Routes', () => {
                     tags: ['tag1']
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('category')
             }
@@ -411,7 +412,7 @@ describe('Forum Routes', () => {
                     category: 'general'
                 })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
             }
         )
     })
@@ -426,7 +427,7 @@ describe('Forum Routes', () => {
             const response = await supertest(App)
                 .get(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.id)
                 .toBe('test-post-id-123')
         })
@@ -440,7 +441,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts/non-existent-id`)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -467,7 +468,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.author.image).toBeNull()
             }
         )
@@ -514,7 +515,7 @@ describe('Forum Routes', () => {
                     title: 'Updated Title'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -527,7 +528,7 @@ describe('Forum Routes', () => {
                         title: 'Updated Title'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -562,7 +563,7 @@ describe('Forum Routes', () => {
                     title: 'Updated Title'
                 })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it(
@@ -595,7 +596,7 @@ describe('Forum Routes', () => {
                     title: 'Updated Title'
                 })
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
     })
@@ -635,7 +636,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toContain('deleted')
             }
@@ -649,7 +650,7 @@ describe('Forum Routes', () => {
                         `/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`
                     )
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -683,7 +684,7 @@ describe('Forum Routes', () => {
                 ])
                 .set('x-csrf-token', csrfToken)
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -705,7 +706,7 @@ describe('Forum Routes', () => {
                     `/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123/replies`
                 )
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data)
                 .toBeInstanceOf(Array)
             expect(response.body.data.length)
@@ -728,7 +729,7 @@ describe('Forum Routes', () => {
                         `/api/${serverConfig.apiVersion}/forum/posts/non-existent/replies`
                     )
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
     })
@@ -769,7 +770,7 @@ describe('Forum Routes', () => {
                     body: 'This is a reply'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('Reply created successfully')
             }
@@ -786,7 +787,7 @@ describe('Forum Routes', () => {
                         body: 'This is a reply'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -809,7 +810,7 @@ describe('Forum Routes', () => {
                 .set('x-csrf-token', csrfToken)
                 .send({})
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             expect(response.body.error[0].statusType)
                 .toBe('Validation Error')
         })
@@ -856,7 +857,7 @@ describe('Forum Routes', () => {
                         body: 'Updated reply'
                     })
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                 }
             )
 
@@ -893,7 +894,7 @@ describe('Forum Routes', () => {
                         body: 'Updated reply'
                     })
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 }
             )
 
@@ -927,7 +928,7 @@ describe('Forum Routes', () => {
                         body: 'Updated reply'
                     })
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 }
             )
         }
@@ -972,7 +973,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', csrfToken)
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                     expect(response.body.message)
                         .toContain('deleted')
                 }
@@ -1011,7 +1012,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', csrfToken)
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(response.body.error[0].error)
                         .toContain('not the author')
                 }
@@ -1038,7 +1039,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', csrfToken)
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 }
             )
 
@@ -1048,7 +1049,7 @@ describe('Forum Routes', () => {
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 }
             )
 
@@ -1074,7 +1075,7 @@ describe('Forum Routes', () => {
                             `_csrf=${csrfSecret}`
                         ])
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(response.body.error[0].error)
                         .toContain('CSRF')
                 }
@@ -1103,7 +1104,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', 'invalid-token')
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(response.body.error[0].error)
                         .toContain('CSRF')
                 }
@@ -1155,7 +1156,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.liked).toBe(true)
                 expect(response.body.data.likes).toBe(1)
                 expect(response.body.message).toBe('Post liked')
@@ -1189,7 +1190,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.liked).toBe(false)
                 expect(response.body.data.likes).toBe(0)
                 expect(response.body.message).toBe('Post unliked')
@@ -1202,7 +1203,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(likeEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1216,7 +1217,7 @@ describe('Forum Routes', () => {
                     .post(likeEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1240,7 +1241,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1261,7 +1262,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(shareEndpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.shareCount).toBe(1)
                 expect(response.body.message)
                     .toBe('Post test-post-id-123 shared')
@@ -1281,7 +1282,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-404/share`)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1327,7 +1328,7 @@ describe('Forum Routes', () => {
                         csrfToken
                     )
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                     expect(response.body.data.liked).toBe(true)
                     expect(response.body.data.likes).toBe(1)
                     expect(response.body.message)
@@ -1365,7 +1366,7 @@ describe('Forum Routes', () => {
                         csrfToken
                     )
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                     expect(response.body.data.liked).toBe(false)
                     expect(response.body.message)
                         .toBe('Reply unliked')
@@ -1378,7 +1379,7 @@ describe('Forum Routes', () => {
                     const response = await supertest(App)
                         .post(likeReplyEndpoint)
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 }
             )
 
@@ -1402,7 +1403,7 @@ describe('Forum Routes', () => {
                         csrfToken
                     )
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                     expect(response.body.error[0].statusType)
                         .toBe('Not Found')
                 }
@@ -1452,7 +1453,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.saved).toBe(true)
                 expect(response.body.message).toBe('Post saved')
             }
@@ -1483,7 +1484,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.saved).toBe(false)
                 expect(response.body.message).toBe('Post unsaved')
             }
@@ -1495,7 +1496,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(saveEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1509,7 +1510,7 @@ describe('Forum Routes', () => {
                     .post(saveEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1533,7 +1534,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1567,7 +1568,7 @@ describe('Forum Routes', () => {
                     .get(savedEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.data).toHaveLength(2)
@@ -1595,7 +1596,7 @@ describe('Forum Routes', () => {
                     .get(savedEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data).toEqual([])
                 expect(response.body.message)
                     .toBe('0 saved posts found')
@@ -1622,7 +1623,7 @@ describe('Forum Routes', () => {
                     .set('Cookie', [`accessToken=${token}`])
                     .query({ limit: 5, page: 1 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1632,7 +1633,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(savedEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -1651,7 +1652,7 @@ describe('Forum Routes', () => {
             const response = await supertest(App)
                 .get(tagsEndpoint)
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data)
                 .toBeInstanceOf(Array)
         })
@@ -1666,7 +1667,7 @@ describe('Forum Routes', () => {
                     .get(tagsEndpoint)
                     .query({ search: 'java' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1680,7 +1681,7 @@ describe('Forum Routes', () => {
                     .get(tagsEndpoint)
                     .query({ filter: 'popular' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1697,7 +1698,7 @@ describe('Forum Routes', () => {
                         page: 1
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1710,7 +1711,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(tagsEndpoint)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
     })
@@ -1724,7 +1725,7 @@ describe('Forum Routes', () => {
             const response = await supertest(App)
                 .get(`/api/${serverConfig.apiVersion}/forum/tags/test-tag-id-123`)
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.id)
                 .toBe('test-tag-id-123')
         })
@@ -1738,7 +1739,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/tags/non-existent-id`)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1775,7 +1776,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 ).send({ tagName: 'non-existent-tag' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('Tag attempt recorded')
             }
@@ -1788,7 +1789,7 @@ describe('Forum Routes', () => {
                     .post(endpoint)
                     .send({ tagName: 'some-tag' })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1803,7 +1804,7 @@ describe('Forum Routes', () => {
                     .set('Cookie', [`accessToken=${token}`])
                     .send({ tagName: 'some-tag' })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1824,7 +1825,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 ).send({})
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('tagName')
             }
@@ -1847,7 +1848,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 ).send({ tagName: '' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -1868,7 +1869,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
@@ -1888,7 +1889,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data[0].category).toBe('all')
                 expect(response.body.data[0].count).toBe(6)
             }
@@ -1905,7 +1906,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data[1])
                     .toHaveProperty('category')
                 expect(response.body.data[1])
@@ -1924,7 +1925,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data).toEqual([
                     { category: 'all', count: 0 }
                 ])
@@ -1970,7 +1971,7 @@ describe('Forum Routes', () => {
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
@@ -1984,7 +1985,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -2005,7 +2006,7 @@ describe('Forum Routes', () => {
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(403)
+                expect(response.status).toBe(HttpStatusCodes.FORBIDDEN)
             }
         )
     })
@@ -2035,7 +2036,7 @@ describe('Forum Routes', () => {
                         tags: []
                     })
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
 
@@ -2048,7 +2049,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts`)
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
     })

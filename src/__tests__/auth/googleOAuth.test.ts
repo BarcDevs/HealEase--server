@@ -665,7 +665,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -691,7 +691,7 @@ describe('Google OAuth', () => {
                             })
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -722,7 +722,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -752,7 +752,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -793,7 +793,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -832,7 +832,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -871,7 +871,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -910,7 +910,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -949,7 +949,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(500)
+                        .toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
                 }
             )
 
@@ -978,7 +978,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(500)
+                        .toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
                 }
             )
 
