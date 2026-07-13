@@ -19,7 +19,8 @@ export const isAuthenticated = (
 
         const { id } = jwt.verify(
             accessToken,
-            authConfig.jwtSecret
+            authConfig.jwtSecret,
+            { algorithms: ['HS256'] }
         ) as Partial<UserType>
 
         req.userId = id
