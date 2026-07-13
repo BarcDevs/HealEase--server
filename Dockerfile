@@ -35,15 +35,18 @@ RUN cp -r prisma/generated dist/prisma/
 FROM node:20-bullseye-slim AS runner
 RUN apt-get update && apt-get install -y openssl curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=deps-prod /app/node_modules ./node_modules
+COPY --from=deps-prod --chown=node:node /app/node_modules ./node_modules
 # Compiled app + config + prisma generated
-COPY --from=builder /app/dist ./dist
+COPY --from=builder --chown=node:node /app/dist ./dist
 # Prisma schema + migrations for migrate deploy
-COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
-COPY --from=builder /app/prisma/migrations ./prisma/migrations
+COPY --from=builder --chown=node:node /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder --chown=node:node /app/prisma/migrations ./prisma/migrations
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
+USER node
 # WORKDIR /app/dist: process.cwd() = /app/dist → config pkg finds dist/config/*.js
 WORKDIR /app/dist
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/api/status || exit 1
 CMD ["sh", "-c", "npx prisma migrate deploy --schema /app/prisma/schema.prisma && node src/app.js"]
