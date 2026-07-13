@@ -9,6 +9,7 @@ import type {
     EmailConfig,
     EnvConfig,
     GoogleOAuthConfig,
+    LoggingConfig,
     ServerConfig
 } from '../src/types/configType'
 
@@ -86,6 +87,10 @@ const aiGenerationConfig: AIGenerationConfig = {
     )
 }
 
+const loggingConfig: LoggingConfig = {
+    dir: config.get<string>('logging.dir')
+}
+
 export {
     aiConfig,
     aiGenerationConfig,
@@ -96,5 +101,6 @@ export {
     env,
     googleOAuthConfig,
     isDev,
+    loggingConfig,
     serverConfig
 }

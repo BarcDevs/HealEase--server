@@ -44,6 +44,9 @@ export default {
     aiGeneration: {
         maxOutputTokens: 1000,
         temperature: 0.7
+    },
+    logging: {
+        dir: 'logs'
     }
 }
 

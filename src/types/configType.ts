@@ -53,6 +53,10 @@ type AIGenerationConfig = {
     temperature: number
 }
 
+type LoggingConfig = {
+    dir: string
+}
+
 export type {
     AIConfig,
     AIGenerationConfig,
@@ -62,5 +66,6 @@ export type {
     EmailConfig,
     EnvConfig,
     GoogleOAuthConfig,
+    LoggingConfig,
     ServerConfig
 }
