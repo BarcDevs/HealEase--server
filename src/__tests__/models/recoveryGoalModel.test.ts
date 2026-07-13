@@ -309,24 +309,23 @@ describe('RecoveryGoalModel', () => {
     describe('setPrimaryGoal', () => {
         it('clears all primary flags then sets the target goal as primary', async () => {
             prismaMock.$executeRaw.mockResolvedValue(0)
-            prismaMock.recoveryGoal.updateMany.mockResolvedValue({
-                count: 2
-            })
-            prismaMock.recoveryGoal.update.mockResolvedValue(createMockRecoveryGoal({
-                isPrimary: true
-            }))
+            prismaMock.recoveryGoal.updateMany
+                .mockResolvedValueOnce({ count: 2 })
+                .mockResolvedValueOnce({ count: 1 })
 
             await recoveryGoalModel.setPrimaryGoal('profile-id', 'goal-id')
 
-            expect(prismaMock.recoveryGoal.updateMany).toHaveBeenCalledWith(
+            expect(prismaMock.recoveryGoal.updateMany).toHaveBeenNthCalledWith(
+                1,
                 expect.objectContaining({
                     where: { profileId: 'profile-id' },
                     data: { isPrimary: false }
                 })
             )
-            expect(prismaMock.recoveryGoal.update).toHaveBeenCalledWith(
+            expect(prismaMock.recoveryGoal.updateMany).toHaveBeenNthCalledWith(
+                2,
                 expect.objectContaining({
-                    where: { id: 'goal-id' },
+                    where: { id: 'goal-id', profileId: 'profile-id' },
                     data: { isPrimary: true }
                 })
             )
@@ -334,8 +333,9 @@ describe('RecoveryGoalModel', () => {
 
         it('propagates error when second update fails mid-transaction', async () => {
             prismaMock.$executeRaw.mockResolvedValue(0)
-            prismaMock.recoveryGoal.updateMany.mockResolvedValue({ count: 2 })
-            prismaMock.recoveryGoal.update.mockRejectedValue(new Error('DB write failed'))
+            prismaMock.recoveryGoal.updateMany
+                .mockResolvedValueOnce({ count: 2 })
+                .mockRejectedValueOnce(new Error('DB write failed'))
 
             await expect(
                 recoveryGoalModel.setPrimaryGoal('profile-id', 'goal-id')

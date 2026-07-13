@@ -134,8 +134,8 @@ export const setPrimaryGoal = async (
             data: { isPrimary: false }
         })
 
-        await tx.recoveryGoal.update({
-            where: { id: goalId },
+        await tx.recoveryGoal.updateMany({
+            where: { id: goalId, profileId },
             data: { isPrimary: true }
         })
     })
