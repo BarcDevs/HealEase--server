@@ -3,7 +3,12 @@ import type {
     Response
 } from 'express'
 
-import { env, googleOAuthConfig, serverConfig } from '../../config'
+import {
+    env,
+    googleOAuthConfig,
+    isDev,
+    serverConfig
+} from '../../config'
 import { version } from '../../package.json'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
@@ -16,10 +21,12 @@ export const getServerStatus = (
         .json({
             message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`,
             version,
-            config: {
-                CORS_Origin: serverConfig.origin,
-                NODE_ENV: env,
-                googleRedirectUri: googleOAuthConfig.redirectUri
-            }
+            ...(isDev && {
+                config: {
+                    CORS_Origin: serverConfig.origin,
+                    NODE_ENV: env,
+                    googleRedirectUri: googleOAuthConfig.redirectUri
+                }
+            })
         })
 }
