@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library'
 import { googleOAuthConfig } from '../../config'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { AuthError } from '../errors/AuthError'
+import { hashPassword } from '../lib/authCrypto'
 import * as authModel from '../models/authModel'
 import * as profileModel from '../models/profileModel'
 import type { ServerUserType } from '../types/data/UserType'
@@ -193,7 +194,7 @@ const createGoogleUser = async (
                     lastName: profile.lastName || 'User',
                     username,
                     email: profile.email,
-                    password: randomPassword,
+                    password: hashPassword(randomPassword),
                     googleId: profile.googleId
                 }
             })
