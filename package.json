@@ -1,6 +1,6 @@
 {
   "name": "pulse-api",
-  "version": "0.19.11",
+  "version": "0.19.12",
   "description": "",
   "lint-staged": {
     "src/**/*.ts": [
@@ -18,7 +18,7 @@
     "test": "NODE_ENV=test jest --detectOpenHandles --forceExit --coverage",
     "test:integration": "NODE_ENV=test jest --config jest.integration.config.ts --detectOpenHandles --forceExit",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint:check": "eslint",
+    "lint:check": "eslint --max-warnings=0",
     "lint:fix": "npm run lint:check -- --fix",
     "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
     "prisma:migrate": "npx prisma migrate dev --name init",

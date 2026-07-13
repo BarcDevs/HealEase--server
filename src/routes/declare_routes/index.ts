@@ -1,7 +1,7 @@
 import type { Express } from 'express'
 import swaggerUi from 'swagger-ui-express'
 
-import { env, serverConfig } from '../../../config'
+import { serverConfig } from '../../../config'
 import { getServerStatus } from '../../controllers/serverController'
 import { swagger } from '../../controllers/swaggerController'
 import { errorHandler } from '../../middlewares/errorHandler'
