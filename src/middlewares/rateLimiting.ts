@@ -11,7 +11,7 @@ export const rateLimiter = rateLimit({
     skip: (req) => {
         // Exempt auth infrastructure endpoints from rate limiting
         return req.path === `/api/${serverConfig.apiVersion}/auth/me`
-            || req.path === `/api/${serverConfig.apiVersion}/auth/csrf`
+            || req.path === `/api/${serverConfig.apiVersion}/auth/refresh`
     }
 })
 
