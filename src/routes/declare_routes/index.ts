@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express'
 import { serverConfig } from '../../../config'
 import { getServerStatus } from '../../controllers/serverController'
 import { swagger } from '../../controllers/swaggerController'
+import { errorFactory } from '../../errors/factory/ErrorFactory'
 import { errorHandler } from '../../middlewares/errorHandler'
 import { swaggerSpec } from '../../utils/swagger'
 import authRoute from '../authRoute'
@@ -19,6 +20,7 @@ declare module 'express-serve-static-core' {
     interface Request {
         userId?: string
         csrfToken?: string
+        requestId?: string
     }
 }
 
@@ -45,6 +47,10 @@ export const declareRoutes = (app: Express) => {
     app.use(baseRoute('profile'), profileRoute)
     app.use(baseRoute('recovery-goals'), recoveryGoalRoute)
     app.use(baseRoute('users'), userRoute)
+
+    app.use(() => {
+        throw errorFactory.generic.notFound('Route')
+    })
 
     app.use(errorHandler)
 }
