@@ -34,6 +34,12 @@ const authConfig: AuthConfig = {
     otp_expiration: config.get<number>('auth.otp_expiration')
 }
 
+if (authConfig.jwtSecret.length < 32) {
+    throw new Error(
+        'JWT_SECRET is missing or too short (min 32 chars) — refusing to start'
+    )
+}
+
 const databaseConfig: DatabaseConfig = {
     url: config.get<string>('database.url')
 }

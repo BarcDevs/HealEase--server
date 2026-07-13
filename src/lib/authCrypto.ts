@@ -33,7 +33,7 @@ export const createToken = (
 
     return jwt.sign(
         payload,
-        authConfig.jwtSecret!,
+        authConfig.jwtSecret,
         options
     )
 }

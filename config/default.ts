@@ -12,7 +12,7 @@ export default {
         apiVersion: 'v1'
     },
     auth: {
-        jwtSecret: 'JWT_SECRET',
+        jwtSecret: '',
         expiresIn: '1d',
         otp_expiration: '10m'
     },
