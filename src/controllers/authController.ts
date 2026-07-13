@@ -42,6 +42,7 @@ import type {
     ServerUserType,
     UserType
 } from '../types/data/UserType'
+import logger from '../utils/logger'
 
 // region Login and Signup
 export const login = async (
@@ -289,7 +290,7 @@ export const resetPassword = async (
 
     removeResetPasswordOTP(user.id).catch(
         (err) => {
-            console.error(
+            logger.error(
                 'Failed to clear OTP:',
                 err
             )

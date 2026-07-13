@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken'
 import { authConfig } from '../../config'
 import { errorFactory } from '../errors/factory/ErrorFactory'
 import type { UserType } from '../types/data/UserType'
+import logger from '../utils/logger'
 
 export const isAuthenticated = (
     req: Request,
@@ -29,7 +30,7 @@ export const isAuthenticated = (
     } catch (error) {
         res.clearCookie('accessToken')
 
-        console.error('Error authenticating user', error)
+        logger.error('Error authenticating user', error)
 
         throw errorFactory.auth.unauthorized()
     }

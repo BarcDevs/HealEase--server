@@ -9,6 +9,7 @@ import {
 
 import exposeProductionApp from './middlewares/exposeProductionApp'
 import { declareRoutes } from './routes/declare_routes'
+import logger from './utils/logger'
 import { declareMiddlewares } from './middlewares'
 
 const {
@@ -40,7 +41,7 @@ if (env !== 'test') {
 
         const message = `${start.replace(/\{0}/g, serverUrl)}`
 
-        console.info(message)
+        logger.info(message)
     })
 }
 
