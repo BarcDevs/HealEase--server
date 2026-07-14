@@ -1,7 +1,7 @@
 import type { Express } from 'express'
 import swaggerUi from 'swagger-ui-express'
 
-import { serverConfig } from '../../../config'
+import { env, serverConfig } from '../../../config'
 import { getServerStatus } from '../../controllers/serverController'
 import { swagger } from '../../controllers/swaggerController'
 import { errorFactory } from '../../errors/factory/ErrorFactory'
@@ -37,7 +37,9 @@ export const declareRoutes = (app: Express) => {
         swaggerUi.setup(swaggerSpec)
     )
 
-    app.use('/dev', devRoute)
+    if (env !== 'production') {
+        app.use('/dev', devRoute)
+    }
 
 
     app.use(baseRoute('auth'), authRoute)
