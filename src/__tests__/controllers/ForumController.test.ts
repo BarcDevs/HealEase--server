@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import { FORUM_PAGINATION } from '../../constants/forum/pagination'
@@ -54,7 +53,7 @@ describe('ForumController', () => {
                 query: {}
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getPosts(req, res)
 
@@ -95,7 +94,7 @@ describe('ForumController', () => {
                     }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await forumController.getPosts(req, res)
 
@@ -120,7 +119,7 @@ describe('ForumController', () => {
                     query: {}
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.getPosts(req, res)
@@ -151,7 +150,7 @@ describe('ForumController', () => {
                     }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await forumController.createPost(req, res)
 
@@ -190,7 +189,7 @@ describe('ForumController', () => {
                     }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.createPost(req, res)
@@ -210,7 +209,7 @@ describe('ForumController', () => {
                     }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.createPost(req, res)
@@ -230,7 +229,7 @@ describe('ForumController', () => {
                 params: { postId: 'test-post-id-123' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getPost(req, res)
 
@@ -252,7 +251,7 @@ describe('ForumController', () => {
                 query: { limit: '5' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getPost(req, res)
 
@@ -272,7 +271,7 @@ describe('ForumController', () => {
                     params: { postId: 'non-existent' }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.getPost(req, res)
@@ -298,7 +297,7 @@ describe('ForumController', () => {
                 body: { title: 'Updated Title' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.updatePost(req, res)
 
@@ -324,7 +323,7 @@ describe('ForumController', () => {
                     body: { title: 'Updated Title' }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.updatePost(req, res)
@@ -346,7 +345,7 @@ describe('ForumController', () => {
                 params: { postId: 'test-post-id-123' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.deletePost(req, res)
 
@@ -370,7 +369,7 @@ describe('ForumController', () => {
                     params: { postId: 'test-post-id-123' }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.deletePost(req, res)
@@ -394,7 +393,7 @@ describe('ForumController', () => {
                     body: { body: 'Reply content' }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await forumController.createReply(req, res)
 
@@ -419,7 +418,7 @@ describe('ForumController', () => {
                     body: { body: 'Reply content' }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.createReply(req, res)
@@ -444,7 +443,7 @@ describe('ForumController', () => {
                 params: { postId: 'test-post-id-123' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getReplies(req, res)
 
@@ -469,7 +468,7 @@ describe('ForumController', () => {
                 query: { limit: '10', page: '2' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getReplies(req, res)
 
@@ -490,7 +489,7 @@ describe('ForumController', () => {
                 params: { postId: 'test-post-id-123' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getReplies(req, res)
 
@@ -518,7 +517,7 @@ describe('ForumController', () => {
                 body: { body: 'Updated reply' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.updateReply(req, res)
 
@@ -554,7 +553,7 @@ describe('ForumController', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.deleteReply(req, res)
 
@@ -579,7 +578,7 @@ describe('ForumController', () => {
             const req = createMockRequest({
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.likePost(req, res)).rejects.toThrow()
         })
 
@@ -589,7 +588,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.likePost(req, res)
             expect(forumService.togglePostLike).toHaveBeenCalledWith('test-post-id-123', 'test-user-id-123')
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Post liked' }))
@@ -601,7 +600,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.likePost(req, res)
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Post unliked' }))
         })
@@ -612,7 +611,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.likePost(req, res)).rejects.toThrow('DB error')
         })
     })
@@ -623,7 +622,7 @@ describe('ForumController', () => {
             const req = createMockRequest({
                 params: { postId: 'test-post-id-123', replyId: 'test-reply-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.likeReply(req, res)).rejects.toThrow()
         })
 
@@ -633,7 +632,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123', replyId: 'test-reply-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.likeReply(req, res)
             expect(forumService.toggleReplyLike).toHaveBeenCalledWith('test-post-id-123', 'test-reply-id-123', 'test-user-id-123')
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Reply liked' }))
@@ -645,7 +644,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123', replyId: 'test-reply-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.likeReply(req, res)).rejects.toThrow('DB error')
         })
     })
@@ -656,7 +655,7 @@ describe('ForumController', () => {
             const req = createMockRequest({
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.savePost(req, res)).rejects.toThrow()
         })
 
@@ -666,7 +665,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.savePost(req, res)
             expect(forumService.toggleSavePost).toHaveBeenCalledWith('test-post-id-123', 'test-user-id-123')
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Post saved' }))
@@ -678,7 +677,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.savePost(req, res)
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Post unsaved' }))
         })
@@ -689,7 +688,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.savePost(req, res)).rejects.toThrow('DB error')
         })
     })
@@ -698,7 +697,7 @@ describe('ForumController', () => {
     describe('getSavedPosts', () => {
         it('throws unauthorized when no userId', async () => {
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.getSavedPosts(req, res)).rejects.toThrow()
         })
 
@@ -706,7 +705,7 @@ describe('ForumController', () => {
             const mockPosts = [createMockPost()]
             ;(forumService.getSavedPosts as jest.Mock).mockResolvedValue(mockPosts)
             const req = createMockRequest({ userId: 'test-user-id-123' }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.getSavedPosts(req, res)
             expect(forumService.getSavedPosts).toHaveBeenCalledWith('test-user-id-123', expect.anything())
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: mockPosts }))
@@ -715,7 +714,7 @@ describe('ForumController', () => {
         it('returns empty array when no saved posts', async () => {
             ;(forumService.getSavedPosts as jest.Mock).mockResolvedValue(null)
             const req = createMockRequest({ userId: 'test-user-id-123' }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.getSavedPosts(req, res)
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: [] }))
         })
@@ -726,7 +725,7 @@ describe('ForumController', () => {
         it('calls service with tagName', async () => {
             ;(forumService.reportUnknownTag as jest.Mock).mockResolvedValue(undefined)
             const req = createMockRequest({ body: { tagName: 'unknown-tag' } }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.reportUnknownTag(req, res)
             expect(forumService.reportUnknownTag).toHaveBeenCalledWith('unknown-tag')
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: 'Tag attempt recorded' }))
@@ -734,14 +733,14 @@ describe('ForumController', () => {
 
         it('throws validation error when tagName missing', async () => {
             const req = createMockRequest({ body: {} }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.reportUnknownTag(req, res)).rejects.toThrow()
         })
 
         it('propagates service error', async () => {
             ;(forumService.reportUnknownTag as jest.Mock).mockRejectedValue(new Error('DB error'))
             const req = createMockRequest({ body: { tagName: 'unknown-tag' } }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.reportUnknownTag(req, res)).rejects.toThrow('DB error')
         })
     })
@@ -752,7 +751,7 @@ describe('ForumController', () => {
             const attempts = [{ tagName: 'foo', count: 3 }, { tagName: 'bar', count: 1 }]
             ;(forumService.getUnknownTagAttempts as jest.Mock).mockResolvedValue(attempts)
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.getUnknownTagAttempts(req, res)
             expect(forumService.getUnknownTagAttempts).toHaveBeenCalled()
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: attempts }))
@@ -761,7 +760,7 @@ describe('ForumController', () => {
         it('propagates service error', async () => {
             ;(forumService.getUnknownTagAttempts as jest.Mock).mockRejectedValue(new Error('DB error'))
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.getUnknownTagAttempts(req, res)).rejects.toThrow('DB error')
         })
     })
@@ -772,7 +771,7 @@ describe('ForumController', () => {
             const stats = [{ category: 'health', count: 5 }]
             ;(forumService.getCategoryStats as jest.Mock).mockResolvedValue(stats)
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await forumController.getCategoryStats(req, res)
             expect(forumService.getCategoryStats).toHaveBeenCalled()
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: stats }))
@@ -781,7 +780,7 @@ describe('ForumController', () => {
         it('propagates service error', async () => {
             ;(forumService.getCategoryStats as jest.Mock).mockRejectedValue(new Error('DB error'))
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.getCategoryStats(req, res)).rejects.toThrow('DB error')
         })
     })
@@ -795,7 +794,7 @@ describe('ForumController', () => {
                 params: { postId: 'test-post-id-123' },
                 body: { title: 'Updated' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.updatePost(req, res)).rejects.toThrow('not owner')
         })
 
@@ -806,7 +805,7 @@ describe('ForumController', () => {
                 params: { postId: 'test-post-id-123', replyId: 'test-reply-id-123' },
                 body: { body: 'Updated' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.updateReply(req, res)).rejects.toThrow('not owner')
         })
 
@@ -816,7 +815,7 @@ describe('ForumController', () => {
                 userId: 'test-user-id-123',
                 params: { postId: 'test-post-id-123', replyId: 'test-reply-id-123' }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             await expect(forumController.deleteReply(req, res)).rejects.toThrow('not owner')
         })
     })
@@ -835,7 +834,7 @@ describe('ForumController', () => {
                 query: {}
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getTags(req, res)
 
@@ -854,7 +853,7 @@ describe('ForumController', () => {
                     query: {}
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.getTags(req, res)
@@ -874,7 +873,7 @@ describe('ForumController', () => {
                 params: { tagId: 'test-tag-id-123' }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await forumController.getTag(req, res)
 
@@ -895,7 +894,7 @@ describe('ForumController', () => {
                     params: { tagId: 'non-existent' }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
 
                 await expect(
                     forumController.getTag(req, res)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../../constants/httpStatusCodes'
@@ -34,7 +33,7 @@ describe('recommendationsController', () => {
                 .mockResolvedValue(mockRecommendations)
 
             const req = createMockRequest({ userId: 'user-1' }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await recommendationsController.getRecommendations(req, res)
 
@@ -49,7 +48,7 @@ describe('recommendationsController', () => {
 
         it('throws unauthorized when userId missing', async () => {
             const req = createMockRequest({ userId: undefined }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await expect(
                 recommendationsController.getRecommendations(req, res)
@@ -63,7 +62,7 @@ describe('recommendationsController', () => {
                 .mockRejectedValue(new Error('service down'))
 
             const req = createMockRequest({ userId: 'user-1' }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await expect(
                 recommendationsController.getRecommendations(req, res)
@@ -75,7 +74,7 @@ describe('recommendationsController', () => {
                 .mockResolvedValue({ items: [], generatedAt: null, basedOnCheckInId: null })
 
             const req = createMockRequest({ userId: 'user-1' }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
 
             await recommendationsController.getRecommendations(req, res)
 

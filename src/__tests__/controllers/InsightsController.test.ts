@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import * as insightsController from '../../controllers/insightsController'
@@ -32,11 +31,12 @@ describe('InsightsController', () => {
 
         it('returns observation when available', async () => {
             const observation = {
-                type: 'consistent_mood',
+                type: 'mood_stability' as const,
                 title: 'Your Daily Observation',
                 observation: 'You are consistent.',
                 supportiveDescription: 'Keep it up!',
-                icon: '🌟'
+                icon: '🌟',
+                createdAt: new Date().toISOString()
             }
             jest.spyOn(dailyObservationService, 'getTodayObservation')
                 .mockResolvedValue(observation)

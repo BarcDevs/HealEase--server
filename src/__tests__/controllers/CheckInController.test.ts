@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../../constants/httpStatusCodes'
@@ -25,6 +24,7 @@ const mockCheckIn = (overrides = {}) => ({
     checkInDate: new Date('2026-06-04'),
     createdAt: new Date(),
     updatedAt: new Date(),
+    insights: [],
     ...overrides
 })
 
@@ -241,7 +241,19 @@ describe('CheckInController', () => {
         })
 
         it('returns progress insights', async () => {
-            const insight = { summary: 'Good progress', metrics: [] }
+            const insight = {
+                summary: 'Good progress',
+                trend: 'improving',
+                highlights: { improvements: [], regressions: [] },
+                period: {
+                    currentStart: new Date(),
+                    currentEnd: new Date(),
+                    previousStart: new Date(),
+                    previousEnd: new Date()
+                }
+            } as unknown as Awaited<
+                ReturnType<typeof progressInsightsService.generateProgressInsight>
+            >
             jest.spyOn(progressInsightsService, 'generateProgressInsight').mockResolvedValue(insight)
 
             const req = createMockRequest({ userId: USER_ID }) as unknown as Request
