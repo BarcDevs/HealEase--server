@@ -58,3 +58,59 @@ describe('/dev route gating', () => {
         )
     })
 })
+
+describe('/api-docs route gating', () => {
+    afterEach(() => {
+        jest.resetModules()
+    })
+
+    const mountRoutes = (env: string) => {
+        jest.doMock('../../../config', () => ({
+            env,
+            serverConfig: { apiVersion: 'v1' }
+        }))
+
+        const mockApp = {
+            get: jest.fn(),
+            use: jest.fn()
+        } as unknown as Express
+
+        const { declareRoutes } = require('../../routes/declare_routes')
+        declareRoutes(mockApp)
+
+        return mockApp
+    }
+
+    it('mounts /api-docs in development', () => {
+        const app = mountRoutes('development')
+
+        expect(app.use).toHaveBeenCalledWith(
+            '/api-docs',
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
+
+    it('mounts /api-docs in staging', () => {
+        const app = mountRoutes('staging')
+
+        expect(app.use).toHaveBeenCalledWith(
+            '/api-docs',
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
+
+    it('does not mount /api-docs in production', () => {
+        const app = mountRoutes('production')
+
+        expect(app.use).not.toHaveBeenCalledWith(
+            '/api-docs',
+            expect.anything(),
+            expect.anything(),
+            expect.anything()
+        )
+    })
+})

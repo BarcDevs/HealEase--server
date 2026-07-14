@@ -30,12 +30,14 @@ const baseRoute = (route: string) =>
 export const declareRoutes = (app: Express) => {
     app.get('/api/status', getServerStatus)
 
-    app.use(
-        '/api-docs',
-        swagger,
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerSpec)
-    )
+    if (env !== 'production') {
+        app.use(
+            '/api-docs',
+            swagger,
+            swaggerUi.serve,
+            swaggerUi.setup(swaggerSpec)
+        )
+    }
 
     if (env !== 'production') {
         app.use('/dev', devRoute)
