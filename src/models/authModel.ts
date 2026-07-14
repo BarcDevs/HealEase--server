@@ -138,6 +138,37 @@ export const incrementResetPasswordAttempts = (
         }
     }) as Promise<ServerUserType>
 
+export const setConfirmEmailOTP = (
+    userId: string,
+    data: {
+        confirmEmailOTP: number | null
+        confirmEmailExpiration: Date | null
+        confirmEmailAttempts?: number
+    }
+): Promise<ServerUserType> =>
+    Prisma.user.update({
+        where: {
+            id: userId,
+            active: true
+        },
+        data
+    }) as Promise<ServerUserType>
+
+export const incrementConfirmEmailAttempts = (
+    userId: string
+): Promise<ServerUserType> =>
+    Prisma.user.update({
+        where: {
+            id: userId,
+            active: true
+        },
+        data: {
+            confirmEmailAttempts: {
+                increment: 1
+            }
+        }
+    }) as Promise<ServerUserType>
+
 export const updatePassword = (
     userId: string,
     hashedPassword: string

@@ -70,6 +70,9 @@ export const createMockUser = (
     createdAt: new Date(),
     active: true,
     deletedAt: undefined,
+    confirmEmailOTP: undefined,
+    confirmEmailExpiration: undefined,
+    confirmEmailAttempts: 0,
     ...overrides
 })
 

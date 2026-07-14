@@ -7,3 +7,5 @@ export const OTP_CONFIG = {
 }
 
 export const MAX_RESET_PASSWORD_ATTEMPTS = 5
+
+export const MAX_CONFIRM_EMAIL_ATTEMPTS = 5

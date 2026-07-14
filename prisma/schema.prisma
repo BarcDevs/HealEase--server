@@ -26,6 +26,10 @@ model User {
   passwordUpdatedAt       DateTime  @default(now())
   deletedAt               DateTime?
 
+  confirmEmailOTP        Int?
+  confirmEmailExpiration DateTime?
+  confirmEmailAttempts   Int       @default(0)
+
   pendingEmail          String?
   emailChangeOTP        Int?
   emailChangeExpiration DateTime?

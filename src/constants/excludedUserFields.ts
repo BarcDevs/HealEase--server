@@ -6,5 +6,8 @@ export const excludedUserFields: (keyof ServerUserType)[] = [
     'resetPasswordExpiration',
     'resetPasswordAttempts',
     'passwordUpdatedAt',
-    'deletedAt'
+    'deletedAt',
+    'confirmEmailOTP',
+    'confirmEmailExpiration',
+    'confirmEmailAttempts'
 ]

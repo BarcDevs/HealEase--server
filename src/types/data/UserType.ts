@@ -46,6 +46,9 @@ export type ServerUserType = Prettify<
         resetPasswordAttempts: number
         passwordUpdatedAt: Date
         deletedAt?: Date | null
+        confirmEmailOTP?: number | null
+        confirmEmailExpiration?: Date | null
+        confirmEmailAttempts: number
         pendingEmail?: string | null
         emailChangeOTP?: number | null
         emailChangeExpiration?: Date | null

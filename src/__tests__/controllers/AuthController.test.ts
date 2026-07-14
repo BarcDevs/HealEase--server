@@ -24,7 +24,9 @@ jest.mock('../../lib/authOTP', () => ({
     sendForgotPasswordOTP: jest.fn(),
     sendConfirmEmailOTP: jest.fn(),
     removeResetPasswordOTP: jest.fn(),
-    recordFailedResetPasswordAttempt: jest.fn()
+    recordFailedResetPasswordAttempt: jest.fn(),
+    removeConfirmEmailOTP: jest.fn(),
+    recordFailedConfirmEmailAttempt: jest.fn()
 }))
 
 const mockLogin = authServices.login as jest.MockedFunction<
@@ -385,8 +387,8 @@ describe('AuthController', () => {
                     Date.now() + 1000 * 60 * 60
                 )
                 const mockUser = createMockUser({
-                    resetPasswordOTP: 123456,
-                    resetPasswordExpiration: futureDate
+                    confirmEmailOTP: 123456,
+                    confirmEmailExpiration: futureDate
                 })
                 ;(authServices.getUser as jest.Mock)
                     .mockResolvedValue(mockUser)
@@ -421,8 +423,8 @@ describe('AuthController', () => {
                 Date.now() + 1000 * 60 * 60
             )
             const mockUser = createMockUser({
-                resetPasswordOTP: 123456,
-                resetPasswordExpiration: futureDate
+                confirmEmailOTP: 123456,
+                confirmEmailExpiration: futureDate
             })
             ;(authServices.getUser as jest.Mock)
                 .mockResolvedValue(mockUser)
@@ -446,8 +448,8 @@ describe('AuthController', () => {
                 Date.now() - 1000 * 60 * 60
             )
             const mockUser = createMockUser({
-                resetPasswordOTP: 123456,
-                resetPasswordExpiration: pastDate
+                confirmEmailOTP: 123456,
+                confirmEmailExpiration: pastDate
             })
             ;(authServices.getUser as jest.Mock)
                 .mockResolvedValue(mockUser)

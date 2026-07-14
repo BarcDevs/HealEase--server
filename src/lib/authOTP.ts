@@ -3,7 +3,10 @@ import ms from 'ms'
 
 import { authConfig } from '../../config'
 import { appConfig } from '../config/app'
-import { MAX_RESET_PASSWORD_ATTEMPTS } from '../constants/auth/authRules'
+import {
+    MAX_CONFIRM_EMAIL_ATTEMPTS,
+    MAX_RESET_PASSWORD_ATTEMPTS
+} from '../constants/auth/authRules'
 import { getMessages } from '../locales'
 import * as authModel from '../models/authModel'
 import { sendEmail } from '../utils/emailSender'
@@ -63,6 +66,31 @@ export const recordFailedResetPasswordAttempt = async (
     await authModel.incrementResetPasswordAttempts(userId)
 }
 
+export const removeConfirmEmailOTP = async (
+    userId: string
+): Promise<void> => {
+    await authModel.setConfirmEmailOTP(
+        userId,
+        {
+            confirmEmailOTP: null,
+            confirmEmailExpiration: null,
+            confirmEmailAttempts: 0
+        }
+    )
+}
+
+export const recordFailedConfirmEmailAttempt = async (
+    userId: string,
+    currentAttempts: number
+): Promise<void> => {
+    if (currentAttempts + 1 >= MAX_CONFIRM_EMAIL_ATTEMPTS) {
+        await removeConfirmEmailOTP(userId)
+        return
+    }
+
+    await authModel.incrementConfirmEmailAttempts(userId)
+}
+
 export const removeEmailChangeOTP = async (
     userId: string
 ): Promise<void> => {
@@ -117,12 +145,12 @@ export const sendConfirmEmailOTP = async (
 
     const { otp, expiration } = generateOTP()
 
-    await authModel.setUserOTP(
+    await authModel.setConfirmEmailOTP(
         user.id,
         {
-            resetPasswordOTP: otp,
-            resetPasswordExpiration: expiration,
-            resetPasswordAttempts: 0
+            confirmEmailOTP: otp,
+            confirmEmailExpiration: expiration,
+            confirmEmailAttempts: 0
         }
     )
 

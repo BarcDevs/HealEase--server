@@ -312,6 +312,45 @@ describe('AuthModel', () => {
         })
     })
 
+    describe('setConfirmEmailOTP', () => {
+        it('calls update with confirm-email OTP data and active constraint', async () => {
+            const user = createMockUser()
+            const expiration = new Date('2026-01-01T12:00:00Z')
+            prismaMock.user.update.mockResolvedValue(user)
+
+            await authModel.setConfirmEmailOTP(user.id, {
+                confirmEmailOTP: 654321,
+                confirmEmailExpiration: expiration
+            })
+
+            expect(prismaMock.user.update).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: { id: user.id, active: true },
+                    data: expect.objectContaining({
+                        confirmEmailOTP: 654321,
+                        confirmEmailExpiration: expiration
+                    })
+                })
+            )
+        })
+    })
+
+    describe('incrementConfirmEmailAttempts', () => {
+        it('increments the attempt counter with active constraint', async () => {
+            const user = createMockUser()
+            prismaMock.user.update.mockResolvedValue(user)
+
+            await authModel.incrementConfirmEmailAttempts(user.id)
+
+            expect(prismaMock.user.update).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: { id: user.id, active: true },
+                    data: { confirmEmailAttempts: { increment: 1 } }
+                })
+            )
+        })
+    })
+
     describe('setEmailChangeOTP', () => {
         it('calls update with email change data and active constraint', async () => {
             const user = createMockUser()

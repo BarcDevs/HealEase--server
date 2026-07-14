@@ -23,7 +23,9 @@ import {
     sanitizeUserData
 } from '../lib/authHelpers'
 import {
+    recordFailedConfirmEmailAttempt,
     recordFailedResetPasswordAttempt,
+    removeConfirmEmailOTP,
     removeResetPasswordOTP,
     sendEmailChangeOTP,
     sendForgotPasswordOTP,
@@ -230,17 +232,19 @@ export const confirmEmail = async (
 
     if (
         !verifyOTP(
-            user.resetPasswordOTP!,
-            user.resetPasswordExpiration!,
+            user.confirmEmailOTP!,
+            user.confirmEmailExpiration!,
             OTP
         )
     ) {
-        await recordFailedResetPasswordAttempt(
+        await recordFailedConfirmEmailAttempt(
             user.id,
-            user.resetPasswordAttempts
+            user.confirmEmailAttempts
         )
         throw errorFactory.validation.otpError()
     }
+
+    await removeConfirmEmailOTP(user.id)
 
     successResponse<{
         user: UserType

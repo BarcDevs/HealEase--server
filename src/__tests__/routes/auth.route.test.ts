@@ -682,8 +682,8 @@ describe('Auth Routes', () => {
                 prismaMock.user.findUnique.mockResolvedValue(
                     {
                         ...mockUser,
-                        resetPasswordOTP: OTP,
-                        resetPasswordExpiration: new Date(
+                        confirmEmailOTP: OTP,
+                        confirmEmailExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
                     }
@@ -712,8 +712,8 @@ describe('Auth Routes', () => {
                 prismaMock.user.findUnique.mockResolvedValue(
                     {
                         ...mockUser,
-                        resetPasswordOTP: OTP,
-                        resetPasswordExpiration: new Date(
+                        confirmEmailOTP: OTP,
+                        confirmEmailExpiration: new Date(
                             Date.now() - 1000
                         )
                     }
@@ -739,8 +739,8 @@ describe('Auth Routes', () => {
                 prismaMock.user.findUnique.mockResolvedValue(
                     {
                         ...mockUser,
-                        resetPasswordOTP: OTP,
-                        resetPasswordExpiration: new Date(
+                        confirmEmailOTP: OTP,
+                        confirmEmailExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
                     }
