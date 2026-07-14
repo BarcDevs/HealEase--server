@@ -6,7 +6,7 @@ import helmet from 'helmet'
 import hpp from 'hpp'
 import path from 'path'
 
-import { serverConfig } from '../../config'
+import { isDev, serverConfig } from '../../config'
 
 import { loggerMiddleware } from './loggerMiddleWare'
 import { rateLimiter } from './rateLimiting'
@@ -30,9 +30,14 @@ export const declareMiddlewares = (app: Express) => {
                 const normalizeUrl = (url: string) => url.replace(/\/$/, '')
                 const normalizedOrigin = normalizeUrl(serverConfig.origin)
 
+                const isLocalOrigin = isDev
+                    && (
+                        origin.startsWith('http://localhost:')
+                        || origin.startsWith('http://127.0.0.1:')
+                    )
+
                 if (
-                    origin.startsWith('http://localhost:')
-                    || origin.startsWith('http://127.0.0.1:')
+                    isLocalOrigin
                     || normalizeUrl(origin) === normalizedOrigin
                 ) {
                     callback(null, true)
