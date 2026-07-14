@@ -158,7 +158,7 @@ describe('Auth Routes', () => {
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
                 expect(response.body.error[0].error)
-                    .toBe('User not found!')
+                    .toBe('Invalid credentials! please try again!')
             }
         )
 

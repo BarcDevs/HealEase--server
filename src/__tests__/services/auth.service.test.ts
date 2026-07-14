@@ -372,7 +372,7 @@ describe('Auth Service', () => {
                     login('notfound@test.com', 'Password123!')
                 )
                     .rejects
-                    .toThrow('User not found!')
+                    .toThrow('Invalid credentials! please try again!')
             }
         )
 
@@ -387,7 +387,7 @@ describe('Auth Service', () => {
                     login('test@test.com', 'WrongPassword')
                 )
                     .rejects
-                    .toThrow('Invalid password!')
+                    .toThrow('Invalid credentials! please try again!')
             }
         )
 
