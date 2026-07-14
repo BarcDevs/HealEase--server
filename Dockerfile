@@ -49,4 +49,9 @@ USER node
 WORKDIR /app/dist
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:${PORT}/api/status || exit 1
-CMD ["sh", "-c", "npx prisma migrate deploy --schema /app/prisma/schema.prisma && node src/app.js"]
+# Migrations are NOT run here — running `prisma migrate deploy` on every
+# container start races across replicas. Run `npm run release` (repo root,
+# schema at /app/prisma/schema.prisma) as a one-off pre-deploy step instead —
+# e.g. a Render "Pre-Deploy Command", a k8s Job/initContainer, or a manual
+# step before rolling out new containers.
+CMD ["node", "src/app.js"]

@@ -1,6 +1,6 @@
 {
   "name": "pulse-api",
-  "version": "0.19.17",
+  "version": "0.19.18",
   "description": "",
   "lint-staged": {
     "src/**/*.ts": [
@@ -11,10 +11,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/src/app.js",
-    "build": "npx prisma generate && (npx prisma migrate resolve --rolled-back 20260602_migrate_daily_checkin_to_profile || true) && npx prisma migrate deploy && tsc",
+    "build": "npx prisma generate && tsc",
     "start:dev": "NODE_ENV=development node --watch --import tsx src/app.ts",
     "start:prod": "NODE_ENV=production node build/index.bundle.js",
-    "prod": "npm run prisma:generate && npm run prisma:deploy && webpack",
+    "prod": "npm run prisma:generate && webpack",
+    "release": "npx prisma migrate deploy --schema=prisma/schema.prisma",
     "test": "NODE_ENV=test jest --detectOpenHandles --forceExit --coverage",
     "test:integration": "NODE_ENV=test jest --config jest.integration.config.ts --detectOpenHandles --forceExit",
     "format": "prettier --write \"src/**/*.ts\"",
