@@ -43,6 +43,7 @@ export type ServerUserType = Prettify<
         password: string
         resetPasswordOTP?: number | null
         resetPasswordExpiration?: Date | null
+        resetPasswordAttempts: number
         passwordUpdatedAt: Date
         deletedAt?: Date | null
         pendingEmail?: string | null

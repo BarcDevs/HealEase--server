@@ -23,6 +23,7 @@ import {
     sanitizeUserData
 } from '../lib/authHelpers'
 import {
+    recordFailedResetPasswordAttempt,
     removeResetPasswordOTP,
     sendEmailChangeOTP,
     sendForgotPasswordOTP,
@@ -233,8 +234,13 @@ export const confirmEmail = async (
             user.resetPasswordExpiration!,
             OTP
         )
-    )
+    ) {
+        await recordFailedResetPasswordAttempt(
+            user.id,
+            user.resetPasswordAttempts
+        )
         throw errorFactory.validation.otpError()
+    }
 
     successResponse<{
         user: UserType
@@ -279,8 +285,13 @@ export const resetPassword = async (
             user.resetPasswordExpiration!,
             userOTP
         )
-    )
+    ) {
+        await recordFailedResetPasswordAttempt(
+            user.id,
+            user.resetPasswordAttempts
+        )
         throw errorFactory.auth.resetPassword()
+    }
 
     const updatedUser =
         await authServices.resetPassword(

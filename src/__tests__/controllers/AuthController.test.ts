@@ -23,7 +23,8 @@ jest.mock('../../lib/authOTP', () => ({
     ...jest.requireActual('../../lib/authOTP'),
     sendForgotPasswordOTP: jest.fn(),
     sendConfirmEmailOTP: jest.fn(),
-    removeResetPasswordOTP: jest.fn()
+    removeResetPasswordOTP: jest.fn(),
+    recordFailedResetPasswordAttempt: jest.fn()
 }))
 
 const mockLogin = authServices.login as jest.MockedFunction<

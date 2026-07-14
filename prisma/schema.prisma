@@ -22,6 +22,7 @@ model User {
   password                String
   resetPasswordOTP        Int?
   resetPasswordExpiration DateTime?
+  resetPasswordAttempts   Int       @default(0)
   passwordUpdatedAt       DateTime  @default(now())
   deletedAt               DateTime?
 

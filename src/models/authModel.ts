@@ -111,6 +111,7 @@ export const setUserOTP = (
     data: {
         resetPasswordOTP: number | null
         resetPasswordExpiration: Date | null
+        resetPasswordAttempts?: number
         passwordUpdatedAt?: Date
     }
 ): Promise<ServerUserType> =>
@@ -120,6 +121,21 @@ export const setUserOTP = (
             active: true
         },
         data
+    }) as Promise<ServerUserType>
+
+export const incrementResetPasswordAttempts = (
+    userId: string
+): Promise<ServerUserType> =>
+    Prisma.user.update({
+        where: {
+            id: userId,
+            active: true
+        },
+        data: {
+            resetPasswordAttempts: {
+                increment: 1
+            }
+        }
     }) as Promise<ServerUserType>
 
 export const updatePassword = (

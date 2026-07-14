@@ -296,6 +296,22 @@ describe('AuthModel', () => {
         })
     })
 
+    describe('incrementResetPasswordAttempts', () => {
+        it('increments the attempt counter with active constraint', async () => {
+            const user = createMockUser()
+            prismaMock.user.update.mockResolvedValue(user)
+
+            await authModel.incrementResetPasswordAttempts(user.id)
+
+            expect(prismaMock.user.update).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: { id: user.id, active: true },
+                    data: { resetPasswordAttempts: { increment: 1 } }
+                })
+            )
+        })
+    })
+
     describe('setEmailChangeOTP', () => {
         it('calls update with email change data and active constraint', async () => {
             const user = createMockUser()

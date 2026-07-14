@@ -1,6 +1,7 @@
 // @ts-nocheck
 import {
     generateOTP,
+    recordFailedResetPasswordAttempt,
     removeEmailChangeOTP,
     removeResetPasswordOTP,
     sendConfirmEmailOTP,
@@ -25,12 +26,15 @@ const mockSetEmailChangeOTP =
     authModel.setEmailChangeOTP as jest.Mock
 const mockGetUserByEmail =
     authModel.getUserByEmail as jest.Mock
+const mockIncrementResetPasswordAttempts =
+    authModel.incrementResetPasswordAttempts as jest.Mock
 const mockSendEmail = sendEmail as jest.Mock
 
 beforeEach(() => {
     jest.clearAllMocks()
     mockSetUserOTP.mockResolvedValue(undefined)
     mockSetEmailChangeOTP.mockResolvedValue(undefined)
+    mockIncrementResetPasswordAttempts.mockResolvedValue(undefined)
     mockSendEmail.mockResolvedValue(undefined)
 })
 
@@ -113,16 +117,42 @@ describe('authOTP', () => {
 
     // ==================== removeResetPasswordOTP ====================
     describe('removeResetPasswordOTP', () => {
-        it('should call setUserOTP with null values', async () => {
+        it('should call setUserOTP with null values and reset attempts', async () => {
             await removeResetPasswordOTP('user-123')
 
             expect(mockSetUserOTP).toHaveBeenCalledWith(
                 'user-123',
                 {
                     resetPasswordOTP: null,
-                    resetPasswordExpiration: null
+                    resetPasswordExpiration: null,
+                    resetPasswordAttempts: 0
                 }
             )
+        })
+    })
+
+    // ==================== recordFailedResetPasswordAttempt ====================
+    describe('recordFailedResetPasswordAttempt', () => {
+        it('increments the attempt counter when below the max', async () => {
+            await recordFailedResetPasswordAttempt('user-123', 2)
+
+            expect(mockIncrementResetPasswordAttempts)
+                .toHaveBeenCalledWith('user-123')
+            expect(mockSetUserOTP).not.toHaveBeenCalled()
+        })
+
+        it('invalidates the OTP once the max attempts is reached', async () => {
+            await recordFailedResetPasswordAttempt('user-123', 4)
+
+            expect(mockSetUserOTP).toHaveBeenCalledWith(
+                'user-123',
+                {
+                    resetPasswordOTP: null,
+                    resetPasswordExpiration: null,
+                    resetPasswordAttempts: 0
+                }
+            )
+            expect(mockIncrementResetPasswordAttempts).not.toHaveBeenCalled()
         })
     })
 

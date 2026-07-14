@@ -5,3 +5,5 @@ export const OTP_CONFIG = {
     RANGE_MIN: 100000,
     RANGE_MAX: 900000
 }
+
+export const MAX_RESET_PASSWORD_ATTEMPTS = 5

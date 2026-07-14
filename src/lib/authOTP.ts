@@ -3,6 +3,7 @@ import ms from 'ms'
 
 import { authConfig } from '../../config'
 import { appConfig } from '../config/app'
+import { MAX_RESET_PASSWORD_ATTEMPTS } from '../constants/auth/authRules'
 import { getMessages } from '../locales'
 import * as authModel from '../models/authModel'
 import { sendEmail } from '../utils/emailSender'
@@ -44,9 +45,22 @@ export const removeResetPasswordOTP = async (
         userId,
         {
             resetPasswordOTP: null,
-            resetPasswordExpiration: null
+            resetPasswordExpiration: null,
+            resetPasswordAttempts: 0
         }
     )
+}
+
+export const recordFailedResetPasswordAttempt = async (
+    userId: string,
+    currentAttempts: number
+): Promise<void> => {
+    if (currentAttempts + 1 >= MAX_RESET_PASSWORD_ATTEMPTS) {
+        await removeResetPasswordOTP(userId)
+        return
+    }
+
+    await authModel.incrementResetPasswordAttempts(userId)
 }
 
 export const removeEmailChangeOTP = async (
@@ -76,7 +90,8 @@ export const sendForgotPasswordOTP = async (
         user.id,
         {
             resetPasswordOTP: otp,
-            resetPasswordExpiration: expiration
+            resetPasswordExpiration: expiration,
+            resetPasswordAttempts: 0
         }
     )
 
@@ -106,7 +121,8 @@ export const sendConfirmEmailOTP = async (
         user.id,
         {
             resetPasswordOTP: otp,
-            resetPasswordExpiration: expiration
+            resetPasswordExpiration: expiration,
+            resetPasswordAttempts: 0
         }
     )
 
