@@ -75,7 +75,7 @@ export const createUser = async (
 ): Promise<ServerUserType> => {
     const user =
         await Prisma.$transaction(
-            async (tx: typeof Prisma) => {
+            async (tx) => {
                 const createdUser =
                     await tx.user.create({
                         data: newUser
@@ -268,7 +268,7 @@ export const createGoogleUser = async (
     }
 ): Promise<ServerUserType> => {
     const user = await Prisma.$transaction(
-        async (tx: typeof Prisma) => {
+        async (tx) => {
             const createdUser = await tx.user.create({
                 data: {
                     firstName: data.firstName,
@@ -300,7 +300,7 @@ export const linkGoogleAccount = async (
     picture: string | null
 ): Promise<ServerUserType> => {
     const user = await Prisma.$transaction(
-        async (tx: typeof Prisma) => {
+        async (tx) => {
             const updatedUser = await tx.user.update({
                 where: {
                     id: userId,
