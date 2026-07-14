@@ -22,6 +22,18 @@ export const otpRateLimiter = rateLimit({
         'Too many OTP requests from this IP, please try again after 15 minutes'
 })
 
+export const loginRateLimiter = rateLimit({
+    windowMs: 15 * minuteInMs,
+    limit: isDev ? 100 : 10,
+    message:
+        'Too many login attempts, please try again after 15 minutes',
+    keyGenerator: (req) => {
+        const ip = ipKeyGenerator(req.ip ?? '')
+        const email = req.body?.email ?? ''
+        return `${ip}:${email}`
+    }
+})
+
 export const sharePostRateLimiter = rateLimit({
     windowMs: hourInMs,
     limit: 1,

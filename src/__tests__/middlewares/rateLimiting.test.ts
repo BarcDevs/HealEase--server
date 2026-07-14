@@ -3,6 +3,7 @@ import type { Request, Response } from 'express'
 
 import { serverConfig } from '../../../config'
 import {
+    loginRateLimiter,
     rateLimiter,
     sharePostRateLimiter
 } from '../../middlewares/rateLimiting'
@@ -73,6 +74,87 @@ describe('Rate Limiting Middleware', () => {
             await sharePostRateLimiter(req, res, next)
 
             expect(next).toHaveBeenCalled()
+        })
+    })
+
+    describe('loginRateLimiter', () => {
+        it('should be defined', () => {
+            expect(loginRateLimiter).toBeDefined()
+        })
+
+        it('should be a function (middleware)', () => {
+            expect(typeof loginRateLimiter).toBe('function')
+        })
+
+        it('should call next for the first login attempt', async () => {
+            const req = createMockRequest({
+                ip: '127.0.0.1',
+                body: { email: 'login-rate-limit-test@test.com' },
+                method: 'POST',
+                originalUrl: `/api/${serverConfig.apiVersion}/auth/login`
+            }) as Request
+
+            const res = createMockResponse() as Response
+            res.setHeader = jest.fn()
+            const next = createMockNext()
+
+            await loginRateLimiter(req, res, next)
+
+            expect(next).toHaveBeenCalled()
+        })
+    })
+
+    describe('loginRateLimiter behavior (real implementation)', () => {
+        const { loginRateLimiter: realLoginRateLimiter } =
+            jest.requireActual('../../middlewares/rateLimiting')
+
+        const createRateLimitMockResponse = () => {
+            const headers: Record<string, unknown> = {}
+            const res: Partial<MockResponse> & {
+                getHeader: jest.Mock
+                removeHeader: jest.Mock
+                headersSent: boolean
+            } = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn().mockReturnThis(),
+                send: jest.fn().mockReturnThis(),
+                setHeader: jest.fn((key: string, value: unknown) => {
+                    headers[key] = value
+                }),
+                getHeader: jest.fn((key: string) => headers[key]),
+                removeHeader: jest.fn((key: string) => {
+                    delete headers[key]
+                }),
+                headersSent: false
+            }
+            return res as unknown as Response
+        }
+
+        it('should rate limit independently per email for the same IP', async () => {
+            const ip = '10.0.0.4'
+
+            await realLoginRateLimiter(
+                createMockRequest({
+                    ip,
+                    body: { email: 'login-limit-a@test.com' }
+                }) as Request,
+                createRateLimitMockResponse(),
+                createMockNext()
+            )
+
+            const res = createRateLimitMockResponse()
+            const next = createMockNext()
+            await realLoginRateLimiter(
+                createMockRequest({
+                    ip,
+                    body: { email: 'login-limit-b@test.com' }
+                }) as Request,
+                res,
+                next
+            )
+
+            expect(next).toHaveBeenCalled()
+            expect(res.status).not.toHaveBeenCalled()
         })
     })
 
