@@ -1,4 +1,3 @@
-// @ts-nocheck
 import request from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -47,7 +46,7 @@ describe('Profile Routes', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         prismaMock.profile.findUnique
-            .mockResolvedValue(mockProfile)
+            .mockResolvedValue(mockProfile as never)
         prismaMock.postLike.findMany
             .mockResolvedValue([])
         prismaMock.replyLike.findMany
@@ -88,7 +87,7 @@ describe('Profile Routes', () => {
                     .mockResolvedValue(createMockProfile({
                         userId: mockUser.id,
                         healthInterests: ['mental-health']
-                    }))
+                    }) as never)
 
                 const res = await request(App)
                     .get(endpoint)
@@ -117,7 +116,7 @@ describe('Profile Routes', () => {
             async () => {
                 const token = createAuthToken(mockUser)
                 prismaMock.profile.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const res = await request(App)
                     .get(endpoint)
@@ -142,7 +141,7 @@ describe('Profile Routes', () => {
                     timezone: 'America/New_York'
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -178,7 +177,7 @@ describe('Profile Routes', () => {
                     theme: 'dark'
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -208,7 +207,7 @@ describe('Profile Routes', () => {
                     image: imageUrl
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -238,7 +237,7 @@ describe('Profile Routes', () => {
                     profileVisibility: 'public'
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -273,7 +272,7 @@ describe('Profile Routes', () => {
                     communityAlerts: true
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -388,7 +387,7 @@ describe('Profile Routes', () => {
                     dateOfBirth: dob
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -497,7 +496,7 @@ describe('Profile Routes', () => {
                         healthInterests: ['mental-health', 'fitness']
                     }
                     prismaMock.profile.update
-                        .mockResolvedValue(updated)
+                        .mockResolvedValue(updated as never)
 
                     const {
                         token,
@@ -559,7 +558,7 @@ describe('Profile Routes', () => {
                         activityPreferences: ['walking', 'mindfulness']
                     }
                     prismaMock.profile.update
-                        .mockResolvedValue(updated)
+                        .mockResolvedValue(updated as never)
 
                     const {
                         token,

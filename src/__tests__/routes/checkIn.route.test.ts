@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -36,7 +35,7 @@ const createMockCheckIn = (
     updatedAt: null,
     insights: [],
     ...overrides
-})
+} as unknown as CheckInType)
 
 describe('Check-in Routes', () => {
     beforeEach(() => {
@@ -46,17 +45,17 @@ describe('Check-in Routes', () => {
                 id: 'test-profile-id-123',
                 userId: 'test-user-id-123',
                 timezone: null
-            })
+            } as never)
         prismaMock.profile.update
-            .mockImplementation(async (args) => ({
+            .mockImplementation((async (args: { data: Record<string, unknown> }) => ({
                 id: 'test-profile-id-123',
                 userId: 'test-user-id-123',
                 ...args.data
-            }))
+            })) as never)
         jest.mocked(recommendationsService.generateRecommendationsSafely)
-            .mockResolvedValue(undefined)
+            .mockResolvedValue(undefined as never)
         jest.mocked(insightService.generateInsightSafely)
-            .mockResolvedValue(undefined)
+            .mockResolvedValue(undefined as never)
     })
 
     // ==================== GET CHECK-INS ====================
@@ -75,7 +74,7 @@ describe('Check-in Routes', () => {
                     })
                 ]
                 prismaMock.dailyCheckIn.findMany
-                    .mockResolvedValue(mockCheckIns)
+                    .mockResolvedValue(mockCheckIns as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -99,7 +98,7 @@ describe('Check-in Routes', () => {
                 const mockUser = createMockUser()
                 const token = createAuthToken(mockUser)
                 prismaMock.dailyCheckIn.findMany
-                    .mockResolvedValue([createMockCheckIn()])
+                    .mockResolvedValue([createMockCheckIn()] as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -165,10 +164,10 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValueOnce(null)
-                    .mockResolvedValueOnce(mockCheckIn)
+                    .mockResolvedValueOnce(null as never)
+                    .mockResolvedValueOnce(mockCheckIn as never)
                 prismaMock.dailyCheckIn.create
-                    .mockResolvedValue(mockCheckIn)
+                    .mockResolvedValue(mockCheckIn as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -201,9 +200,9 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValueOnce(existingCheckIn)
+                    .mockResolvedValueOnce(existingCheckIn as never)
                 prismaMock.dailyCheckIn.update
-                    .mockResolvedValue(existingCheckIn)
+                    .mockResolvedValue(existingCheckIn as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -381,10 +380,10 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValueOnce(createMockCheckIn())
-                    .mockResolvedValueOnce(updated)
+                    .mockResolvedValueOnce(createMockCheckIn() as never)
+                    .mockResolvedValueOnce(updated as never)
                 prismaMock.dailyCheckIn.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const response = await supertest(App)
                     .patch(endpoint)
@@ -415,7 +414,7 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .patch(endpoint)
@@ -520,7 +519,7 @@ describe('Check-in Routes', () => {
                     updatedAt: null,
                     insights: []
                 }
-            ])
+            ] as never)
 
             const response = await supertest(App)
                 .get(endpoint)

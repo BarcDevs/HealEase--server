@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -33,7 +32,7 @@ describe('Forum Routes', () => {
                 ]
                 prismaMock.post.findMany
                     .mockResolvedValue(
-                        mockPosts
+                        mockPosts as never
                     )
 
                 const response =
@@ -54,7 +53,7 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [createMockPost()]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -78,7 +77,7 @@ describe('Forum Routes', () => {
                     })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -95,7 +94,7 @@ describe('Forum Routes', () => {
                     createMockPost({ category: 'health' })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -112,7 +111,7 @@ describe('Forum Routes', () => {
                     createMockPost({ title: 'Search Test' })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -127,7 +126,7 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [createMockPost()]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -144,7 +143,7 @@ describe('Forum Routes', () => {
                     createMockPost({ views: 100 })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -159,7 +158,7 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [createMockPost()]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -174,11 +173,11 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [
                     createMockPost({
-                        _count: { replies: 0 }
+                        _count: { replies: 0, likes: 0 }
                     })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -239,7 +238,7 @@ describe('Forum Routes', () => {
                 prismaMock.tag.findMany
                     .mockResolvedValue([])
                 prismaMock.post.create
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(postsEndpoint),
@@ -399,7 +398,7 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.create
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(postsEndpoint),
@@ -422,7 +421,7 @@ describe('Forum Routes', () => {
         it('should return 200 and single post', async () => {
             const mockPost = createMockPost()
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const response = await supertest(App)
                 .get(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
@@ -436,7 +435,7 @@ describe('Forum Routes', () => {
             'should return 404 for non-existent post',
             async () => {
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts/non-existent-id`)
@@ -463,7 +462,7 @@ describe('Forum Routes', () => {
                     }
                 })
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
@@ -496,11 +495,11 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
                 prismaMock.post.update.mockResolvedValue({
                     ...mockPost,
                     title: 'Updated Title'
-                })
+                } as never)
                 prismaMock.tag.findMany
                     .mockResolvedValue([])
 
@@ -550,7 +549,7 @@ describe('Forum Routes', () => {
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const response = await supertest(App)
                 .put(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
@@ -583,7 +582,7 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).put(
@@ -623,9 +622,9 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
                 prismaMock.post.delete
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).delete(
@@ -672,7 +671,7 @@ describe('Forum Routes', () => {
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const response = await supertest(App)
                 .delete(
@@ -697,9 +696,9 @@ describe('Forum Routes', () => {
                 createMockReply({ id: 'reply-2' })
             ]
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
             prismaMock.reply.findMany
-                .mockResolvedValue(mockReplies)
+                .mockResolvedValue(mockReplies as never)
 
             const response = await supertest(App)
                 .get(
@@ -722,7 +721,7 @@ describe('Forum Routes', () => {
             'should return 404 when post not found',
             async () => {
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(
@@ -753,11 +752,11 @@ describe('Forum Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.reply.create
-                    .mockResolvedValue(mockReply)
+                    .mockResolvedValue(mockReply as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(
@@ -840,11 +839,11 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
                     prismaMock.reply.update.mockResolvedValue({
                         ...mockReply,
                         body: 'Updated reply'
-                    })
+                    } as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).put(
@@ -881,7 +880,7 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).put(
@@ -915,7 +914,7 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(null)
+                        .mockResolvedValue(null as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).put(
@@ -961,9 +960,9 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
                     prismaMock.reply.delete
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1002,7 +1001,7 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1029,7 +1028,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(null)
+                        .mockResolvedValue(null as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1066,7 +1065,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1094,7 +1093,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1122,7 +1121,7 @@ describe('Forum Routes', () => {
             userId: string
         }) => {
             prismaMock.post.findUnique
-                .mockResolvedValue(createMockPost())
+                .mockResolvedValue(createMockPost() as never)
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
         }
@@ -1143,11 +1142,11 @@ describe('Forum Routes', () => {
 
                 setupLikeMocks(mockProfile)
                 prismaMock.postLike.deleteMany
-                    .mockResolvedValue({ count: 0 })
+                    .mockResolvedValue({ count: 0 } as never)
                 prismaMock.postLike.create
                     .mockResolvedValue({} as never)
                 prismaMock.postLike.count
-                    .mockResolvedValue(1)
+                    .mockResolvedValue(1 as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(likeEndpoint),
@@ -1179,9 +1178,9 @@ describe('Forum Routes', () => {
 
                 setupLikeMocks(mockProfile)
                 prismaMock.postLike.deleteMany
-                    .mockResolvedValue({ count: 1 })
+                    .mockResolvedValue({ count: 1 } as never)
                 prismaMock.postLike.count
-                    .mockResolvedValue(0)
+                    .mockResolvedValue(0 as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(likeEndpoint),
@@ -1232,7 +1231,7 @@ describe('Forum Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(likeEndpoint),
@@ -1311,15 +1310,15 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(createMockReply())
+                        .mockResolvedValue(createMockReply() as never)
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.replyLike.deleteMany
-                        .mockResolvedValue({ count: 0 })
+                        .mockResolvedValue({ count: 0 } as never)
                     prismaMock.replyLike.create
                         .mockResolvedValue({} as never)
                     prismaMock.replyLike.count
-                        .mockResolvedValue(1)
+                        .mockResolvedValue(1 as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).post(likeReplyEndpoint),
@@ -1351,13 +1350,13 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(createMockReply())
+                        .mockResolvedValue(createMockReply() as never)
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.replyLike.deleteMany
-                        .mockResolvedValue({ count: 1 })
+                        .mockResolvedValue({ count: 1 } as never)
                     prismaMock.replyLike.count
-                        .mockResolvedValue(0)
+                        .mockResolvedValue(0 as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).post(likeReplyEndpoint),
@@ -1394,7 +1393,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(null)
+                        .mockResolvedValue(null as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).post(likeReplyEndpoint),
@@ -1421,7 +1420,7 @@ describe('Forum Routes', () => {
             userId: string
         }) => {
             prismaMock.post.findUnique
-                .mockResolvedValue(createMockPost())
+                .mockResolvedValue(createMockPost() as never)
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
         }
@@ -1442,7 +1441,7 @@ describe('Forum Routes', () => {
 
                 setupSaveMocks(mockProfile)
                 prismaMock.savedPost.deleteMany
-                    .mockResolvedValue({ count: 0 })
+                    .mockResolvedValue({ count: 0 } as never)
                 prismaMock.savedPost.create
                     .mockResolvedValue({} as never)
 
@@ -1475,7 +1474,7 @@ describe('Forum Routes', () => {
 
                 setupSaveMocks(mockProfile)
                 prismaMock.savedPost.deleteMany
-                    .mockResolvedValue({ count: 1 })
+                    .mockResolvedValue({ count: 1 } as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(saveEndpoint),
@@ -1525,7 +1524,7 @@ describe('Forum Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(saveEndpoint),
@@ -1562,7 +1561,7 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(savedEndpoint)
@@ -1616,7 +1615,7 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findMany
-                    .mockResolvedValue([createMockPost()])
+                    .mockResolvedValue([createMockPost()] as never)
 
                 const response = await supertest(App)
                     .get(savedEndpoint)
@@ -1734,7 +1733,7 @@ describe('Forum Routes', () => {
             'should return 404 for non-existent tag',
             async () => {
                 prismaMock.tag.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/tags/non-existent-id`)
@@ -1860,7 +1859,7 @@ describe('Forum Routes', () => {
         it(
             'should return 200 and category counts array',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([
                         { category: 'therapy', _count: { category: 4 } },
                         { category: 'wellness', _count: { category: 2 } }
@@ -1880,7 +1879,7 @@ describe('Forum Routes', () => {
         it(
             'should include "all" as first item with total count',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([
                         { category: 'therapy', _count: { category: 4 } },
                         { category: 'wellness', _count: { category: 2 } }
@@ -1898,7 +1897,7 @@ describe('Forum Routes', () => {
         it(
             'should return items with category and count fields',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([
                         { category: 'therapy', _count: { category: 4 } }
                     ] as never)
@@ -1919,7 +1918,7 @@ describe('Forum Routes', () => {
         it(
             'should return only "all" with count 0 when no posts',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([] as never)
 
                 const response = await supertest(App)

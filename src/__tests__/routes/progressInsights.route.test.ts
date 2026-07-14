@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -49,7 +48,7 @@ describe('Progress Insights Routes', () => {
                 '../../services/progressInsightsService'
             )
             progressInsightsService.generateProgressInsight
-                .mockResolvedValue(mockInsights)
+                .mockResolvedValue(mockInsights as never)
 
             const response = await supertest(App)
                 .get(endpoint)
@@ -111,7 +110,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -158,7 +157,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -203,7 +202,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -258,7 +257,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -304,7 +303,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -345,7 +344,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -417,7 +416,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -465,7 +464,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -509,7 +508,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -553,7 +552,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)

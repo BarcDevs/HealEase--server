@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -92,7 +91,7 @@ describe('Recommendations Routes', () => {
                     status: 'processing',
                     isStale: true,
                     posts: []
-                })
+                } as never)
 
             const response = await supertest(App)
                 .get(endpoint)

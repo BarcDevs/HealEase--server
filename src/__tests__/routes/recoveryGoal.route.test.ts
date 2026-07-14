@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -28,7 +27,7 @@ describe('Recovery Goals Routes', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         prismaMock.profile.findUnique
-            .mockImplementation(async (args: any) => {
+            .mockImplementation((async (args: any) => {
                 const userId = args.where.userId
                 const profileIdMap: { [key: string]: string } = {
                     'test-user-id-123': 'test-profile-id-123',
@@ -39,7 +38,7 @@ describe('Recovery Goals Routes', () => {
                     id: profileId,
                     userId
                 }
-            })
+            }) as never)
         prismaMock.recoveryGoal.findMany.mockResolvedValue([])
         prismaMock.recoveryGoal.create.mockResolvedValue({} as any)
         prismaMock.recoveryGoal.findFirst.mockResolvedValue({
@@ -47,7 +46,7 @@ describe('Recovery Goals Routes', () => {
             profileId: 'test-profile-id-123',
             title: 'Test Goal',
             description: null,
-            category: 'physical',
+            category: 'PHYSICAL',
             isPrimary: false,
             status: GoalStatus.ACTIVE,
             targetDate: null,
@@ -74,11 +73,11 @@ describe('Recovery Goals Routes', () => {
         } as any)
         prismaMock.milestone.update.mockResolvedValue({} as any)
         prismaMock.milestone.delete.mockResolvedValue({} as any)
-        prismaMock.milestone.count.mockResolvedValue(0)
+        prismaMock.milestone.count.mockResolvedValue(0 as never)
         prismaMock.milestone.aggregate.mockResolvedValue({
             _max: { order: null }
-        })
-        prismaMock.milestone.findUnique.mockResolvedValue(null)
+        } as never)
+        prismaMock.milestone.findUnique.mockResolvedValue(null as never)
     })
 
     // ==================== CREATE GOAL ====================
@@ -91,7 +90,7 @@ describe('Recovery Goals Routes', () => {
                 profileId: 'test-profile-id-123',
                 title: 'Build strength',
                 description: 'Physical recovery goal',
-                category: 'physical',
+                category: 'PHYSICAL',
                 isPrimary: true,
                 status: GoalStatus.ACTIVE,
                 targetDate: new Date('2026-07-23')
@@ -102,7 +101,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.create.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.create.mockResolvedValue(mockGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).post(endpoint),
@@ -112,14 +111,14 @@ describe('Recovery Goals Routes', () => {
             ).send({
                 title: 'Build strength',
                 description: 'Physical recovery goal',
-                category: 'physical',
+                category: 'PHYSICAL',
                 isPrimary: true,
                 targetDate: '2026-07-23T00:00:00Z'
             })
 
             expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.data.title).toBe('Build strength')
-            expect(response.body.data.category).toBe('physical')
+            expect(response.body.data.category).toBe('PHYSICAL')
             expect(response.body.data.isPrimary).toBe(true)
             expect(response.body.data.progress).toBe(0)
         })
@@ -128,7 +127,7 @@ describe('Recovery Goals Routes', () => {
             const mockUser = createMockUser()
             const mockGoal = createMockRecoveryGoal({
                 title: 'Simple goal',
-                category: 'mental'
+                category: 'MENTAL'
             })
             const {
                 token,
@@ -136,7 +135,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.create.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.create.mockResolvedValue(mockGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).post(endpoint),
@@ -145,7 +144,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({
                 title: 'Simple goal',
-                category: 'mental'
+                category: 'MENTAL'
             })
 
             expect(response.status).toBe(HttpStatusCodes.CREATED)
@@ -166,7 +165,7 @@ describe('Recovery Goals Routes', () => {
                 token,
                 csrfSecret,
                 csrfToken
-            ).send({ category: 'physical' })
+            ).send({ category: 'PHYSICAL' })
 
             expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
         })
@@ -197,7 +196,7 @@ describe('Recovery Goals Routes', () => {
                 .post(endpoint)
                 .send({
                     title: 'Goal',
-                    category: 'physical'
+                    category: 'PHYSICAL'
                 })
 
             expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
@@ -212,7 +211,7 @@ describe('Recovery Goals Routes', () => {
                 token
             ).send({
                 title: 'Goal',
-                category: 'physical'
+                category: 'PHYSICAL'
             })
 
             expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
@@ -246,7 +245,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({
                 title: 'New Goal',
-                category: 'physical'
+                category: 'PHYSICAL'
             })
 
             expect(response.status).toBe(HttpStatusCodes.CONFLICT)
@@ -271,13 +270,13 @@ describe('Recovery Goals Routes', () => {
             const newGoal = createMockRecoveryGoal({
                 profileId: 'test-profile-id-123',
                 title: 'New Goal',
-                category: 'physical'
+                category: 'PHYSICAL'
             })
 
             prismaMock.recoveryGoal.findMany.mockResolvedValueOnce(
                 completedGoals
             )
-            prismaMock.recoveryGoal.create.mockResolvedValueOnce(newGoal)
+            prismaMock.recoveryGoal.create.mockResolvedValueOnce(newGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).post(endpoint),
@@ -286,7 +285,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({
                 title: 'New Goal',
-                category: 'physical'
+                category: 'PHYSICAL'
             })
 
             expect(response.status).toBe(HttpStatusCodes.CREATED)
@@ -312,13 +311,13 @@ describe('Recovery Goals Routes', () => {
             const newGoal = createMockRecoveryGoal({
                 profileId: 'test-profile-id-123',
                 title: 'New Goal',
-                category: 'mental'
+                category: 'MENTAL'
             })
 
             prismaMock.recoveryGoal.findMany.mockResolvedValueOnce(
                 abandonedGoals
             )
-            prismaMock.recoveryGoal.create.mockResolvedValueOnce(newGoal)
+            prismaMock.recoveryGoal.create.mockResolvedValueOnce(newGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).post(endpoint),
@@ -327,7 +326,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             ).send({
                 title: 'New Goal',
-                category: 'mental'
+                category: 'MENTAL'
             })
 
             expect(response.status).toBe(HttpStatusCodes.CREATED)
@@ -351,8 +350,8 @@ describe('Recovery Goals Routes', () => {
                 })
             ]
 
-            prismaMock.recoveryGoal.findMany.mockResolvedValue(mockGoals)
-            prismaMock.milestone.count.mockResolvedValue(0)
+            prismaMock.recoveryGoal.findMany.mockResolvedValue(mockGoals as never)
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(API_BASE),
@@ -388,7 +387,7 @@ describe('Recovery Goals Routes', () => {
             })
 
             prismaMock.recoveryGoal.findMany.mockResolvedValue([activeGoal])
-            prismaMock.milestone.count.mockResolvedValue(0)
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(`${API_BASE}?status=ACTIVE`),
@@ -436,8 +435,8 @@ describe('Recovery Goals Routes', () => {
                 createMockRecoveryGoal({ id: 'g2', status: GoalStatus.COMPLETED })
             ]
 
-            prismaMock.recoveryGoal.findMany.mockResolvedValue(goals)
-            prismaMock.milestone.count.mockResolvedValue(0)
+            prismaMock.recoveryGoal.findMany.mockResolvedValue(goals as never)
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(API_BASE),
@@ -459,7 +458,7 @@ describe('Recovery Goals Routes', () => {
             const mockGoal = createMockRecoveryGoal({ id: 'goal-1' })
 
             prismaMock.recoveryGoal.findMany.mockResolvedValue([mockGoal])
-            prismaMock.milestone.count.mockResolvedValue(0)
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(API_BASE),
@@ -481,8 +480,8 @@ describe('Recovery Goals Routes', () => {
             ]
 
             prismaMock.recoveryGoal.findMany.mockResolvedValue([mockGoal])
-            prismaMock.milestone.count.mockResolvedValue(3)
-            prismaMock.milestone.findMany.mockResolvedValue(mockMilestones)
+            prismaMock.milestone.count.mockResolvedValue(3 as never)
+            prismaMock.milestone.findMany.mockResolvedValue(mockMilestones as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(API_BASE),
@@ -516,8 +515,8 @@ describe('Recovery Goals Routes', () => {
                 })
             ]
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
-            prismaMock.milestone.findMany.mockResolvedValue(mockMilestones)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
+            prismaMock.milestone.findMany.mockResolvedValue(mockMilestones as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(`${API_BASE}/goal-123`),
@@ -534,7 +533,7 @@ describe('Recovery Goals Routes', () => {
             const mockUser = createMockUser()
             const token = createAuthToken(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(null)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(null as never)
 
             const response = await withBearerAuth(
                 supertest(App).get(`${API_BASE}/nonexistent`),
@@ -565,8 +564,8 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
-            prismaMock.recoveryGoal.update.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
+            prismaMock.recoveryGoal.update.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
 
             const response = await withCsrfAuth(
@@ -592,12 +591,12 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
-            prismaMock.recoveryGoal.update.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
+            prismaMock.recoveryGoal.update.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
             prismaMock.milestone.updateMany.mockResolvedValue({
                 count: 0
-            })
+            } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123`),
@@ -635,7 +634,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(null)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(null as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123`),
@@ -676,8 +675,8 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(activeGoal)
-            prismaMock.recoveryGoal.update.mockResolvedValue(pausedGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(activeGoal as never)
+            prismaMock.recoveryGoal.update.mockResolvedValue(pausedGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
 
             const response = await withCsrfAuth(
@@ -709,8 +708,8 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(pausedGoal)
-            prismaMock.recoveryGoal.update.mockResolvedValue(activeGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(pausedGoal as never)
+            prismaMock.recoveryGoal.update.mockResolvedValue(activeGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
 
             const response = await withCsrfAuth(
@@ -741,8 +740,8 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(abandonedGoal)
-            prismaMock.recoveryGoal.update.mockResolvedValue(activeGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(abandonedGoal as never)
+            prismaMock.recoveryGoal.update.mockResolvedValue(activeGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
             prismaMock.milestone.findFirst.mockResolvedValue({
                 id: 'm-1',
@@ -776,7 +775,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(completedGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(completedGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123`),
@@ -800,7 +799,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(pausedGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(pausedGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123`),
@@ -824,7 +823,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(completedGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(completedGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123`),
@@ -848,7 +847,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(activeGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(activeGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([
                 createMockMilestone({ status: MilestoneStatus.COMPLETED }),
                 createMockMilestone({ id: 'm-2', status: MilestoneStatus.ACTIVE })
@@ -881,10 +880,10 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(pausedGoal)
-            prismaMock.recoveryGoal.update.mockResolvedValue(abandonedGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(pausedGoal as never)
+            prismaMock.recoveryGoal.update.mockResolvedValue(abandonedGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
-            prismaMock.milestone.updateMany.mockResolvedValue({ count: 0 })
+            prismaMock.milestone.updateMany.mockResolvedValue({ count: 0 } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123`),
@@ -912,8 +911,8 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
-            prismaMock.recoveryGoal.delete.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
+            prismaMock.recoveryGoal.delete.mockResolvedValue(mockGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).delete(`${API_BASE}/goal-123`),
@@ -934,7 +933,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(null)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(null as never)
 
             const response = await withCsrfAuth(
                 supertest(App).delete(`${API_BASE}/goal-123`),
@@ -979,24 +978,24 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.aggregate.mockResolvedValue({
                 _max: { order: 0 }
-            })
-            prismaMock.milestone.count.mockResolvedValue(0)
+            } as never)
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
             prismaMock.$transaction.mockImplementation(async (callback) => {
                 const tx = {
                     $executeRaw: jest.fn(),
                     milestone: {
-                        count: jest.fn().mockResolvedValue(0),
-                        create: jest.fn().mockResolvedValue(mockMilestone)
+                        count: jest.fn().mockResolvedValue(0 as never),
+                        create: jest.fn().mockResolvedValue(mockMilestone as never)
                     },
                     recoveryGoal: {
                         findUnique: jest.fn()
-                            .mockResolvedValue(mockGoal)
+                            .mockResolvedValue(mockGoal as never)
                     }
                 }
-                return callback(tx)
+                return callback(tx as never)
             })
 
             const response = await withCsrfAuth(
@@ -1032,24 +1031,24 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.aggregate.mockResolvedValue({
                 _max: { order: 0 }
-            })
-            prismaMock.milestone.count.mockResolvedValue(0)
+            } as never)
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
             prismaMock.$transaction.mockImplementation(async (callback) => {
                 const tx = {
                     $executeRaw: jest.fn(),
                     milestone: {
-                        count: jest.fn().mockResolvedValue(0),
-                        create: jest.fn().mockResolvedValue(mockMilestone)
+                        count: jest.fn().mockResolvedValue(0 as never),
+                        create: jest.fn().mockResolvedValue(mockMilestone as never)
                     },
                     recoveryGoal: {
                         findUnique: jest.fn()
-                            .mockResolvedValue(mockGoal)
+                            .mockResolvedValue(mockGoal as never)
                     }
                 }
-                return callback(tx)
+                return callback(tx as never)
             })
 
             const response = await withCsrfAuth(
@@ -1082,10 +1081,10 @@ describe('Recovery Goals Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.recoveryGoal.findFirst.mockReset()
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.aggregate.mockResolvedValue({
                 _max: { order: 0 }
-            })
+            } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).post(`${API_BASE}/goal-123/milestones`),
@@ -1111,10 +1110,10 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.aggregate.mockResolvedValue({
                 _max: { order: 8 }
-            })
+            } as never)
             prismaMock.$transaction.mockImplementation(async () => {
                 throw errorFactory.generic.conflict(
                     'Maximum 8 milestones per goal'
@@ -1169,8 +1168,8 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
-            prismaMock.milestone.update.mockResolvedValue(mockMilestone)
+            } as never)
+            prismaMock.milestone.update.mockResolvedValue(mockMilestone as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1201,8 +1200,8 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
-            prismaMock.milestone.update.mockResolvedValue(mockMilestone)
+            } as never)
+            prismaMock.milestone.update.mockResolvedValue(mockMilestone as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1232,8 +1231,8 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
-            prismaMock.milestone.update.mockResolvedValue(mockMilestone)
+            } as never)
+            prismaMock.milestone.update.mockResolvedValue(mockMilestone as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1262,9 +1261,9 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
+            } as never)
             prismaMock.recoveryGoal.findFirst.mockReset()
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1294,7 +1293,7 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
+            } as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1338,8 +1337,8 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
-            prismaMock.milestone.delete.mockResolvedValue(mockMilestone)
+            } as never)
+            prismaMock.milestone.delete.mockResolvedValue(mockMilestone as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1396,30 +1395,30 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
+            } as never)
             prismaMock.recoveryGoal.findFirst.mockReset()
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.$transaction.mockImplementation(async (callback) => {
                 return callback({
-                    $executeRaw: jest.fn().mockResolvedValue(undefined),
+                    $executeRaw: jest.fn().mockResolvedValue(undefined as never),
                     milestone: {
                         findUnique: jest.fn()
-                            .mockResolvedValue(mockMilestone),
+                            .mockResolvedValue(mockMilestone as never),
                         update: jest.fn()
                             .mockResolvedValue({
                                 ...mockMilestone,
                                 status: GoalStatus.COMPLETED
-                            }),
+                            } as never),
                         findFirst: jest.fn()
                             .mockResolvedValue({
                                 id: 'm-2',
                                 status: MilestoneStatus.LOCKED
-                            })
+                            } as never)
                     },
                     recoveryGoal: {
                         update: jest.fn()
                     }
-                })
+                } as never)
             })
 
             const response = await withCsrfAuth(
@@ -1452,8 +1451,8 @@ describe('Recovery Goals Routes', () => {
             prismaMock.milestone.findUnique.mockResolvedValue({
                 ...mockMilestone,
                 goal: mockGoal
-            })
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            } as never)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App)
@@ -1498,7 +1497,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([
                 createMockMilestone({ status: GoalStatus.COMPLETED }),
                 createMockMilestone({
@@ -1509,7 +1508,7 @@ describe('Recovery Goals Routes', () => {
             prismaMock.recoveryGoal.update.mockResolvedValue({
                 ...mockGoal,
                 status: GoalStatus.COMPLETED
-            })
+            } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123/complete`),
@@ -1534,7 +1533,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(`${API_BASE}/goal-123/complete`),
@@ -1557,7 +1556,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([
                 createMockMilestone({ status: GoalStatus.COMPLETED }),
                 createMockMilestone({
@@ -1587,7 +1586,7 @@ describe('Recovery Goals Routes', () => {
                 csrfToken
             } = createAuthenticatedRequest(mockUser)
 
-            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal)
+            prismaMock.recoveryGoal.findFirst.mockResolvedValue(mockGoal as never)
             prismaMock.milestone.findMany.mockResolvedValue([])
 
             const response = await withCsrfAuth(
@@ -1618,13 +1617,13 @@ describe('Recovery Goals Routes', () => {
             const mockUser = createMockUser()
             const token = createAuthToken(mockUser)
 
-            prismaMock.recoveryGoal.count.mockResolvedValue(10)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([
+            prismaMock.recoveryGoal.count.mockResolvedValue(10 as never);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([
                 { category: 'PHYSICAL', _count: 4 },
                 { category: 'MENTAL', _count: 3 },
                 { category: 'LIFESTYLE', _count: 3 }
             ] as any)
-            prismaMock.milestone.count.mockResolvedValue(20)
+            prismaMock.milestone.count.mockResolvedValue(20 as never)
             prismaMock.recoveryGoal.findMany.mockResolvedValue([])
             prismaMock.milestone.findMany.mockResolvedValue([])
 
@@ -1650,9 +1649,9 @@ describe('Recovery Goals Routes', () => {
             const mockUser = createMockUser()
             const token = createAuthToken(mockUser)
 
-            prismaMock.recoveryGoal.count.mockResolvedValue(0)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([])
-            prismaMock.milestone.count.mockResolvedValue(0)
+            prismaMock.recoveryGoal.count.mockResolvedValue(0 as never);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([])
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
             prismaMock.recoveryGoal.findMany.mockResolvedValue([])
             prismaMock.milestone.findMany.mockResolvedValue([])
 
@@ -1672,9 +1671,9 @@ describe('Recovery Goals Routes', () => {
             const mockUser = createMockUser()
             const token = createAuthToken(mockUser)
 
-            prismaMock.recoveryGoal.count.mockResolvedValue(5)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([])
-            prismaMock.milestone.count.mockResolvedValue(10)
+            prismaMock.recoveryGoal.count.mockResolvedValue(5 as never);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([])
+            prismaMock.milestone.count.mockResolvedValue(10 as never)
             prismaMock.recoveryGoal.findMany.mockResolvedValue([])
             prismaMock.milestone.findMany.mockResolvedValue([])
 
@@ -1696,11 +1695,11 @@ describe('Recovery Goals Routes', () => {
             const mockUser = createMockUser()
             const token = createAuthToken(mockUser)
 
-            prismaMock.recoveryGoal.count.mockResolvedValue(4)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([
+            prismaMock.recoveryGoal.count.mockResolvedValue(4 as never);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([
                 { category: 'PHYSICAL', _count: 4 }
             ] as any)
-            prismaMock.milestone.count.mockResolvedValue(8)
+            prismaMock.milestone.count.mockResolvedValue(8 as never)
             prismaMock.recoveryGoal.findMany.mockResolvedValue([])
             prismaMock.milestone.findMany.mockResolvedValue([])
 
@@ -1727,9 +1726,9 @@ describe('Recovery Goals Routes', () => {
             const today = new Date()
             const yesterday = new Date(today.getTime() - dayInMs)
 
-            prismaMock.recoveryGoal.count.mockResolvedValue(2)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([])
-            prismaMock.milestone.count.mockResolvedValue(0)
+            prismaMock.recoveryGoal.count.mockResolvedValue(2 as never);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([])
+            prismaMock.milestone.count.mockResolvedValue(0 as never)
             prismaMock.recoveryGoal.findMany.mockResolvedValue([
                 { completedAt: today },
                 { completedAt: yesterday }
@@ -1750,16 +1749,16 @@ describe('Recovery Goals Routes', () => {
             const token = createAuthToken(mockUser)
 
             prismaMock.recoveryGoal.count
-                .mockResolvedValueOnce(10) // totalCreated
-                .mockResolvedValueOnce(3) // completed
-                .mockResolvedValueOnce(6) // active
-                .mockResolvedValueOnce(1) // paused
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([])
+                .mockResolvedValueOnce(10 as never) // totalCreated
+                .mockResolvedValueOnce(3 as never) // completed
+                .mockResolvedValueOnce(6 as never) // active
+                .mockResolvedValueOnce(1 as never); // paused
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([])
             prismaMock.milestone.count
-                .mockResolvedValueOnce(20) // totalCreated
-                .mockResolvedValueOnce(8) // completed
-                .mockResolvedValueOnce(10) // active
-                .mockResolvedValueOnce(2) // paused
+                .mockResolvedValueOnce(20 as never) // totalCreated
+                .mockResolvedValueOnce(8 as never) // completed
+                .mockResolvedValueOnce(10 as never) // active
+                .mockResolvedValueOnce(2 as never) // paused
             prismaMock.recoveryGoal.findMany.mockResolvedValue([])
             prismaMock.milestone.findMany.mockResolvedValue([])
 

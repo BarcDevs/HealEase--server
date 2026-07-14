@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -26,12 +25,12 @@ describe('User Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.user.findUnique
-                .mockResolvedValue(mockUser)
+                .mockResolvedValue(mockUser as never)
             prismaMock.user.update
                 .mockResolvedValue({
                     ...mockUser,
                     firstName: 'John'
-                })
+                } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(updateUserEndpoint),
@@ -57,12 +56,12 @@ describe('User Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.user.findUnique
-                .mockResolvedValue(mockUser)
+                .mockResolvedValue(mockUser as never)
             prismaMock.user.update
                 .mockResolvedValue({
                     ...mockUser,
                     lastName: 'Doe'
-                })
+                } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(updateUserEndpoint),
@@ -85,13 +84,13 @@ describe('User Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.user.findUnique
-                .mockResolvedValueOnce(mockUser)
-                .mockResolvedValueOnce(null)
+                .mockResolvedValueOnce(mockUser as never)
+                .mockResolvedValueOnce(null as never)
             prismaMock.user.update
                 .mockResolvedValue({
                     ...mockUser,
                     username: 'newusername'
-                })
+                } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(updateUserEndpoint),
@@ -115,16 +114,16 @@ describe('User Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValueOnce(mockUser)
-                    .mockResolvedValueOnce(null)
-                    .mockResolvedValueOnce(null)
+                    .mockResolvedValueOnce(mockUser as never)
+                    .mockResolvedValueOnce(null as never)
+                    .mockResolvedValueOnce(null as never)
                 prismaMock.user.update
                     .mockResolvedValue({
                         ...mockUser,
                         firstName: 'John',
                         lastName: 'Doe',
                         username: 'johndoe'
-                    })
+                    } as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).patch(updateUserEndpoint),
@@ -159,8 +158,8 @@ describe('User Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.user.findUnique
-                .mockResolvedValueOnce(mockUser)
-                .mockResolvedValueOnce(otherUser)
+                .mockResolvedValueOnce(mockUser as never)
+                .mockResolvedValueOnce(otherUser as never)
 
             const response = await withCsrfAuth(
                 supertest(App).patch(updateUserEndpoint),
@@ -233,12 +232,12 @@ describe('User Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValueOnce(mockUser)
-                    .mockResolvedValueOnce(null)
+                    .mockResolvedValueOnce(mockUser as never)
+                    .mockResolvedValueOnce(null as never)
                 prismaMock.user.update.mockResolvedValue({
                     ...mockUser,
                     username: 'john_doe'
-                })
+                } as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).patch(updateUserEndpoint),
@@ -279,12 +278,12 @@ describe('User Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
                 prismaMock.user.update
                     .mockResolvedValue({
                         ...mockUser,
                         passwordUpdatedAt: new Date()
-                    })
+                    } as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).patch(updatePasswordEndpoint),
@@ -316,7 +315,7 @@ describe('User Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).patch(updatePasswordEndpoint),
@@ -495,12 +494,12 @@ describe('User Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.user.findUnique
-                .mockResolvedValue(mockUser)
+                .mockResolvedValue(mockUser as never)
             prismaMock.user.update
                 .mockResolvedValue({
                     ...mockUser,
                     active: false
-                })
+                } as never)
 
             const response = await withCsrfAuth(
                 supertest(App).delete(deleteUserEndpoint),
@@ -547,7 +546,7 @@ describe('User Routes', () => {
             } = createAuthenticatedRequest(mockUser)
 
             prismaMock.user.findUnique
-                .mockResolvedValue(null)
+                .mockResolvedValue(null as never)
 
             const response = await withCsrfAuth(
                 supertest(App).delete(deleteUserEndpoint),
@@ -580,7 +579,7 @@ describe('User Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await supertest(App)
                     .delete(deleteUserEndpoint)
@@ -605,7 +604,7 @@ describe('User Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await supertest(App)
                     .delete(deleteUserEndpoint)
