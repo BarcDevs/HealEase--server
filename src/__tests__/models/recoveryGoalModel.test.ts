@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as recoveryGoalModel from '../../models/recoveryGoalModel'
 import { prismaMock } from '../setup/jestSetup'
 import {
@@ -18,7 +17,7 @@ jest.mock('../../errors/factory/ErrorFactory', () => ({
 describe('RecoveryGoalModel', () => {
     describe('getProfileIdForUser', () => {
         it('returns profile id when found', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue({ id: 'profile-id' })
+            prismaMock.profile.findUnique.mockResolvedValue({ id: 'profile-id' } as never)
 
             const result = await recoveryGoalModel.getProfileIdForUser('user-id')
 
@@ -121,7 +120,7 @@ describe('RecoveryGoalModel', () => {
 
     describe('getMaxMilestoneOrder', () => {
         it('returns max order value', async () => {
-            prismaMock.milestone.aggregate.mockResolvedValue({ _max: { order: 3 } })
+            prismaMock.milestone.aggregate.mockResolvedValue({ _max: { order: 3 } } as never)
 
             const result = await recoveryGoalModel.getMaxMilestoneOrder('goal-id')
 
@@ -129,7 +128,7 @@ describe('RecoveryGoalModel', () => {
         })
 
         it('returns null when no milestones', async () => {
-            prismaMock.milestone.aggregate.mockResolvedValue({ _max: { order: null } })
+            prismaMock.milestone.aggregate.mockResolvedValue({ _max: { order: null } } as never)
 
             const result = await recoveryGoalModel.getMaxMilestoneOrder('goal-id')
 
@@ -207,8 +206,8 @@ describe('RecoveryGoalModel', () => {
 
     describe('getGoalsStats', () => {
         it('returns aggregated counts for all statuses', async () => {
-            prismaMock.recoveryGoal.count.mockResolvedValue(5)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([
+            prismaMock.recoveryGoal.count.mockResolvedValue(5);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([
                 { category: 'LIFESTYLE', _count: { _all: 3 } },
                 { category: 'MENTAL_HEALTH', _count: { _all: 2 } }
             ])
@@ -222,8 +221,8 @@ describe('RecoveryGoalModel', () => {
         })
 
         it('maps byCategory correctly', async () => {
-            prismaMock.recoveryGoal.count.mockResolvedValue(0)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([
+            prismaMock.recoveryGoal.count.mockResolvedValue(0);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([
                 { category: 'LIFESTYLE', _count: { _all: 4 } }
             ])
 
@@ -233,8 +232,8 @@ describe('RecoveryGoalModel', () => {
         })
 
         it('returns zero byCategory when no goals', async () => {
-            prismaMock.recoveryGoal.count.mockResolvedValue(0)
-            prismaMock.recoveryGoal.groupBy.mockResolvedValue([])
+            prismaMock.recoveryGoal.count.mockResolvedValue(0);
+            (prismaMock.recoveryGoal.groupBy as jest.Mock).mockResolvedValue([])
 
             const result = await recoveryGoalModel.getGoalsStats('profile-id')
 
@@ -576,10 +575,10 @@ describe('RecoveryGoalModel', () => {
             const completedDate = new Date('2026-05-01')
             prismaMock.recoveryGoal.findMany.mockResolvedValue([
                 { completedAt: completedDate }
-            ])
+            ] as never)
             prismaMock.milestone.findMany.mockResolvedValue([
                 { completedAt: completedDate }
-            ])
+            ] as never)
 
             const result = await recoveryGoalModel.getCompletedDatesForStreak('profile-id')
 
@@ -597,8 +596,8 @@ describe('RecoveryGoalModel', () => {
         })
 
         it('excludes null completedAt values', async () => {
-            prismaMock.recoveryGoal.findMany.mockResolvedValue([{ completedAt: null }])
-            prismaMock.milestone.findMany.mockResolvedValue([{ completedAt: null }])
+            prismaMock.recoveryGoal.findMany.mockResolvedValue([{ completedAt: null }] as never)
+            prismaMock.milestone.findMany.mockResolvedValue([{ completedAt: null }] as never)
 
             const result = await recoveryGoalModel.getCompletedDatesForStreak('profile-id')
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as authModel from '../../models/authModel'
 import { prismaMock } from '../setup/jestSetup'
 import { createMockUser } from '../setup/testSetup'
@@ -7,7 +6,7 @@ describe('AuthModel', () => {
     describe('getUserById', () => {
         it('returns user when found and active', async () => {
             const user = createMockUser()
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await authModel.getUserById(user.id)
 
@@ -16,7 +15,7 @@ describe('AuthModel', () => {
 
         it('returns null when user is inactive', async () => {
             const user = createMockUser({ active: false })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await authModel.getUserById(user.id)
 
@@ -33,7 +32,7 @@ describe('AuthModel', () => {
 
         it('queries by id', async () => {
             const user = createMockUser()
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             await authModel.getUserById('target-id')
 
@@ -48,7 +47,7 @@ describe('AuthModel', () => {
     describe('getUserByEmail', () => {
         it('returns user when found and active', async () => {
             const user = createMockUser()
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await authModel.getUserByEmail(user.email)
 
@@ -57,7 +56,7 @@ describe('AuthModel', () => {
 
         it('returns null when user is inactive', async () => {
             const user = createMockUser({ active: false })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await authModel.getUserByEmail(user.email)
 
@@ -65,7 +64,7 @@ describe('AuthModel', () => {
         })
 
         it('queries by email', async () => {
-            prismaMock.user.findUnique.mockResolvedValue(createMockUser())
+            prismaMock.user.findUnique.mockResolvedValue(createMockUser() as never)
 
             await authModel.getUserByEmail('someone@test.com')
 
@@ -80,11 +79,11 @@ describe('AuthModel', () => {
     describe('createUser', () => {
         it('creates user and profile atomically in transaction', async () => {
             const user = createMockUser()
-            prismaMock.user.create.mockResolvedValue(user)
+            prismaMock.user.create.mockResolvedValue(user as never)
             prismaMock.profile.create.mockResolvedValue({
                 id: 'profile-id',
                 userId: user.id
-            })
+            } as never)
 
             const result = await authModel.createUser({
                 firstName: 'Test',
@@ -103,7 +102,7 @@ describe('AuthModel', () => {
     describe('updateUser', () => {
         it('calls update with active: true constraint', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.updateUser(user.id, { firstName: 'Updated' })
 
@@ -119,7 +118,7 @@ describe('AuthModel', () => {
     describe('updatePassword', () => {
         it('stores hashed password and timestamp', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.updatePassword(user.id, 'new-hashed-pw')
 
@@ -136,7 +135,7 @@ describe('AuthModel', () => {
     describe('disableUser', () => {
         it('sets active to false without requiring active constraint', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue({ ...user, active: false })
+            prismaMock.user.update.mockResolvedValue({ ...user, active: false } as never)
 
             await authModel.disableUser(user.id)
 
@@ -152,7 +151,7 @@ describe('AuthModel', () => {
     describe('deleteUser', () => {
         it('deletes by id', async () => {
             const user = createMockUser()
-            prismaMock.user.delete.mockResolvedValue(user)
+            prismaMock.user.delete.mockResolvedValue(user as never)
 
             await authModel.deleteUser(user.id)
 
@@ -164,7 +163,7 @@ describe('AuthModel', () => {
 
     describe('getUserTimezone', () => {
         it('returns timezone from profile', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue({ timezone: 'Asia/Jerusalem' })
+            prismaMock.profile.findUnique.mockResolvedValue({ timezone: 'Asia/Jerusalem' } as never)
 
             const result = await authModel.getUserTimezone('user-id')
 
@@ -180,7 +179,7 @@ describe('AuthModel', () => {
         })
 
         it('returns null when profile has no timezone', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue({ timezone: null })
+            prismaMock.profile.findUnique.mockResolvedValue({ timezone: null } as never)
 
             const result = await authModel.getUserTimezone('user-id')
 
@@ -190,7 +189,7 @@ describe('AuthModel', () => {
 
     describe('getUserLanguage', () => {
         it('returns language from profile', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue({ language: 'en' })
+            prismaMock.profile.findUnique.mockResolvedValue({ language: 'en' } as never)
 
             const result = await authModel.getUserLanguage('user-id')
 
@@ -206,7 +205,7 @@ describe('AuthModel', () => {
         })
 
         it('defaults to he when language is null', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue({ language: null })
+            prismaMock.profile.findUnique.mockResolvedValue({ language: null } as never)
 
             const result = await authModel.getUserLanguage('user-id')
 
@@ -217,7 +216,7 @@ describe('AuthModel', () => {
     describe('getUserByUsername', () => {
         it('returns user when found and active', async () => {
             const user = createMockUser()
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await authModel.getUserByUsername('testuser')
 
@@ -226,7 +225,7 @@ describe('AuthModel', () => {
 
         it('returns null when user is inactive', async () => {
             const user = createMockUser({ active: false })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await authModel.getUserByUsername('testuser')
 
@@ -242,7 +241,7 @@ describe('AuthModel', () => {
         })
 
         it('queries by username', async () => {
-            prismaMock.user.findUnique.mockResolvedValue(createMockUser())
+            prismaMock.user.findUnique.mockResolvedValue(createMockUser() as never)
 
             await authModel.getUserByUsername('targetuser')
 
@@ -258,7 +257,7 @@ describe('AuthModel', () => {
         it('calls update with OTP data and active constraint', async () => {
             const user = createMockUser()
             const expiration = new Date('2026-01-01T12:00:00Z')
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.setUserOTP(user.id, {
                 resetPasswordOTP: 123456,
@@ -278,7 +277,7 @@ describe('AuthModel', () => {
 
         it('can clear OTP with null values', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.setUserOTP(user.id, {
                 resetPasswordOTP: null,
@@ -299,7 +298,7 @@ describe('AuthModel', () => {
     describe('incrementResetPasswordAttempts', () => {
         it('increments the attempt counter with active constraint', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.incrementResetPasswordAttempts(user.id)
 
@@ -316,7 +315,7 @@ describe('AuthModel', () => {
         it('calls update with confirm-email OTP data and active constraint', async () => {
             const user = createMockUser()
             const expiration = new Date('2026-01-01T12:00:00Z')
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.setConfirmEmailOTP(user.id, {
                 confirmEmailOTP: 654321,
@@ -338,7 +337,7 @@ describe('AuthModel', () => {
     describe('incrementConfirmEmailAttempts', () => {
         it('increments the attempt counter with active constraint', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.incrementConfirmEmailAttempts(user.id)
 
@@ -355,7 +354,7 @@ describe('AuthModel', () => {
         it('calls update with email change data and active constraint', async () => {
             const user = createMockUser()
             const expiration = new Date('2026-01-01T12:00:00Z')
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.setEmailChangeOTP(user.id, {
                 pendingEmail: 'new@test.com',
@@ -377,7 +376,7 @@ describe('AuthModel', () => {
 
         it('can clear pending email with null values', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.setEmailChangeOTP(user.id, {
                 pendingEmail: null,
@@ -400,7 +399,7 @@ describe('AuthModel', () => {
     describe('updateEmail', () => {
         it('sets new email and clears all OTP fields', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.updateEmail(user.id, 'new@test.com')
 
@@ -421,7 +420,7 @@ describe('AuthModel', () => {
     describe('linkGoogleId', () => {
         it('calls update with googleId and active constraint', async () => {
             const user = createMockUser()
-            prismaMock.user.update.mockResolvedValue(user)
+            prismaMock.user.update.mockResolvedValue(user as never)
 
             await authModel.linkGoogleId(user.id, 'google-oauth-id-123')
 
@@ -442,7 +441,7 @@ describe('AuthModel', () => {
         })
 
         it('createUser propagates error when profile creation fails mid-transaction', async () => {
-            prismaMock.user.create.mockResolvedValue(createMockUser())
+            prismaMock.user.create.mockResolvedValue(createMockUser() as never)
             prismaMock.profile.create.mockRejectedValue(new Error('Profile creation failed'))
 
             await expect(
