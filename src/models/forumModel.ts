@@ -251,6 +251,14 @@ export const getReplies = async (
         })
     ) as unknown as ReplyType[]
 
+export const getRepliesCount = async (
+    postId: string
+): Promise<{count: number}> => ({
+    count: await Prisma.reply.count({
+        where: { postId }
+    })
+})
+
 export const updateReply = async (
     replyId: string,
     postId: string,

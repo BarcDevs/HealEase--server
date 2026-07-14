@@ -42,7 +42,7 @@ describe('Forum Routes', () => {
 
                 expect(response.status)
                     .toBe(HttpStatusCodes.OK)
-                expect(response.body.data)
+                expect(response.body.data.items)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
                     .toContain('posts found')
@@ -707,11 +707,11 @@ describe('Forum Routes', () => {
                 )
 
             expect(response.status).toBe(HttpStatusCodes.OK)
-            expect(response.body.data)
+            expect(response.body.data.items)
                 .toBeInstanceOf(Array)
-            expect(response.body.data.length)
+            expect(response.body.data.items.length)
                 .toBeGreaterThan(0)
-            response.body.data.forEach((reply: unknown) => {
+            response.body.data.items.forEach((reply: unknown) => {
                 expect(reply).toHaveProperty('_count')
                 expect((reply as { _count: unknown })._count)
                     .toHaveProperty('likes')

@@ -256,6 +256,10 @@ export const getReplies = async (
     )
 }
 
+export const getRepliesCount = async (
+    postId: string
+) => forumModel.getRepliesCount(postId)
+
 export const updateReply = async (
     replyId: string,
     postId: string,

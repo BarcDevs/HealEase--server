@@ -17,6 +17,7 @@ import * as forumService from '../services/forumService'
 import type { PostType } from '../types/data/PostType'
 import type { ReplyType } from '../types/data/ReplyType'
 import type { TagType } from '../types/data/TagType'
+import type { PaginatedType } from '../types/PaginatedType'
 
 // region Posts
 export const getPosts = async (
@@ -36,9 +37,21 @@ export const getPosts = async (
     if (!data)
         throw errorFactory.generic.notFound('Posts')
 
-    return successResponse<PostType[]>(
+    const { count } = await forumService.getPostsCount(validatedQuery)
+    const page = validatedQuery?.page ?? 1
+    const limit = validatedQuery?.limit ?? 10
+
+    return successResponse<PaginatedType<PostType>>(
         res,
-        data,
+        {
+            items: data,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                hasMore: page * limit < count
+            }
+        },
         `${data.length} posts found`
     )
 }
@@ -205,18 +218,29 @@ export const getReplies = async (
         )
 
     const resolvedLimit = limit ?? FORUM_PAGINATION.DEFAULT_REPLY_LIMIT
+    const resolvedPage = page ?? 1
 
     const data = (
         await forumService.getReplies(
             postId,
             resolvedLimit,
-            page)
+            resolvedPage)
 
     ) as ReplyType[]
 
-    return successResponse<ReplyType[]>(
+    const { count } = await forumService.getRepliesCount(postId)
+
+    return successResponse<PaginatedType<ReplyType>>(
         res,
-        data,
+        {
+            items: data,
+            pagination: {
+                total: count,
+                page: resolvedPage,
+                limit: resolvedLimit,
+                hasMore: resolvedPage * resolvedLimit < count
+            }
+        },
         `found ${data.length} replies for post ${postId}`
     )
 }

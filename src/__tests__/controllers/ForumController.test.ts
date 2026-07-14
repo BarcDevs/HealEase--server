@@ -15,6 +15,7 @@ import {
 
 jest.mock('../../services/forumService', () => ({
     getPosts: jest.fn(),
+    getPostsCount: jest.fn(),
     getPost: jest.fn(),
     createPost: jest.fn(),
     updatePost: jest.fn(),
@@ -22,6 +23,7 @@ jest.mock('../../services/forumService', () => ({
     validateOwner: jest.fn(),
     createReply: jest.fn(),
     getReplies: jest.fn(),
+    getRepliesCount: jest.fn(),
     updateReply: jest.fn(),
     deleteReply: jest.fn(),
     getTags: jest.fn(),
@@ -45,6 +47,8 @@ describe('ForumController', () => {
             ]
             ;(forumService.getPosts as jest.Mock)
                 .mockResolvedValue(mockPosts)
+            ;(forumService.getPostsCount as jest.Mock)
+                .mockResolvedValue({ count: 2 })
 
             const req = createMockRequest({
                 query: {}
@@ -60,7 +64,15 @@ describe('ForumController', () => {
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: expect.stringContaining('posts found'),
-                    data: mockPosts
+                    data: {
+                        items: mockPosts,
+                        pagination: {
+                            total: 2,
+                            page: 1,
+                            limit: 10,
+                            hasMore: false
+                        }
+                    }
                 })
             )
         })
@@ -71,6 +83,8 @@ describe('ForumController', () => {
                 const mockPosts = [createMockPost()]
                 ;(forumService.getPosts as jest.Mock)
                     .mockResolvedValue(mockPosts)
+                ;(forumService.getPostsCount as jest.Mock)
+                    .mockResolvedValue({ count: 1 })
 
                 const req = createMockRequest({
                     query: {
@@ -423,6 +437,8 @@ describe('ForumController', () => {
             ]
             ;(forumService.getReplies as jest.Mock)
                 .mockResolvedValue(mockReplies)
+            ;(forumService.getRepliesCount as jest.Mock)
+                .mockResolvedValue({ count: 2 })
 
             const req = createMockRequest({
                 params: { postId: 'test-post-id-123' }
@@ -435,7 +451,7 @@ describe('ForumController', () => {
             expect(forumService.getReplies).toHaveBeenCalledWith(
                 'test-post-id-123',
                 FORUM_PAGINATION.DEFAULT_REPLY_LIMIT,
-                undefined
+                1
             )
             expect(res.status)
                 .toHaveBeenCalledWith(HttpStatusCodes.OK)
@@ -445,6 +461,8 @@ describe('ForumController', () => {
             const mockReplies = [createMockReply()]
             ;(forumService.getReplies as jest.Mock)
                 .mockResolvedValue(mockReplies)
+            ;(forumService.getRepliesCount as jest.Mock)
+                .mockResolvedValue({ count: 1 })
 
             const req = createMockRequest({
                 params: { postId: 'test-post-id-123' },
@@ -465,6 +483,8 @@ describe('ForumController', () => {
         it('should return empty array when no replies', async () => {
             ;(forumService.getReplies as jest.Mock)
                 .mockResolvedValue([])
+            ;(forumService.getRepliesCount as jest.Mock)
+                .mockResolvedValue({ count: 0 })
 
             const req = createMockRequest({
                 params: { postId: 'test-post-id-123' }
