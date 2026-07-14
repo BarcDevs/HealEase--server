@@ -9,7 +9,6 @@ import * as authModel from '../models/authModel'
 import * as profileModel from '../models/profileModel'
 import type { ServerUserType } from '../types/data/UserType'
 import logger from '../utils/logger'
-import Prisma from '../utils/prismaClient'
 
 import { applyDetectedTimezone } from './authService'
 
@@ -123,19 +122,6 @@ export const fetchGoogleProfile = async (
     }
 }
 
-const findUserByGoogleId = async (
-    googleId: string
-): Promise<ServerUserType | null> => {
-    const user = await Prisma.user.findUnique({
-        where: {
-            googleId,
-            active: true
-        }
-    })
-
-    return user as ServerUserType | null
-}
-
 const slugifyUsername = (raw: string): string =>
     raw
         .toLowerCase()
@@ -186,83 +172,28 @@ const createGoogleUser = async (
         .randomBytes(32)
         .toString('hex')
 
-    const user = await Prisma.$transaction(
-        async (tx: typeof Prisma) => {
-            const createdUser = await tx.user.create({
-                data: {
-                    firstName: profile.firstName || 'Google',
-                    lastName: profile.lastName || 'User',
-                    username,
-                    email: profile.email,
-                    password: hashPassword(randomPassword),
-                    googleId: profile.googleId
-                }
-            })
-
-            await tx.profile.create({
-                data: {
-                    userId: createdUser.id,
-                    image: profile.picture
-                }
-            })
-
-            return createdUser
-        }
-    )
-
-    return user as ServerUserType
-}
-
-const linkGoogleId = async (
-    userId: string,
-    googleId: string,
-    picture: string | null
-): Promise<ServerUserType> => {
-    const user = await Prisma.$transaction(
-        async (tx: typeof Prisma) => {
-            const updatedUser = await tx.user.update({
-                where: {
-                    id: userId,
-                    active: true
-                },
-                data: {
-                    googleId
-                }
-            })
-
-            if (picture) {
-                const profile =
-                    await tx.profile.findUnique({
-                        where: { userId },
-                        select: { image: true }
-                    })
-
-                if (!profile?.image) {
-                    await tx.profile.update({
-                        where: { userId },
-                        data: { image: picture }
-                    })
-                }
-            }
-
-            return updatedUser
-        }
-    )
-
-    return user as ServerUserType
+    return authModel.createGoogleUser({
+        firstName: profile.firstName || 'Google',
+        lastName: profile.lastName || 'User',
+        username,
+        email: profile.email,
+        password: hashPassword(randomPassword),
+        googleId: profile.googleId,
+        picture: profile.picture
+    })
 }
 
 export const findOrCreateUser = async (
     profile: GoogleProfile
 ): Promise<ServerUserType> => {
     const existingByGoogleId =
-        await findUserByGoogleId(profile.googleId)
+        await authModel.getUserByGoogleId(profile.googleId)
     if (existingByGoogleId) return existingByGoogleId
 
     const existingByEmail =
         await authModel.getUserByEmail(profile.email)
     if (existingByEmail)
-        return linkGoogleId(
+        return authModel.linkGoogleAccount(
             existingByEmail.id,
             profile.googleId,
             profile.picture

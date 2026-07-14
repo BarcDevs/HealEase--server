@@ -45,7 +45,11 @@ jest.mock('../../../config', () => ({
     }
 }))
 
-jest.mock('../../models/authModel')
+jest.mock('../../models/authModel', () => ({
+    ...jest.requireActual('../../models/authModel'),
+    getUserByEmail: jest.fn(),
+    getUserByUsername: jest.fn()
+}))
 jest.mock('../../utils/logger', () => ({
     __esModule: true,
     default: { info: jest.fn(), error: jest.fn(), warn: jest.fn() }

@@ -248,6 +248,91 @@ export const linkGoogleId = (
         }
     }) as Promise<ServerUserType>
 
+export const getUserByGoogleId = async (
+    googleId: string
+): Promise<ServerUserType | null> => {
+    const user = await Prisma.user.findUnique({
+        where: {
+            googleId,
+            active: true
+        }
+    })
+
+    return user as ServerUserType | null
+}
+
+export const createGoogleUser = async (
+    data: NewUserType & {
+        googleId: string
+        picture: string | null
+    }
+): Promise<ServerUserType> => {
+    const user = await Prisma.$transaction(
+        async (tx: typeof Prisma) => {
+            const createdUser = await tx.user.create({
+                data: {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    username: data.username,
+                    email: data.email,
+                    password: data.password,
+                    googleId: data.googleId
+                }
+            })
+
+            await tx.profile.create({
+                data: {
+                    userId: createdUser.id,
+                    image: data.picture
+                }
+            })
+
+            return createdUser
+        }
+    )
+
+    return user as ServerUserType
+}
+
+export const linkGoogleAccount = async (
+    userId: string,
+    googleId: string,
+    picture: string | null
+): Promise<ServerUserType> => {
+    const user = await Prisma.$transaction(
+        async (tx: typeof Prisma) => {
+            const updatedUser = await tx.user.update({
+                where: {
+                    id: userId,
+                    active: true
+                },
+                data: {
+                    googleId
+                }
+            })
+
+            if (picture) {
+                const profile =
+                    await tx.profile.findUnique({
+                        where: { userId },
+                        select: { image: true }
+                    })
+
+                if (!profile?.image) {
+                    await tx.profile.update({
+                        where: { userId },
+                        data: { image: picture }
+                    })
+                }
+            }
+
+            return updatedUser
+        }
+    )
+
+    return user as ServerUserType
+}
+
 export const getUserTimezone = async (
     userId: string
 ): Promise<string | null> => {
