@@ -187,7 +187,8 @@ export const createReply = async (
     return successResponse<ReplyType>(
         res,
         data,
-        'Reply created successfully'
+        'Reply created successfully',
+        HttpStatusCodes.CREATED
     )
 }
 

@@ -737,7 +737,7 @@ describe('Forum Routes', () => {
     // ==================== CREATE REPLY ====================
     describe(`POST /api/${serverConfig.apiVersion}/forum/posts/:postId/replies`, () => {
         it(
-            'should return 200 for valid reply creation',
+            'should return 201 for valid reply creation',
             async () => {
                 const mockUser = createMockUser()
                 const mockPost = createMockPost()
@@ -770,7 +770,7 @@ describe('Forum Routes', () => {
                     body: 'This is a reply'
                 })
 
-                expect(response.status).toBe(HttpStatusCodes.OK)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.message)
                     .toBe('Reply created successfully')
             }

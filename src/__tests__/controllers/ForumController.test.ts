@@ -392,7 +392,7 @@ describe('ForumController', () => {
                     })
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
+                    .toHaveBeenCalledWith(HttpStatusCodes.CREATED)
             }
         )
 

@@ -141,7 +141,7 @@ describe('UserController', () => {
             expect(authService.deactivateUser).toHaveBeenCalledWith(USER_ID)
             expect(res.clearCookie).toHaveBeenCalledWith('accessToken')
             expect(res.clearCookie).toHaveBeenCalledWith('_csrf')
-            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.NO_CONTENT)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 })

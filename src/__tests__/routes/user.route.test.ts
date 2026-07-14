@@ -509,7 +509,7 @@ describe('User Routes', () => {
                 csrfToken
             )
 
-            expect(response.status).toBe(HttpStatusCodes.NO_CONTENT)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(prismaMock.user.findUnique)
                 .toHaveBeenCalledWith({
                     where: { id: mockUser.id },

@@ -86,6 +86,6 @@ export const deleteUser = async (
         res,
         null,
         'User account deactivated successfully',
-        HttpStatusCodes.NO_CONTENT
+        HttpStatusCodes.OK
     )
 }
