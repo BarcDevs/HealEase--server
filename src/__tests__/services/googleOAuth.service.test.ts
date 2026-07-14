@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as googleAuthLib from 'google-auth-library'
 
 import { AuthError } from '../../errors/AuthError'
@@ -129,7 +128,7 @@ describe('GoogleOAuthService', () => {
     describe('exchangeCodeForTokens', () => {
         it('returns tokens on success', async () => {
             const tokens = { id_token: 'id-token-123', access_token: 'access-token' }
-            mockGetToken.mockResolvedValue({ tokens })
+            mockGetToken.mockResolvedValue({ tokens } as never)
 
             const result = await exchangeCodeForTokens('auth-code')
 
@@ -154,7 +153,7 @@ describe('GoogleOAuthService', () => {
                 family_name: 'Doe',
                 picture: 'https://example.com/photo.jpg'
             }
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => payload })
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => payload } as never)
 
             const profile = await fetchGoogleProfile('id-token')
 
@@ -164,7 +163,7 @@ describe('GoogleOAuthService', () => {
         })
 
         it('throws AuthError when payload is null', async () => {
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => null })
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => null } as never)
 
             await expect(fetchGoogleProfile('id-token')).rejects.toThrow(AuthError)
         })
@@ -176,7 +175,7 @@ describe('GoogleOAuthService', () => {
                     email: undefined,
                     email_verified: true
                 })
-            })
+            } as never)
 
             await expect(fetchGoogleProfile('id-token')).rejects.toThrow(/Email not provided/)
         })
@@ -188,7 +187,7 @@ describe('GoogleOAuthService', () => {
                     email: 'user@test.com',
                     email_verified: false
                 })
-            })
+            } as never)
 
             await expect(fetchGoogleProfile('id-token')).rejects.toThrow(/not verified/)
         })
@@ -211,7 +210,7 @@ describe('GoogleOAuthService', () => {
     describe('findOrCreateUser', () => {
         it('returns user when found by googleId', async () => {
             const existingUser = createMockUser({ id: 'google-user-id' })
-            prismaMock.user.findUnique.mockResolvedValue(existingUser)
+            prismaMock.user.findUnique.mockResolvedValue(existingUser as never)
 
             const result = await findOrCreateUser(mockGoogleProfile)
 
@@ -221,11 +220,11 @@ describe('GoogleOAuthService', () => {
 
         it('links googleId to existing email user when no googleId match', async () => {
             const emailUser = createMockUser({ id: 'email-user-id' })
-            prismaMock.user.findUnique.mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(emailUser)
-            prismaMock.user.update.mockResolvedValue({ ...emailUser, googleId: mockGoogleProfile.googleId })
-            prismaMock.profile.findUnique.mockResolvedValue({ image: null })
-            prismaMock.profile.update.mockResolvedValue({})
+            prismaMock.user.findUnique.mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(emailUser as never)
+            prismaMock.user.update.mockResolvedValue({ ...emailUser, googleId: mockGoogleProfile.googleId } as never)
+            prismaMock.profile.findUnique.mockResolvedValue({ image: null } as never)
+            prismaMock.profile.update.mockResolvedValue({} as never)
 
             const result = await findOrCreateUser(mockGoogleProfile)
 
@@ -235,11 +234,11 @@ describe('GoogleOAuthService', () => {
 
         it('creates new user when no existing match found', async () => {
             const newUser = createMockUser({ id: 'new-user-id' })
-            prismaMock.user.findUnique.mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByUsername').mockResolvedValue(null)
-            prismaMock.user.create.mockResolvedValue(newUser)
-            prismaMock.profile.create.mockResolvedValue({})
+            prismaMock.user.findUnique.mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByUsername').mockResolvedValue(null as never)
+            prismaMock.user.create.mockResolvedValue(newUser as never)
+            prismaMock.profile.create.mockResolvedValue({} as never)
 
             const result = await findOrCreateUser(mockGoogleProfile)
 
@@ -249,11 +248,11 @@ describe('GoogleOAuthService', () => {
 
         it('throws AuthError when all username generation attempts are exhausted', async () => {
             const existingUser = createMockUser()
-            prismaMock.user.findUnique.mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(null)
+            prismaMock.user.findUnique.mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(null as never)
             // All attempts (base + 10 retries) return a taken username
             jest.spyOn(authModel, 'getUserByUsername')
-                .mockResolvedValue(existingUser)
+                .mockResolvedValue(existingUser as never)
 
             await expect(
                 findOrCreateUser(mockGoogleProfile)
@@ -261,9 +260,9 @@ describe('GoogleOAuthService', () => {
         })
 
         it('propagates transaction error when createGoogleUser fails', async () => {
-            prismaMock.user.findUnique.mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByUsername').mockResolvedValue(null)
+            prismaMock.user.findUnique.mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByUsername').mockResolvedValue(null as never)
             prismaMock.user.create.mockRejectedValue(new Error('DB error'))
 
             await expect(
@@ -273,8 +272,8 @@ describe('GoogleOAuthService', () => {
 
         it('propagates transaction error when linkGoogleId fails', async () => {
             const emailUser = createMockUser({ id: 'email-user-id' })
-            prismaMock.user.findUnique.mockResolvedValue(null)
-            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(emailUser)
+            prismaMock.user.findUnique.mockResolvedValue(null as never)
+            jest.spyOn(authModel, 'getUserByEmail').mockResolvedValue(emailUser as never)
             prismaMock.user.update.mockRejectedValue(new Error('DB error'))
 
             await expect(
@@ -296,10 +295,10 @@ describe('GoogleOAuthService', () => {
 
         it('returns user on successful OAuth flow', async () => {
             const tokens = { id_token: 'valid-id-token', access_token: 'access' }
-            mockGetToken.mockResolvedValue({ tokens })
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload })
+            mockGetToken.mockResolvedValue({ tokens } as never)
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload } as never)
             const user = createMockUser({ id: 'callback-user' })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
 
             const result = await handleCallback('auth-code')
 
@@ -307,7 +306,7 @@ describe('GoogleOAuthService', () => {
         })
 
         it('throws AuthError when id_token is missing from token response', async () => {
-            mockGetToken.mockResolvedValue({ tokens: { access_token: 'access', id_token: null } })
+            mockGetToken.mockResolvedValue({ tokens: { access_token: 'access', id_token: null } } as never)
 
             await expect(handleCallback('auth-code')).rejects.toThrow(AuthError)
         })
@@ -321,10 +320,10 @@ describe('GoogleOAuthService', () => {
         // ==================== timezone auto-detect ====================
         it('does not update profile timezone when ip is not provided', async () => {
             const tokens = { id_token: 'valid-id-token', access_token: 'access' }
-            mockGetToken.mockResolvedValue({ tokens })
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload })
+            mockGetToken.mockResolvedValue({ tokens } as never)
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload } as never)
             const user = createMockUser({ id: 'callback-user' })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
             prismaMock.profile.findUnique.mockResolvedValue({ timezone: 'Asia/Jerusalem' } as never)
 
             await handleCallback('auth-code')
@@ -334,12 +333,12 @@ describe('GoogleOAuthService', () => {
 
         it('does not update profile timezone when geoip returns null', async () => {
             const tokens = { id_token: 'valid-id-token', access_token: 'access' }
-            mockGetToken.mockResolvedValue({ tokens })
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload })
+            mockGetToken.mockResolvedValue({ tokens } as never)
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload } as never)
             const user = createMockUser({ id: 'callback-user' })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
             prismaMock.profile.findUnique.mockResolvedValue({ timezone: 'Asia/Jerusalem' } as never)
-            jest.mocked(getTimezoneFromIp).mockReturnValue(null)
+            jest.mocked(getTimezoneFromIp).mockReturnValue(null as never)
 
             await handleCallback('auth-code', '1.2.3.4')
 
@@ -348,10 +347,10 @@ describe('GoogleOAuthService', () => {
 
         it('does not update profile timezone when detected timezone matches current', async () => {
             const tokens = { id_token: 'valid-id-token', access_token: 'access' }
-            mockGetToken.mockResolvedValue({ tokens })
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload })
+            mockGetToken.mockResolvedValue({ tokens } as never)
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload } as never)
             const user = createMockUser({ id: 'callback-user' })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
             prismaMock.profile.findUnique.mockResolvedValue({ timezone: 'America/New_York' } as never)
             jest.mocked(getTimezoneFromIp).mockReturnValue('America/New_York')
 
@@ -362,10 +361,10 @@ describe('GoogleOAuthService', () => {
 
         it('updates profile timezone when detected timezone differs from current', async () => {
             const tokens = { id_token: 'valid-id-token', access_token: 'access' }
-            mockGetToken.mockResolvedValue({ tokens })
-            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload })
+            mockGetToken.mockResolvedValue({ tokens } as never)
+            mockVerifyIdToken.mockResolvedValue({ getPayload: () => validPayload } as never)
             const user = createMockUser({ id: 'callback-user' })
-            prismaMock.user.findUnique.mockResolvedValue(user)
+            prismaMock.user.findUnique.mockResolvedValue(user as never)
             prismaMock.profile.findUnique.mockResolvedValue({ timezone: 'Asia/Jerusalem' } as never)
             prismaMock.profile.update.mockResolvedValue({} as never)
             jest.mocked(getTimezoneFromIp).mockReturnValue('America/New_York')

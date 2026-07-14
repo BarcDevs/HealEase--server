@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as checkInModel
     from '../../models/checkInModel'
 import * as forumModel
@@ -24,7 +23,7 @@ jest.mock('../../services/recommendationsService', () => {
     const actual = jest.requireActual('../../services/recommendationsService')
     return {
         ...actual,
-        generateRecommendations: jest.fn().mockResolvedValue(undefined)
+        generateRecommendations: jest.fn().mockResolvedValue(undefined as never)
     }
 })
 
@@ -64,7 +63,7 @@ const makePost = (overrides?: Partial<PostType>): PostType => ({
     replies: [],
     _count: { replies: 2, likes: 5 },
     ...overrides
-})
+} as unknown as PostType)
 
 const makeSnapshotItem = (postId: string): PostRecommendationItem => ({
     postId,
@@ -98,9 +97,9 @@ const mockReadySnapshotFlow = (firstPost: PostType): void => {
             snapshot: makeSnapshot(),
             generationPending: false,
             pendingSince: null
-        })
+        } as never)
     jest.mocked(forumModel.getPost)
-        .mockResolvedValueOnce(firstPost)
+        .mockResolvedValueOnce(firstPost as never)
         .mockResolvedValueOnce(makePost({ id: 'post-2' }))
         .mockResolvedValueOnce(makePost({ id: 'post-3' }))
 }
@@ -109,7 +108,7 @@ describe('recommendationsService.getRecommendations', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         jest.mocked(checkInModel.getProfileIdForUser)
-            .mockResolvedValue(PROFILE_ID)
+            .mockResolvedValue(PROFILE_ID as never)
         jest.mocked(forumModel.getPosts)
             .mockResolvedValue(makeFallbackPosts())
     })
@@ -136,7 +135,7 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: null,
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
 
         const result = await getRecommendations(USER_ID)
 
@@ -171,7 +170,7 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: makeSnapshot(),
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
         jest.mocked(forumModel.getPost)
             .mockResolvedValueOnce(posts[0])
             .mockResolvedValueOnce(posts[1])
@@ -210,7 +209,7 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: makeSnapshot({ basedOnCheckInId: oldCheckInId }),
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
         jest.mocked(forumModel.getPost)
             .mockResolvedValueOnce(stalePosts[0])
             .mockResolvedValueOnce(stalePosts[1])
@@ -234,9 +233,9 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: makeSnapshot({ basedOnCheckInId: oldCheckInId }),
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
         jest.mocked(forumModel.getPost)
-            .mockResolvedValue(null)
+            .mockResolvedValue(null as never)
 
         const result = await getRecommendations(USER_ID)
 
@@ -262,7 +261,7 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: makeSnapshot({ basedOnCheckInId: oldCheckInId }),
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
         jest.mocked(forumModel.getPost)
             .mockResolvedValueOnce(posts[0])
             .mockResolvedValueOnce(posts[1])
@@ -288,12 +287,12 @@ describe('recommendationsService.getRecommendations', () => {
                 }),
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
         jest.mocked(forumModel.getPost)
             .mockResolvedValueOnce(makePost({ id: 'post-1' }))
-            .mockResolvedValueOnce(null)
+            .mockResolvedValueOnce(null as never)
         jest.mocked(recommendationsModel.setPendingGeneration)
-            .mockResolvedValue(undefined)
+            .mockResolvedValue(undefined as never)
 
         const result = await getRecommendations(USER_ID)
 
@@ -314,10 +313,10 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: makeSnapshot(),
                 generationPending: false,
                 pendingSince: null
-            })
-        jest.mocked(forumModel.getPost).mockResolvedValue(null)
+            } as never)
+        jest.mocked(forumModel.getPost).mockResolvedValue(null as never)
         jest.mocked(recommendationsModel.setPendingGeneration)
-            .mockResolvedValue(undefined)
+            .mockResolvedValue(undefined as never)
 
         const result = await getRecommendations(USER_ID)
 
@@ -421,9 +420,9 @@ describe('recommendationsService.getRecommendations', () => {
                 snapshot: makeSnapshot(),
                 generationPending: false,
                 pendingSince: null
-            })
+            } as never)
         jest.mocked(forumModel.getPost)
-            .mockResolvedValueOnce(post)
+            .mockResolvedValueOnce(post as never)
             .mockResolvedValueOnce(makePost({ id: 'post-2' }))
             .mockResolvedValueOnce(makePost({ id: 'post-3' }))
 

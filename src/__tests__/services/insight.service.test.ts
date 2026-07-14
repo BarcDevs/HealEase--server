@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as insightGenerationService from '../../services/insightGenerationService'
 import { generateInsightSafely } from '../../services/insightService'
 
@@ -17,7 +16,7 @@ describe('InsightService', () => {
     describe('generateInsightSafely', () => {
         it('calls generateInsightForCheckIn with correct args', async () => {
             jest.spyOn(insightGenerationService, 'generateInsightForCheckIn')
-                .mockResolvedValue(undefined)
+                .mockResolvedValue(undefined as never)
 
             await generateInsightSafely(USER_ID, CHECK_IN_ID)
 

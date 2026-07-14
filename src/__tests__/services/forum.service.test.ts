@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     createPost,
     createReply,
@@ -41,7 +40,7 @@ describe('Forum Service', () => {
                         userId: 'user-123'
                     } as any)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 await expect(
                     validateOwner('post', 'post-id', 'user-123')
@@ -61,7 +60,7 @@ describe('Forum Service', () => {
                         userId: 'user-123'
                     } as any)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 await expect(
                     validateOwner('post', 'post-id', 'user-123')
@@ -78,7 +77,7 @@ describe('Forum Service', () => {
                         userId: 'user-123'
                     } as any)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 await expect(
                     validateOwner('post', 'post-id', 'user-123')
@@ -98,7 +97,7 @@ describe('Forum Service', () => {
                         userId: 'user-123'
                     } as any)
                 prismaMock.reply.findUnique
-                    .mockResolvedValue(mockReply)
+                    .mockResolvedValue(mockReply as never)
 
                 await expect(
                     validateOwner(
@@ -123,7 +122,7 @@ describe('Forum Service', () => {
                         userId: 'user-123'
                     } as any)
                 prismaMock.reply.findUnique
-                    .mockResolvedValue(mockReply)
+                    .mockResolvedValue(mockReply as never)
 
                 await expect(
                     validateOwner(
@@ -166,7 +165,7 @@ describe('Forum Service', () => {
                 createMockPost({ id: 'post-2' })
             ]
             prismaMock.post.findMany
-                .mockResolvedValue(mockPosts)
+                .mockResolvedValue(mockPosts as never)
 
             const result = await getPosts()
 
@@ -180,7 +179,7 @@ describe('Forum Service', () => {
             async () => {
                 const mockPost = createMockPost()
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const result = await getPosts(
                     undefined,
@@ -196,13 +195,13 @@ describe('Forum Service', () => {
         it('should pass query parameters', async () => {
             const mockPosts = [createMockPost()]
             prismaMock.post.findMany
-                .mockResolvedValue(mockPosts)
+                .mockResolvedValue(mockPosts as never)
 
             await getPosts({
                 limit: 5,
                 page: 1,
                 filter: 'newest'
-            })
+            } as never)
 
             expect(prismaMock.post.findMany)
                 .toHaveBeenCalled()
@@ -212,7 +211,7 @@ describe('Forum Service', () => {
     // ==================== getPostsCount ====================
     describe('getPostsCount', () => {
         it('should return count object', async () => {
-            prismaMock.post.count.mockResolvedValue(10)
+            prismaMock.post.count.mockResolvedValue(10 as never)
 
             const result = await getPostsCount()
 
@@ -220,7 +219,7 @@ describe('Forum Service', () => {
         })
 
         it('should filter by query', async () => {
-            prismaMock.post.count.mockResolvedValue(5)
+            prismaMock.post.count.mockResolvedValue(5 as never)
 
             const result = await getPostsCount({
                 category: 'health'
@@ -274,7 +273,7 @@ describe('Forum Service', () => {
             prismaMock.tag.findMany
                 .mockResolvedValue([])
             prismaMock.post.create
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const result = await createPost({
                 title: 'New Post',
@@ -301,7 +300,7 @@ describe('Forum Service', () => {
             })
             prismaMock.tag.findMany.mockResolvedValue([])
             prismaMock.post.update
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const result = await updatePost(
                 'post-id',
@@ -322,9 +321,9 @@ describe('Forum Service', () => {
                 })
             ]
             prismaMock.tag.findMany
-                .mockResolvedValue(existingTags)
+                .mockResolvedValue(existingTags as never)
             prismaMock.post.update
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             await updatePost('post-id', { tags: ['new-tag'] })
 
@@ -338,7 +337,7 @@ describe('Forum Service', () => {
         it('should delete post', async () => {
             const mockPost = createMockPost()
             prismaMock.post.delete
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             await deletePost('post-id')
 
@@ -362,7 +361,7 @@ describe('Forum Service', () => {
                 })
             ]
             prismaMock.tag.findMany
-                .mockResolvedValue(rawTags)
+                .mockResolvedValue(rawTags as never)
 
             const result = await getTags({})
 
@@ -453,7 +452,7 @@ describe('Forum Service', () => {
             'should return null for non-existent tag',
             async () => {
                 prismaMock.tag.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const result = await getTag('non-existent')
 
@@ -472,11 +471,11 @@ describe('Forum Service', () => {
                 userId: 'user-id'
             }
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
             prismaMock.reply.create
-                .mockResolvedValue(mockReply)
+                .mockResolvedValue(mockReply as never)
 
             const result = await createReply({
                 body: 'Reply content',
@@ -493,7 +492,7 @@ describe('Forum Service', () => {
             'should throw NotFoundError when post not found',
             async () => {
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 await expect(
                     createReply({
@@ -507,7 +506,7 @@ describe('Forum Service', () => {
 
         it('propagates DB error from profileModel lookup', async () => {
             prismaMock.post.findUnique
-                .mockResolvedValue(createMockPost())
+                .mockResolvedValue(createMockPost() as never)
             prismaMock.profile.findUnique
                 .mockRejectedValue(new Error('DB error'))
 
@@ -526,7 +525,7 @@ describe('Forum Service', () => {
         it('should return post by id', async () => {
             const mockPost = createMockPost()
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const result = await getPost('post-id')
 
@@ -535,7 +534,7 @@ describe('Forum Service', () => {
 
         it('should return null for non-existent post', async () => {
             prismaMock.post.findUnique
-                .mockResolvedValue(null)
+                .mockResolvedValue(null as never)
 
             const result = await getPost('non-existent')
 
@@ -552,9 +551,9 @@ describe('Forum Service', () => {
                 createMockReply({ id: 'reply-2' })
             ]
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
             prismaMock.reply.findMany
-                .mockResolvedValue(mockReplies)
+                .mockResolvedValue(mockReplies as never)
 
             const result = await getReplies('post-id')
 
@@ -565,9 +564,9 @@ describe('Forum Service', () => {
             const mockPost = createMockPost()
             const mockReplies = [createMockReply()]
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
             prismaMock.reply.findMany
-                .mockResolvedValue(mockReplies)
+                .mockResolvedValue(mockReplies as never)
 
             const result = await getReplies('post-id', 10, 2)
 
@@ -585,7 +584,7 @@ describe('Forum Service', () => {
             'should throw NotFoundError when post not found',
             async () => {
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 await expect(
                     getReplies('non-existent')
@@ -601,7 +600,7 @@ describe('Forum Service', () => {
                 body: 'Updated reply'
             })
             prismaMock.reply.update
-                .mockResolvedValue(mockReply)
+                .mockResolvedValue(mockReply as never)
 
             const result = await updateReply(
                 'reply-id',
@@ -618,7 +617,7 @@ describe('Forum Service', () => {
         it('should delete reply', async () => {
             const mockReply = createMockReply()
             prismaMock.reply.delete
-                .mockResolvedValue(mockReply)
+                .mockResolvedValue(mockReply as never)
 
             await deleteReply('reply-id', 'post-id')
 
@@ -636,7 +635,7 @@ describe('Forum Service', () => {
         const mockProfile = { id: 'profile-id', userId: 'user-id' }
 
         it('throws NotFoundError when post not found', async () => {
-            prismaMock.post.findUnique.mockResolvedValue(null)
+            prismaMock.post.findUnique.mockResolvedValue(null as never)
 
             await expect(
                 togglePostLike('nonexistent-post', 'user-id')
@@ -645,8 +644,8 @@ describe('Forum Service', () => {
 
         it('throws NotFoundError when profile not found', async () => {
             const mockPost = createMockPost()
-            prismaMock.post.findUnique.mockResolvedValue(mockPost)
-            prismaMock.profile.findUnique.mockResolvedValue(null)
+            prismaMock.post.findUnique.mockResolvedValue(mockPost as never)
+            prismaMock.profile.findUnique.mockResolvedValue(null as never)
 
             await expect(
                 togglePostLike('post-id', 'user-id')
@@ -655,11 +654,11 @@ describe('Forum Service', () => {
 
         it('toggles like and returns result', async () => {
             const mockPost = createMockPost()
-            prismaMock.post.findUnique.mockResolvedValue(mockPost)
+            prismaMock.post.findUnique.mockResolvedValue(mockPost as never)
             prismaMock.profile.findUnique.mockResolvedValue(mockProfile as never)
-            prismaMock.postLike.deleteMany.mockResolvedValue({ count: 0 })
+            prismaMock.postLike.deleteMany.mockResolvedValue({ count: 0 } as never)
             prismaMock.postLike.create.mockResolvedValue({} as never)
-            prismaMock.postLike.count.mockResolvedValue(1)
+            prismaMock.postLike.count.mockResolvedValue(1 as never)
 
             const result = await togglePostLike('post-id', 'user-id')
 
@@ -669,7 +668,7 @@ describe('Forum Service', () => {
 
         it('propagates DB error from togglePostLike model call', async () => {
             const mockPost = createMockPost()
-            prismaMock.post.findUnique.mockResolvedValue(mockPost)
+            prismaMock.post.findUnique.mockResolvedValue(mockPost as never)
             prismaMock.profile.findUnique.mockResolvedValue(mockProfile as never)
             prismaMock.postLike.deleteMany.mockRejectedValue(new Error('DB error'))
 
@@ -684,7 +683,7 @@ describe('Forum Service', () => {
         const mockProfile = { id: 'profile-id', userId: 'user-id' }
 
         it('throws NotFoundError when reply not found', async () => {
-            prismaMock.reply.findFirst.mockResolvedValue(null)
+            prismaMock.reply.findFirst.mockResolvedValue(null as never)
 
             await expect(
                 toggleReplyLike('post-id', 'nonexistent-reply', 'user-id')
@@ -693,8 +692,8 @@ describe('Forum Service', () => {
 
         it('throws NotFoundError when profile not found', async () => {
             const mockReply = createMockReply()
-            prismaMock.reply.findUnique.mockResolvedValue(mockReply)
-            prismaMock.profile.findUnique.mockResolvedValue(null)
+            prismaMock.reply.findUnique.mockResolvedValue(mockReply as never)
+            prismaMock.profile.findUnique.mockResolvedValue(null as never)
 
             await expect(
                 toggleReplyLike('post-id', 'reply-id', 'user-id')
@@ -703,11 +702,11 @@ describe('Forum Service', () => {
 
         it('toggles reply like and returns result', async () => {
             const mockReply = createMockReply()
-            prismaMock.reply.findUnique.mockResolvedValue(mockReply)
+            prismaMock.reply.findUnique.mockResolvedValue(mockReply as never)
             prismaMock.profile.findUnique.mockResolvedValue(mockProfile as never)
-            prismaMock.replyLike.deleteMany.mockResolvedValue({ count: 0 })
+            prismaMock.replyLike.deleteMany.mockResolvedValue({ count: 0 } as never)
             prismaMock.replyLike.create.mockResolvedValue({} as never)
-            prismaMock.replyLike.count.mockResolvedValue(2)
+            prismaMock.replyLike.count.mockResolvedValue(2 as never)
 
             const result = await toggleReplyLike('post-id', 'reply-id', 'user-id')
 
@@ -721,7 +720,7 @@ describe('Forum Service', () => {
         const mockProfile = { id: 'profile-id', userId: 'user-id' }
 
         it('throws NotFoundError when post not found', async () => {
-            prismaMock.post.findUnique.mockResolvedValue(null)
+            prismaMock.post.findUnique.mockResolvedValue(null as never)
 
             await expect(
                 toggleSavePost('nonexistent-post', 'user-id')
@@ -730,8 +729,8 @@ describe('Forum Service', () => {
 
         it('throws NotFoundError when profile not found', async () => {
             const mockPost = createMockPost()
-            prismaMock.post.findUnique.mockResolvedValue(mockPost)
-            prismaMock.profile.findUnique.mockResolvedValue(null)
+            prismaMock.post.findUnique.mockResolvedValue(mockPost as never)
+            prismaMock.profile.findUnique.mockResolvedValue(null as never)
 
             await expect(
                 toggleSavePost('post-id', 'user-id')
@@ -740,9 +739,9 @@ describe('Forum Service', () => {
 
         it('toggles save and returns result', async () => {
             const mockPost = createMockPost()
-            prismaMock.post.findUnique.mockResolvedValue(mockPost)
+            prismaMock.post.findUnique.mockResolvedValue(mockPost as never)
             prismaMock.profile.findUnique.mockResolvedValue(mockProfile as never)
-            prismaMock.savedPost.deleteMany.mockResolvedValue({ count: 0 })
+            prismaMock.savedPost.deleteMany.mockResolvedValue({ count: 0 } as never)
             prismaMock.savedPost.create.mockResolvedValue({} as never)
 
             const result = await toggleSavePost('post-id', 'user-id')
@@ -753,7 +752,7 @@ describe('Forum Service', () => {
 
         it('propagates DB error from toggleSavePost model call', async () => {
             const mockPost = createMockPost()
-            prismaMock.post.findUnique.mockResolvedValue(mockPost)
+            prismaMock.post.findUnique.mockResolvedValue(mockPost as never)
             prismaMock.profile.findUnique
                 .mockResolvedValue({ id: 'profile-id', userId: 'user-id' } as never)
             prismaMock.savedPost.deleteMany
@@ -770,7 +769,7 @@ describe('Forum Service', () => {
         const mockProfile = { id: 'profile-id', userId: 'user-id' }
 
         it('throws NotFoundError when profile not found', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue(null)
+            prismaMock.profile.findUnique.mockResolvedValue(null as never)
 
             await expect(
                 getSavedPosts('user-id')
@@ -780,7 +779,7 @@ describe('Forum Service', () => {
         it('returns saved posts for user', async () => {
             const posts = [createMockPost()]
             prismaMock.profile.findUnique.mockResolvedValue(mockProfile as never)
-            prismaMock.post.findMany.mockResolvedValue(posts)
+            prismaMock.post.findMany.mockResolvedValue(posts as never)
 
             const result = await getSavedPosts('user-id')
 
