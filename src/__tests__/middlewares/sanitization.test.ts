@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import { sanitizeData } from '../../middlewares/sanitaization'
@@ -19,7 +18,7 @@ describe('Sanitization Middleware', () => {
                     }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 sanitizeData(req, res, next)
@@ -41,7 +40,7 @@ describe('Sanitization Middleware', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -64,7 +63,7 @@ describe('Sanitization Middleware', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -85,7 +84,7 @@ describe('Sanitization Middleware', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -99,7 +98,7 @@ describe('Sanitization Middleware', () => {
                 body: {}
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -112,7 +111,7 @@ describe('Sanitization Middleware', () => {
             const req = createMockRequest() as Request
             req.body = undefined
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -129,7 +128,7 @@ describe('Sanitization Middleware', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -149,7 +148,7 @@ describe('Sanitization Middleware', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -168,7 +167,7 @@ describe('Sanitization Middleware', () => {
                     }
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 sanitizeData(req, res, next)
@@ -187,7 +186,7 @@ describe('Sanitization Middleware', () => {
                 }
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             sanitizeData(req, res, next)
@@ -200,7 +199,7 @@ describe('Sanitization Middleware', () => {
     describe('Quill HTML preservation', () => {
         const run = (content: string) => {
             const req = createMockRequest({ body: { content } }) as Request
-            sanitizeData(req, createMockResponse() as Response, createMockNext())
+            sanitizeData(req, createMockResponse() as unknown as Response, createMockNext())
             return req.body.content as string
         }
 

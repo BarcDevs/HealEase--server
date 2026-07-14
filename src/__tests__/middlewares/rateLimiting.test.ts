@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import { serverConfig } from '../../../config'
@@ -39,7 +38,7 @@ describe('Rate Limiting Middleware', () => {
                     originalUrl: `/api/${serverConfig.apiVersion}/test`
                 }) as Request
 
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 res.setHeader = jest.fn()
                 const next = createMockNext()
 
@@ -67,7 +66,7 @@ describe('Rate Limiting Middleware', () => {
                 originalUrl: `/api/${serverConfig.apiVersion}/forum/posts/rate-limit-test-post/share`
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             res.setHeader = jest.fn()
             const next = createMockNext()
 
@@ -94,7 +93,7 @@ describe('Rate Limiting Middleware', () => {
                 originalUrl: `/api/${serverConfig.apiVersion}/auth/login`
             }) as Request
 
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             res.setHeader = jest.fn()
             const next = createMockNext()
 
@@ -110,11 +109,7 @@ describe('Rate Limiting Middleware', () => {
 
         const createRateLimitMockResponse = () => {
             const headers: Record<string, unknown> = {}
-            const res: Partial<MockResponse> & {
-                getHeader: jest.Mock
-                removeHeader: jest.Mock
-                headersSent: boolean
-            } = {
+            const res = {
                 status: jest.fn().mockReturnThis(),
                 json: jest.fn().mockReturnThis(),
                 send: jest.fn().mockReturnThis(),
@@ -127,7 +122,7 @@ describe('Rate Limiting Middleware', () => {
                 }),
                 headersSent: false
             }
-            return res as unknown as Response
+            return res as unknown as unknown as Response
         }
 
         it('should rate limit independently per email for the same IP', async () => {
@@ -164,11 +159,7 @@ describe('Rate Limiting Middleware', () => {
 
         const createRateLimitMockResponse = () => {
             const headers: Record<string, unknown> = {}
-            const res: Partial<MockResponse> & {
-                getHeader: jest.Mock
-                removeHeader: jest.Mock
-                headersSent: boolean
-            } = {
+            const res = {
                 status: jest.fn().mockReturnThis(),
                 json: jest.fn().mockReturnThis(),
                 send: jest.fn().mockReturnThis(),
@@ -181,7 +172,7 @@ describe('Rate Limiting Middleware', () => {
                 }),
                 headersSent: false
             }
-            return res as unknown as Response
+            return res as unknown as unknown as Response
         }
 
         it('should allow the first share request for a post', async () => {

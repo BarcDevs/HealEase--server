@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../../constants/httpStatusCodes'
@@ -19,7 +18,7 @@ describe('errorHandler Middleware', () => {
             () => {
                 const error = new AuthError('Unauthorized access!')
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -49,7 +48,7 @@ describe('errorHandler Middleware', () => {
                     'email'
                 )
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -82,7 +81,7 @@ describe('errorHandler Middleware', () => {
                     HttpStatusCodes.NOT_FOUND
                 )
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -108,7 +107,7 @@ describe('errorHandler Middleware', () => {
                     HttpStatusCodes.UNAUTHORIZED
                 )
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -129,7 +128,7 @@ describe('errorHandler Middleware', () => {
                     HttpStatusCodes.CONFLICT
                 )
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -145,7 +144,7 @@ describe('errorHandler Middleware', () => {
         it('should return 500 for generic Error', () => {
             const error = new Error('Something went wrong')
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             errorHandler(error, req, res, next)
@@ -171,7 +170,7 @@ describe('errorHandler Middleware', () => {
                 'Cannot read property of undefined'
             )
             const req = createMockRequest() as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             errorHandler(error, req, res, next)
@@ -186,7 +185,7 @@ describe('errorHandler Middleware', () => {
             () => {
                 const error = new Error('Generic error')
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -209,7 +208,7 @@ describe('errorHandler Middleware', () => {
             () => {
                 const error = new Error('Test error')
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)
@@ -227,7 +226,7 @@ describe('errorHandler Middleware', () => {
             () => {
                 const error = new Error('Test error')
                 const req = createMockRequest() as Request
-                const res = createMockResponse() as Response
+                const res = createMockResponse() as unknown as Response
                 const next = createMockNext()
 
                 errorHandler(error, req, res, next)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Csrf from 'csrf'
 import type { Response } from 'express'
 
@@ -28,7 +27,7 @@ describe('extractCsrfToken', () => {
             ...createMockRequest(),
             headers: { 'x-csrf-token': 'test-token' }
         } as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         extractCsrfToken(req, res, next)
@@ -42,7 +41,7 @@ describe('extractCsrfToken', () => {
             ...createMockRequest(),
             headers: {}
         } as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         extractCsrfToken(req, res, next)
@@ -59,7 +58,7 @@ describe('csrfMiddleware', () => {
             cookies: { _csrf: secret },
             csrfToken: token
         }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         csrfMiddleware(req, res, next)
@@ -72,7 +71,7 @@ describe('csrfMiddleware', () => {
             cookies: { _csrf: 'bad-secret' },
             csrfToken: 'bad-token'
         }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => csrfMiddleware(req, res, next)).toThrow()
@@ -83,7 +82,7 @@ describe('csrfMiddleware', () => {
             cookies: { _csrf: 'some-secret' },
             csrfToken: ''
         }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => csrfMiddleware(req, res, next)).toThrow()
@@ -94,7 +93,7 @@ describe('csrfMiddleware', () => {
             cookies: { _csrf: 'invalid' },
             csrfToken: 'invalid'
         }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         try {

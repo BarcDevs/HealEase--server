@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
@@ -38,7 +37,7 @@ describe('isAuthenticated Middleware', () => {
             const req = createMockRequest({
                 cookies: { accessToken: token }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             isAuthenticated(req, res, next)
@@ -54,7 +53,7 @@ describe('isAuthenticated Middleware', () => {
         const req = createMockRequest({
             cookies: {}
         }) as Request
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => isAuthenticated(req, res, next)).toThrow()
@@ -66,7 +65,7 @@ describe('isAuthenticated Middleware', () => {
         const req = createMockRequest({
             cookies: { accessToken: '' }
         }) as Request
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => isAuthenticated(req, res, next)).toThrow()
@@ -78,7 +77,7 @@ describe('isAuthenticated Middleware', () => {
         const req = createMockRequest({
             cookies: { accessToken: 'invalid-token' }
         }) as Request
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => isAuthenticated(req, res, next)).toThrow()
@@ -99,7 +98,7 @@ describe('isAuthenticated Middleware', () => {
         const req = createMockRequest({
             cookies: { accessToken: expiredToken }
         }) as Request
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => isAuthenticated(req, res, next)).toThrow()
@@ -122,7 +121,7 @@ describe('isAuthenticated Middleware', () => {
             const req = createMockRequest({
                 cookies: { accessToken: wrongSecretToken }
             }) as Request
-            const res = createMockResponse() as Response
+            const res = createMockResponse() as unknown as Response
             const next = createMockNext()
 
             expect(() => isAuthenticated(req, res, next)).toThrow()
@@ -135,7 +134,7 @@ describe('isAuthenticated Middleware', () => {
         const req = createMockRequest({
             cookies: { accessToken: 'not.a.valid.jwt.token' }
         }) as Request
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         expect(() => isAuthenticated(req, res, next)).toThrow()
@@ -147,7 +146,7 @@ describe('isAuthenticated Middleware', () => {
         const req = createMockRequest({
             cookies: { accessToken: 'bad-token' }
         }) as Request
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         try {
