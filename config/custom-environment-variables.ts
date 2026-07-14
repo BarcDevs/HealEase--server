@@ -6,7 +6,7 @@ export default {
         apiVersion: 'SERVER_API_VERSION'
     },
     database: {
-        url: 'DEV_DATABASE_URL'
+        url: 'DATABASE_URL'
     },
     auth: {
         jwtSecret: 'JWT_SECRET'

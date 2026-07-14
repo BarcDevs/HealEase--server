@@ -1,8 +1,5 @@
 export default {
     env: 'production',
-    database: {
-        url: process.env.DATABASE_URL || ''
-    },
     server: {
         port: process.env.PORT || 8080,
         protocol: 'https',
