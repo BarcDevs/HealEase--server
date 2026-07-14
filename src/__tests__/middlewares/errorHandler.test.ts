@@ -156,7 +156,12 @@ describe('errorHandler Middleware', () => {
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: 'Something went wrong',
-                    error: 'Internal server error'
+                    error: expect.arrayContaining([
+                        expect.objectContaining({
+                            statusType: 'Internal Server Error',
+                            error: 'Internal server error'
+                        })
+                    ])
                 })
             )
         })
