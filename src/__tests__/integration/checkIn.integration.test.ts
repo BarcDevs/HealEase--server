@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Csrf from 'csrf'
 import supertest from 'supertest'
 

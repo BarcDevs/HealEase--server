@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Unmock so we test the real implementation (jestSetup globally mocks it)
 import nodemailer from 'nodemailer'
 

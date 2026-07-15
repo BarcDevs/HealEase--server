@@ -1,4 +1,3 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
@@ -74,7 +73,7 @@ describe('Auth Routes — Integration', () => {
             expect(res.status).toBe(HttpStatusCodes.OK)
             expect(res.body.data).toHaveProperty('token')
             expect(res.body.data).toHaveProperty('_csrf')
-            const cookies = res.headers['set-cookie'].join('; ')
+            const cookies = ([] as string[]).concat(res.headers['set-cookie'] || []).join('; ')
             expect(cookies).toContain('accessToken')
         })
 
@@ -129,7 +128,7 @@ describe('Auth Routes — Integration', () => {
             const res = await supertest(App).get(LOGOUT_URL)
 
             expect(res.status).toBe(HttpStatusCodes.OK)
-            const cookies = res.headers['set-cookie'].join('; ')
+            const cookies = ([] as string[]).concat(res.headers['set-cookie'] || []).join('; ')
             expect(cookies).toContain('accessToken')
             expect(cookies).toContain('_csrf')
         })
