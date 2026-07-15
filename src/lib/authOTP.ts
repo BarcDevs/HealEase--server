@@ -2,7 +2,7 @@ import { randomInt } from 'crypto'
 import ms from 'ms'
 
 import { authConfig } from '../../config'
-import { appConfig } from '../config/app'
+import { brandConfig } from '../config/app'
 import {
     MAX_CONFIRM_EMAIL_ATTEMPTS,
     MAX_RESET_PASSWORD_ATTEMPTS
@@ -127,8 +127,8 @@ export const sendForgotPasswordOTP = async (
     const messages = getMessages(lang).emails.resetPassword
     await sendEmail(
         email,
-        t(messages.subject, { brandName: appConfig.brandName }),
-        t(messages.body, { otp, brandName: appConfig.brandName }),
+        t(messages.subject, { brandName: brandConfig.brandName }),
+        t(messages.body, { otp, brandName: brandConfig.brandName }),
         resetPasswordTemplate(otp, lang)
     )
 
@@ -158,8 +158,8 @@ export const sendConfirmEmailOTP = async (
     const messages = getMessages(lang).emails.confirmEmail
     await sendEmail(
         email,
-        t(messages.subject, { brandName: appConfig.brandName }),
-        t(messages.body, { otp, brandName: appConfig.brandName }),
+        t(messages.subject, { brandName: brandConfig.brandName }),
+        t(messages.body, { otp, brandName: brandConfig.brandName }),
         confirmEmailTemplate(otp, lang)
     )
 
@@ -182,8 +182,8 @@ export const sendEmailChangeOTP = async (
     const messages = getMessages(language).emails.changeEmail
     await sendEmail(
         newEmail,
-        t(messages.subject, { brandName: appConfig.brandName }),
-        t(messages.body, { otp, brandName: appConfig.brandName }),
+        t(messages.subject, { brandName: brandConfig.brandName }),
+        t(messages.body, { otp, brandName: brandConfig.brandName }),
         changeEmailTemplate(otp, language)
     )
 
