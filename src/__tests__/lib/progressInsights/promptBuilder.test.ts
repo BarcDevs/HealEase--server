@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { buildProgressInsightPrompt } from '../../../lib/progressInsights/promptBuilder'
 
 const makeMetrics = (mood: number, pain: number, activity: number) => ({
