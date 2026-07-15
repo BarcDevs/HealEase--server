@@ -1,3 +1,7 @@
+import type {
+    ProfileTheme,
+    ProfileVisibility
+} from '../../prisma/generated/prisma/enums'
 import { ensureProfileExists } from '../lib/profileHelpers'
 import * as forumModel from '../models/forumModel'
 import * as profileModel from '../models/profileModel'
@@ -7,11 +11,11 @@ type UpdateProfileData = {
     bio?: string | null
     location?: string | null
     timezone?: string
-    theme?: string
+    theme?: ProfileTheme
     language?: string
     dailyReminder?: boolean
     communityAlerts?: boolean
-    profileVisibility?: string
+    profileVisibility?: ProfileVisibility
     anonymousParticipation?: boolean
     dateOfBirth?: string
     recoveryType?: string
