@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
 
-import { errorFactory } from '../errors/factory/ErrorFactory'
 import { ValidationError }
     from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
@@ -8,16 +7,14 @@ import { updateProfileSchema }
     from '../schemas/profile/updateProfileSchema'
 import * as profileService
     from '../services/profileService'
+import { extractUserId } from '../utils/controllerHelpers'
 
 export const getProfile = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
+    const userId = extractUserId(req)
     const includePosts = req.query.includePosts === 'true'
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
 
     const profile =
         await profileService.getProfile(
@@ -36,10 +33,7 @@ export const updateProfile = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedData =
         ValidationError.catchValidationErrors(

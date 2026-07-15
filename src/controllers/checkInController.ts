@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
-import { errorFactory } from '../errors/factory/ErrorFactory'
 import { ValidationError } from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
 import { checkInQuerySchema } from '../schemas/checkIn/checkInQuerySchema'
@@ -14,15 +13,13 @@ import type {
     CheckInType
 } from '../types/data/CheckInType'
 import type { ProgressInsight } from '../types/data/ProgressInsightType'
+import { extractUserId } from '../utils/controllerHelpers'
 
 export const getCheckIns = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedQuery =
         ValidationError.catchValidationErrors(
@@ -45,10 +42,7 @@ export const createCheckIn = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedData =
         ValidationError.catchValidationErrors(
@@ -79,10 +73,7 @@ export const updateCheckIn = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedData =
         ValidationError.catchValidationErrors(
@@ -105,10 +96,7 @@ export const getCheckInStats = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await checkInService
         .getCheckInStats(userId)
@@ -124,10 +112,7 @@ export const getProgressInsights = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await progressInsightsService
         .generateProgressInsight(userId)

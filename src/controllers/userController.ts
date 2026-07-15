@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
-import { errorFactory } from '../errors/factory/ErrorFactory'
 import { ValidationError } from '../errors/ValidationError'
 import {
     sanitizeUserData,
@@ -13,15 +12,13 @@ import { updatePasswordSchema } from '../schemas/user/updatePasswordSchema'
 import { updateUserSchema } from '../schemas/user/updateUserSchema'
 import { deactivateUser } from '../services/authService'
 import type { UserType } from '../types/data/UserType'
+import { extractUserId } from '../utils/controllerHelpers'
 
 export const updateUser = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedData = ValidationError
         .catchValidationErrors(
@@ -45,10 +42,7 @@ export const updatePassword = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedData = ValidationError
         .catchValidationErrors(
@@ -72,10 +66,7 @@ export const deleteUser = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await deactivateUser(userId)
 

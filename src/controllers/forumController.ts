@@ -18,6 +18,7 @@ import type { PostType } from '../types/data/PostType'
 import type { ReplyType } from '../types/data/ReplyType'
 import type { TagType } from '../types/data/TagType'
 import type { PaginatedType } from '../types/PaginatedType'
+import { extractUserId } from '../utils/controllerHelpers'
 
 // region Posts
 export const getPosts = async (
@@ -64,10 +65,7 @@ export const createPost = async (
         ValidationError.catchValidationErrors(
             newPostSchema.safeParse(req.body)
         )
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService.createPost({
         ...validatedData,
@@ -114,10 +112,7 @@ export const updatePost = async (
             updatePostSchema.safeParse(req.body)
         )
     const { postId } = req.params as { postId: string }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'post',
@@ -140,10 +135,7 @@ export const deletePost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'post',
@@ -257,10 +249,7 @@ export const updateReply = async (
         replyId: string
         postId: string
     }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'reply',
@@ -290,10 +279,7 @@ export const deleteReply = async (
         replyId: string
         postId: string
     }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'reply',
@@ -318,10 +304,7 @@ export const likePost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService
         .togglePostLike(postId, userId)
@@ -341,10 +324,7 @@ export const likeReply = async (
         postId: string
         replyId: string
     }
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService.toggleReplyLike(
         postId,
@@ -364,10 +344,7 @@ export const savePost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService
         .toggleSavePost(postId, userId)
@@ -383,10 +360,7 @@ export const getSavedPosts = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedQuery =
         req.query
