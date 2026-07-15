@@ -80,11 +80,11 @@ export const getPostsCount = async (
     const postQuery =
         query
             ? postQueryBuilder(query)
-            : {}
+            : undefined
 
     return {
         count: await Prisma.post.count({
-            ...postQuery
+            where: postQuery?.where
         })
     } as {count: number}
 }
