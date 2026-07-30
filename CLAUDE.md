@@ -26,6 +26,14 @@ Architecture: MVC — Controller → Service → Model → Database.
 ## File Structure
 See `docs/STRUCTURE.md` for the full directory layout and subdirectory rules.
 
+## AI Eval Sync
+Any change to AI provider logic, prompts, insight types, or generation config
+(`src/services/aiProviders/`, `src/lib/aiInsight/`, `aiInsightGeneratorService.ts`,
+`config/default.ts` ai section) → check `scripts/eval-ai-models/` still reflects it:
+scenarios cover the current insight types, prompts match `insightsPrompts.ts`,
+model ids match config defaults. Update the eval scripts in the same change if
+they've drifted — don't let them silently test stale prompts/models.
+
 ## Project Roadmap
 [Pulse Roadmap](https://www.notion.so/Pulse-Development-Timeline-3129e15469d28100be18df6e1ce0a984?source=copy_link)
 

@@ -13,7 +13,7 @@ import {
 
 export class AnthropicProvider extends AIProvider {
     private readonly modelId = aiConfig.anthropicModel
-    private readonly apiVersion = '2024-06-01'
+    private readonly apiVersion = '2023-06-01'
 
     validateConfiguration(): void {
         if (!this.apiKey) {
@@ -67,20 +67,17 @@ export class AnthropicProvider extends AIProvider {
             )
         }
 
-        const data = await response.json() as { content?: Array<{ text?: string }> }
+        const data = await response.json() as { content?: Array<{ type?: string, text?: string }> }
 
-        if (
-            !data.content
-            || !Array.isArray(data.content)
-            || !data.content[0]
-            || !data.content[0].text
-        ) {
+        const textBlock = data.content?.find(block => block.type === 'text' && block.text)
+
+        if (!textBlock || !textBlock.text) {
             throw new Error(
                 'Unexpected response format from Anthropic API'
             )
         }
 
-        const content = data.content[0].text as string
+        const content = textBlock.text
 
         if (!content || content.trim().length === 0) {
             throw new Error(
