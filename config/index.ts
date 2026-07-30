@@ -15,6 +15,7 @@ import type {
 
 const env: EnvConfig = config.get<EnvConfig>('env')
 const isDev = (env as string) === 'development'
+const isProd = (env as string) === 'production'
 
 const serverConfig: ServerConfig = {
     url: config.get<string>('server.url'),
@@ -72,11 +73,20 @@ const aiConfig: AIConfig = {
     provider: config.get<string>('ai.provider'),
     anthropicModel: config.get<string>('ai.anthropicModel'),
     googleModel: config.get<string>('ai.googleModel'),
+    googleProModel: config.get<string>('ai.googleProModel'),
     openaiModel: config.get<string>('ai.openaiModel'),
     openaiApiKey: config.get<string>('ai.openaiApiKey'),
     anthropicApiKey: config.get<string>('ai.anthropicApiKey'),
-    googleApiKey: config.get<string>('ai.googleApiKey')
+    googleApiKey: config.get<string>('ai.googleApiKey'),
+    fallbackOrder: config.get<string>('ai.fallbackOrder')
 }
+
+const aiFallbackOrder: string[] = aiConfig.fallbackOrder
+    ? aiConfig.fallbackOrder
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean)
+    : []
 
 const aiGenerationConfig: AIGenerationConfig = {
     maxOutputTokens: config.get<number>(
@@ -93,6 +103,7 @@ const loggingConfig: LoggingConfig = {
 
 export {
     aiConfig,
+    aiFallbackOrder,
     aiGenerationConfig,
     appConfig,
     authConfig,
@@ -101,6 +112,7 @@ export {
     env,
     googleOAuthConfig,
     isDev,
+    isProd,
     loggingConfig,
     serverConfig
 }

@@ -36,10 +36,12 @@ export default {
         provider: 'google',
         anthropicModel: 'claude-sonnet-5',
         googleModel: 'gemini-3.1-flash-lite',
+        googleProModel: 'gemini-3.1-pro-preview',
         openaiModel: 'gpt-5.6-sol',
         openaiApiKey: '',
         anthropicApiKey: '',
-        googleApiKey: ''
+        googleApiKey: '',
+        fallbackOrder: ''
     },
     aiGeneration: {
         maxOutputTokens: 1000,

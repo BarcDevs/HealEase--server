@@ -3,9 +3,7 @@ import { mkdirSync, writeFileSync } from 'fs'
 import { aiConfig } from '../../config'
 import { buildPromptByType } from '../../src/lib/aiInsight/prompts/insightsPrompts'
 import type { AIProvider } from '../../src/services/aiProviders/AIProvider'
-import { AnthropicProvider } from '../../src/services/aiProviders/AnthropicProvider'
-import { GoogleAIProvider } from '../../src/services/aiProviders/GoogleAIProvider'
-import { OpenAIProvider } from '../../src/services/aiProviders/OpenAIProvider'
+import { createProviderByType } from '../../src/services/aiProviders/ProviderFactory'
 import type { CheckInType } from '../../src/types/data/CheckInType'
 import type { InsightDecisionResult } from '../../src/types/insight'
 
@@ -78,45 +76,32 @@ const scenarios: Scenario[] = [
     }
 ]
 
-// Eval-only override: aiConfig.googleModel defaults to the lite tier, so the
-// stronger model is swapped in right before instantiation (GoogleAIProvider
-// reads aiConfig.googleModel in its field initializer).
-const GOOGLE_PRO_MODEL = 'gemini-3.1-pro-preview'
-
-const buildGoogleWithModel = (apiKey: string, model: string): AIProvider => {
-    const originalModel = aiConfig.googleModel
-    aiConfig.googleModel = model
-    const provider = new GoogleAIProvider({ apiKey })
-    aiConfig.googleModel = originalModel
-    return provider
-}
-
 type Candidate = {
     id: string
     apiKey: string
-    build: (apiKey: string) => AIProvider
+    build: () => AIProvider
 }
 
 const candidateProviders: Candidate[] = [
     {
         id: 'google',
         apiKey: aiConfig.googleApiKey,
-        build: apiKey => new GoogleAIProvider({ apiKey })
+        build: () => createProviderByType('google')
     },
     {
         id: 'google-pro',
         apiKey: aiConfig.googleApiKey,
-        build: apiKey => buildGoogleWithModel(apiKey, GOOGLE_PRO_MODEL)
+        build: () => createProviderByType('google-pro')
     },
     {
         id: 'openai',
         apiKey: aiConfig.openaiApiKey,
-        build: apiKey => new OpenAIProvider({ apiKey })
+        build: () => createProviderByType('openai')
     },
     {
         id: 'anthropic',
         apiKey: aiConfig.anthropicApiKey,
-        build: apiKey => new AnthropicProvider({ apiKey })
+        build: () => createProviderByType('anthropic')
     }
 ]
 
@@ -159,7 +144,7 @@ const run = async (): Promise<void> => {
             const label = labelFor(index)
             mapping[scenario.name][label] = provider.id
             try {
-                const instance = provider.build(provider.apiKey)
+                const instance = provider.build()
                 const result = await instance.generateContent({ prompt })
                 return `**${label}:**\n${result.content.trim()}`
             } catch (error) {

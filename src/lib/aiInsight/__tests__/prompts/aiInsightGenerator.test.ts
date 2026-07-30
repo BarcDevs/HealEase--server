@@ -4,6 +4,29 @@ import type { CheckInType } from '../../../../types/data/CheckInType'
 import type { InsightDecisionResult } from '../../../../types/insight'
 
 jest.mock('../../../../services/aiProviders/ProviderFactory')
+jest.mock('../../../../../config', () => ({
+    aiConfig: {
+        provider: 'google',
+        googleApiKey: 'test-google-key',
+        openaiApiKey: 'test-openai-key',
+        anthropicApiKey: 'test-anthropic-key'
+    },
+    aiFallbackOrder: [],
+    isProd: false,
+    isDev: false,
+    loggingConfig: { dir: 'logs' }
+}))
+
+const configModule = jest.requireMock('../../../../../config') as {
+    aiConfig: {
+        provider: string
+        googleApiKey: string
+        openaiApiKey: string
+        anthropicApiKey: string
+    }
+    aiFallbackOrder: string[]
+    isProd: boolean
+}
 
 const mockCheckIn = (): CheckInType => ({
     id: 'id1',
@@ -24,9 +47,29 @@ const mockDecision = (
     reason: 'test'
 })
 
+const mockConfig = providerModule as jest.Mocked<typeof providerModule>
+
 describe('generateInsight', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        configModule.isProd = false
+        configModule.aiConfig.provider = 'google'
+        configModule.aiFallbackOrder.length = 0
+
+        // ProviderFactory is auto-mocked, so getApiKeyForProvider needs a real
+        // implementation here too, mirroring the actual factory's key lookup.
+        mockConfig.getApiKeyForProvider.mockImplementation((providerType: string) => {
+            switch (providerType) {
+                case 'openai':
+                    return configModule.aiConfig.openaiApiKey
+                case 'anthropic':
+                    return configModule.aiConfig.anthropicApiKey
+                case 'google':
+                case 'google-pro':
+                default:
+                    return configModule.aiConfig.googleApiKey
+            }
+        })
     })
 
     it('calls provider and returns result', async () => {
@@ -38,12 +81,7 @@ describe('generateInsight', () => {
                 })
         }
 
-        jest.spyOn(
-            providerModule,
-            'createProvider'
-        ).mockReturnValue(
-            mockProvider as any
-        )
+        mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
         const result = await generateInsight({
             decision: mockDecision(
@@ -71,12 +109,7 @@ describe('generateInsight', () => {
                 })
         }
 
-        jest.spyOn(
-            providerModule,
-            'createProvider'
-        ).mockReturnValue(
-            mockProvider as any
-        )
+        mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
         const result = await generateInsight({
             decision: mockDecision(
@@ -105,12 +138,7 @@ describe('generateInsight', () => {
                     )
             }
 
-            jest.spyOn(
-                providerModule,
-                'createProvider'
-            ).mockReturnValue(
-                mockProvider as any
-            )
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
             const result = await generateInsight({
                 decision: mockDecision(
@@ -119,13 +147,13 @@ describe('generateInsight', () => {
                 checkIns: [mockCheckIn()],
                 userId: 'user1',
                 checkInId: 'check1',
-            language: 'en'
+                language: 'en'
             })
 
-            // Should have tried 3 times (initial + 2 retries)
+            // Dev/preview chain is just ['google'], 1 retry configured (2 attempts)
             expect(
                 mockProvider.generateContent
-            ).toHaveBeenCalledTimes(3)
+            ).toHaveBeenCalledTimes(2)
 
             // Should use fallback
             expect(result.content).toBeTruthy()
@@ -146,12 +174,7 @@ describe('generateInsight', () => {
                     })
             }
 
-            jest.spyOn(
-                providerModule,
-                'createProvider'
-            ).mockReturnValue(
-                mockProvider as any
-            )
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
             const result = await generateInsight({
                 decision: mockDecision(
@@ -160,7 +183,7 @@ describe('generateInsight', () => {
                 checkIns: [mockCheckIn()],
                 userId: 'user1',
                 checkInId: 'check1',
-            language: 'en'
+                language: 'en'
             })
 
             // Called twice: once failed, once succeeded
@@ -185,12 +208,7 @@ describe('generateInsight', () => {
                     })
             }
 
-            jest.spyOn(
-                providerModule,
-                'createProvider'
-            ).mockReturnValue(
-                mockProvider as any
-            )
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
             const result = await generateInsight({
                 decision: mockDecision(
@@ -199,7 +217,7 @@ describe('generateInsight', () => {
                 checkIns: [mockCheckIn()],
                 userId: 'user1',
                 checkInId: 'check1',
-            language: 'en'
+                language: 'en'
             })
 
             // Should only call once (no retries for validation failure)
@@ -224,12 +242,7 @@ describe('generateInsight', () => {
                     )
             }
 
-            jest.spyOn(
-                providerModule,
-                'createProvider'
-            ).mockReturnValue(
-                mockProvider as any
-            )
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
             const result = await generateInsight({
                 decision: mockDecision(
@@ -238,13 +251,13 @@ describe('generateInsight', () => {
                 checkIns: [mockCheckIn()],
                 userId: 'user1',
                 checkInId: 'check1',
-            language: 'en'
+                language: 'en'
             })
 
-            // 3 total attempts
+            // 2 total attempts (1 retry) in dev/preview single-provider chain
             expect(
                 mockProvider.generateContent
-            ).toHaveBeenCalledTimes(3)
+            ).toHaveBeenCalledTimes(2)
 
             // Falls back to static content
             expect(result.content).toBeTruthy()
@@ -262,12 +275,7 @@ describe('generateInsight', () => {
                     )
             }
 
-            jest.spyOn(
-                providerModule,
-                'createProvider'
-            ).mockReturnValue(
-                mockProvider as any
-            )
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
 
             // Should not throw, should return fallback
             const result = await generateInsight({
@@ -277,7 +285,7 @@ describe('generateInsight', () => {
                 checkIns: [mockCheckIn()],
                 userId: 'user1',
                 checkInId: 'check1',
-            language: 'en'
+                language: 'en'
             })
 
             expect(result).toHaveProperty('title')
@@ -285,4 +293,160 @@ describe('generateInsight', () => {
             expect(result.content.length).toBeGreaterThan(0)
         }
     )
+
+    describe('provider fallback chain', () => {
+        it('dev (isProd=false) only tries google, ignoring any configured chain', async () => {
+            configModule.isProd = false
+            configModule.aiConfig.provider = 'anthropic'
+            configModule.aiFallbackOrder.push('google-pro', 'openai')
+
+            const mockProvider = {
+                generateContent: jest
+                    .fn()
+                    .mockResolvedValue({
+                        content: 'This is a generated insight message for testing purposes'
+                    })
+            }
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
+
+            await generateInsight({
+                decision: mockDecision('MOTIVATIONAL'),
+                checkIns: [mockCheckIn()],
+                userId: 'user1',
+                checkInId: 'check1',
+                language: 'en'
+            })
+
+            expect(mockConfig.createProviderByType).toHaveBeenCalledWith('google')
+            expect(mockConfig.createProviderByType).toHaveBeenCalledTimes(1)
+        })
+
+        it('preview (NODE_ENV=production but isProd=false via APP_ENV) behaves like dev: google only', async () => {
+            configModule.isProd = false
+            configModule.aiConfig.provider = 'anthropic'
+            configModule.aiFallbackOrder.push('google-pro', 'openai')
+
+            const mockProvider = {
+                generateContent: jest
+                    .fn()
+                    .mockResolvedValue({
+                        content: 'This is a generated insight message for testing purposes'
+                    })
+            }
+            mockConfig.createProviderByType.mockReturnValue(mockProvider as any)
+
+            await generateInsight({
+                decision: mockDecision('MOTIVATIONAL'),
+                checkIns: [mockCheckIn()],
+                userId: 'user1',
+                checkInId: 'check1',
+                language: 'en'
+            })
+
+            expect(mockConfig.createProviderByType).toHaveBeenCalledWith('google')
+        })
+
+        it('prod falls through anthropic -> google-pro -> openai in order on failure', async () => {
+            configModule.isProd = true
+            configModule.aiConfig.provider = 'anthropic'
+            configModule.aiFallbackOrder.push('google-pro', 'openai')
+
+            const failing = {
+                generateContent: jest
+                    .fn()
+                    .mockRejectedValue(new Error('network error'))
+            }
+            const succeeding = {
+                generateContent: jest
+                    .fn()
+                    .mockResolvedValue({
+                        content: 'This is a generated insight message for testing purposes'
+                    })
+            }
+
+            mockConfig.createProviderByType.mockImplementation((type: string) => (
+                type === 'openai' ? succeeding : failing
+            ) as any)
+
+            const result = await generateInsight({
+                decision: mockDecision('MOTIVATIONAL'),
+                checkIns: [mockCheckIn()],
+                userId: 'user1',
+                checkInId: 'check1',
+                language: 'en'
+            })
+
+            expect(
+                mockConfig.createProviderByType.mock.calls.map(call => call[0])
+            ).toEqual([
+                'anthropic',
+                'google-pro',
+                'openai'
+            ])
+            expect(result.content).toContain(
+                'This is a generated insight message for testing purposes'
+            )
+        })
+
+        it('prod uses static fallback when every provider in the chain fails', async () => {
+            configModule.isProd = true
+            configModule.aiConfig.provider = 'anthropic'
+            configModule.aiFallbackOrder.push('google-pro', 'openai')
+
+            const failing = {
+                generateContent: jest
+                    .fn()
+                    .mockRejectedValue(new Error('network error'))
+            }
+            mockConfig.createProviderByType.mockReturnValue(failing as any)
+
+            const result = await generateInsight({
+                decision: mockDecision('MOTIVATIONAL'),
+                checkIns: [mockCheckIn()],
+                userId: 'user1',
+                checkInId: 'check1',
+                language: 'en'
+            })
+
+            expect(
+                mockConfig.createProviderByType.mock.calls.map(call => call[0])
+            ).toEqual([
+                'anthropic',
+                'google-pro',
+                'openai'
+            ])
+            expect(result.content).toBeTruthy()
+            expect(result.title).toBeTruthy()
+        })
+
+        it('prod skips providers with no API key configured', async () => {
+            configModule.isProd = true
+            configModule.aiConfig.provider = 'anthropic'
+            configModule.aiConfig.googleApiKey = ''
+            configModule.aiFallbackOrder.push('google-pro', 'openai')
+
+            const succeeding = {
+                generateContent: jest
+                    .fn()
+                    .mockResolvedValue({
+                        content: 'This is a generated insight message for testing purposes'
+                    })
+            }
+            mockConfig.createProviderByType.mockReturnValue(succeeding as any)
+
+            await generateInsight({
+                decision: mockDecision('MOTIVATIONAL'),
+                checkIns: [mockCheckIn()],
+                userId: 'user1',
+                checkInId: 'check1',
+                language: 'en'
+            })
+
+            // google-pro shares googleApiKey, so it's skipped when that key is empty
+            expect(mockConfig.createProviderByType).toHaveBeenCalledWith('anthropic')
+            expect(mockConfig.createProviderByType).not.toHaveBeenCalledWith('google-pro')
+
+            configModule.aiConfig.googleApiKey = 'test-google-key'
+        })
+    })
 })

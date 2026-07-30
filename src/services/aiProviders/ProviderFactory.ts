@@ -5,13 +5,23 @@ import { AnthropicProvider } from './AnthropicProvider'
 import { GoogleAIProvider } from './GoogleAIProvider'
 import { OpenAIProvider } from './OpenAIProvider'
 
-export type ProviderType = 'google' | 'openai' | 'anthropic'
+export type ProviderType =
+    | 'google'
+    | 'google-pro'
+    | 'openai'
+    | 'anthropic'
 
 export const createProvider = (): AIProvider => {
     const providerType: ProviderType = (
         aiConfig.provider as ProviderType
     ) || 'google'
 
+    return createProviderByType(providerType)
+}
+
+export const createProviderByType = (
+    providerType: ProviderType
+): AIProvider => {
     const apiKey = getApiKeyForProvider(providerType)
 
     switch (providerType) {
@@ -19,13 +29,18 @@ export const createProvider = (): AIProvider => {
             return new OpenAIProvider({ apiKey })
         case 'anthropic':
             return new AnthropicProvider({ apiKey })
+        case 'google-pro':
+            return new GoogleAIProvider({
+                apiKey,
+                modelId: aiConfig.googleProModel
+            })
         case 'google':
         default:
             return new GoogleAIProvider({ apiKey })
     }
 }
 
-const getApiKeyForProvider = (
+export const getApiKeyForProvider = (
     providerType: ProviderType
 ): string => {
     switch (providerType) {
@@ -34,6 +49,7 @@ const getApiKeyForProvider = (
         case 'anthropic':
             return aiConfig.anthropicApiKey || ''
         case 'google':
+        case 'google-pro':
         default:
             return aiConfig.googleApiKey || ''
     }

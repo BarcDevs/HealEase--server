@@ -42,10 +42,12 @@ type AIConfig = {
     provider: string
     anthropicModel: string
     googleModel: string
+    googleProModel: string
     openaiModel: string
     openaiApiKey: string
     anthropicApiKey: string
     googleApiKey: string
+    fallbackOrder: string
 }
 
 type AIGenerationConfig = {

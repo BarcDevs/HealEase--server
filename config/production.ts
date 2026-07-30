@@ -14,5 +14,9 @@ export default {
     email: {
         port: 587,
         secure: true
+    },
+    ai: {
+        provider: 'anthropic',
+        fallbackOrder: 'anthropic,google-pro,openai'
     }
 }

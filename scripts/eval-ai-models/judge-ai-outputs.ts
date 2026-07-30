@@ -4,11 +4,9 @@ import {
     writeFileSync
 } from 'fs'
 
-import { aiConfig, aiGenerationConfig } from '../../config'
+import { aiGenerationConfig } from '../../config'
 import type { AIProvider } from '../../src/services/aiProviders/AIProvider'
-import { AnthropicProvider } from '../../src/services/aiProviders/AnthropicProvider'
-import { GoogleAIProvider } from '../../src/services/aiProviders/GoogleAIProvider'
-import { OpenAIProvider } from '../../src/services/aiProviders/OpenAIProvider'
+import { createProviderByType } from '../../src/services/aiProviders/ProviderFactory'
 
 // Judging output is longer than a single insight (ranking + notes across
 // 3 scenarios, each with 4 candidate models), so the shared token budget
@@ -33,18 +31,10 @@ const latestFile = (prefix: string): string => {
     return `eval-output/${last}`
 }
 
-const buildGoogleProProvider = (): AIProvider => {
-    const originalModel = aiConfig.googleModel
-    aiConfig.googleModel = 'gemini-3.1-pro-preview'
-    const provider = new GoogleAIProvider({ apiKey: aiConfig.googleApiKey })
-    aiConfig.googleModel = originalModel
-    return provider
-}
-
 const judges: Array<{ id: string, build: () => AIProvider }> = [
-    { id: 'openai', build: () => new OpenAIProvider({ apiKey: aiConfig.openaiApiKey }) },
-    { id: 'anthropic', build: () => new AnthropicProvider({ apiKey: aiConfig.anthropicApiKey }) },
-    { id: 'google-pro', build: buildGoogleProProvider }
+    { id: 'openai', build: () => createProviderByType('openai') },
+    { id: 'anthropic', build: () => createProviderByType('anthropic') },
+    { id: 'google-pro', build: () => createProviderByType('google-pro') }
 ]
 
 const judgingInstruction = `
@@ -61,7 +51,11 @@ Respond with ONLY valid JSON, no markdown fences, no commentary outside the JSON
 `
 
 const parseVerdict = (raw: string): JudgeVerdict => {
-    const cleaned = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '')
+    const cleaned = raw
+        .trim()
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/, '')
+        .replace(/```\s*$/, '')
     return JSON.parse(cleaned) as JudgeVerdict
 }
 
@@ -103,7 +97,9 @@ const run = async (): Promise<void> => {
             const scenarioVerdict = verdict[scenario]
             if (!scenarioVerdict) continue
 
-            reportLines.push(`- **${judgeId}** ranked: ${scenarioVerdict.ranking.map(label => mapping[scenario][label] || label).join(' > ')} — _${scenarioVerdict.notes}_`)
+            reportLines.push(
+                `- **${judgeId}** ranked: ${scenarioVerdict.ranking.map(label => mapping[scenario][label] || label).join(' > ')} - _${scenarioVerdict.notes}_`
+            )
 
             scenarioVerdict.ranking.forEach((label, index) => {
                 const realModel = mapping[scenario][label] || label

@@ -1,7 +1,12 @@
-export type AIErrorResponse = { error?: { message?: string } }
+export type AIErrorResponse = {
+    error?: {
+        message?: string
+    }
+}
 
 export type AIProviderConfig = {
     apiKey: string
+    modelId?: string
 }
 
 export type GenerateContentInput = {
