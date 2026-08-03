@@ -24,12 +24,13 @@ export default {
     ai: {
         provider: 'AI_PROVIDER',
         anthropicModel: 'ANTHROPIC_MODEL',
+        googleFreeModel: 'GOOGLE_FREE_MODEL',
         googleModel: 'GOOGLE_MODEL',
-        googleProModel: 'GOOGLE_PRO_MODEL',
         openaiModel: 'OPENAI_MODEL',
         openaiApiKey: 'OPENAI_API_KEY',
         anthropicApiKey: 'ANTHROPIC_API_KEY',
         googleApiKey: 'GOOGLE_AI_API_KEY',
+        googleFreeApiKey: 'GOOGLE_FREE_AI_API_KEY',
         fallbackOrder: 'AI_FALLBACK_ORDER'
     },
     aiGeneration: {

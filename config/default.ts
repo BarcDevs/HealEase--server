@@ -35,12 +35,13 @@ export default {
     ai: {
         provider: 'google',
         anthropicModel: 'claude-sonnet-5',
-        googleModel: 'gemini-3.1-flash-lite',
-        googleProModel: 'gemini-3.1-pro-preview',
+        googleFreeModel: 'gemini-3.1-flash-lite',
+        googleModel: 'gemini-3.1-pro-preview',
         openaiModel: 'gpt-5.6-sol',
         openaiApiKey: '',
         anthropicApiKey: '',
         googleApiKey: '',
+        googleFreeApiKey: '',
         fallbackOrder: ''
     },
     aiGeneration: {

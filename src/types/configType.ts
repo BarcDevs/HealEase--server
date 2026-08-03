@@ -41,12 +41,13 @@ type GoogleOAuthConfig = {
 type AIConfig = {
     provider: string
     anthropicModel: string
+    googleFreeModel: string
     googleModel: string
-    googleProModel: string
     openaiModel: string
     openaiApiKey: string
     anthropicApiKey: string
     googleApiKey: string
+    googleFreeApiKey: string
     fallbackOrder: string
 }
 

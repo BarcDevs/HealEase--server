@@ -1,4 +1,4 @@
-import { aiConfig } from '../../../config'
+import { aiConfig, isProd } from '../../../config'
 
 import { type AIProvider } from './AIProvider'
 import { AnthropicProvider } from './AnthropicProvider'
@@ -32,7 +32,7 @@ export const createProviderByType = (
         case 'google-pro':
             return new GoogleAIProvider({
                 apiKey,
-                modelId: aiConfig.googleProModel
+                modelId: aiConfig.googleModel
             })
         case 'google':
         default:
@@ -48,9 +48,17 @@ export const getApiKeyForProvider = (
             return aiConfig.openaiApiKey || ''
         case 'anthropic':
             return aiConfig.anthropicApiKey || ''
-        case 'google':
         case 'google-pro':
-        default:
+            // Pro tier is always paid, regardless of environment.
             return aiConfig.googleApiKey || ''
+        case 'google':
+        default:
+            // Free tier isn't guaranteed availability, so dev/preview use a
+            // separate key to avoid competing with prod's paid-tier quota.
+            return (
+                (!isProd && aiConfig.googleFreeApiKey)
+                || aiConfig.googleApiKey
+                || ''
+            )
     }
 }

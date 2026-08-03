@@ -17,7 +17,7 @@ export class GoogleAIProvider extends AIProvider {
 
     constructor(config: AIProviderConfig) {
         super(config)
-        this.modelId = config.modelId || aiConfig.googleModel
+        this.modelId = config.modelId || aiConfig.googleFreeModel
     }
 
     validateConfiguration(): void {

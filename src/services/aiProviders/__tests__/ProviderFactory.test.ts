@@ -1,13 +1,17 @@
-import { createProviderByType } from '../ProviderFactory'
+import {
+    createProviderByType,
+    getApiKeyForProvider
+} from '../ProviderFactory'
 
 jest.mock('../../../../config', () => ({
     aiConfig: {
         provider: 'google',
-        googleModel: 'gemini-3.1-flash-lite',
-        googleProModel: 'gemini-3.1-pro-preview',
+        googleFreeModel: 'gemini-3.1-flash-lite',
+        googleModel: 'gemini-3.1-pro-preview',
         anthropicModel: 'claude-sonnet-5',
         openaiModel: 'gpt-5.6-sol',
         googleApiKey: 'test-google-key',
+        googleFreeApiKey: '',
         openaiApiKey: 'test-openai-key',
         anthropicApiKey: 'test-anthropic-key'
     },
@@ -15,13 +19,26 @@ jest.mock('../../../../config', () => ({
         maxOutputTokens: 1000,
         temperature: 0.7
     },
-    loggingConfig: { dir: 'logs' }
+    loggingConfig: { dir: 'logs' },
+    isProd: true
 }))
+
+const configModule = jest.requireMock('../../../../config') as {
+    aiConfig: {
+        googleApiKey: string
+        googleFreeApiKey: string
+    }
+    isProd: boolean
+}
 
 describe('createProviderByType', () => {
     let fetchMock: jest.Mock
 
     beforeEach(() => {
+        configModule.isProd = true
+        configModule.aiConfig.googleApiKey = 'test-google-key'
+        configModule.aiConfig.googleFreeApiKey = ''
+
         fetchMock = jest.fn().mockResolvedValue({
             ok: true,
             json: async () => ({
@@ -53,14 +70,65 @@ describe('createProviderByType', () => {
         expect(calledUrl).not.toContain('gemini-3.1-flash-lite')
     })
 
-    it('google and google-pro both authenticate with the shared google API key', async () => {
-        const liteProvider = createProviderByType('google')
-        const proProvider = createProviderByType('google-pro')
+    it(
+        'google and google-pro both authenticate with the shared google API key in prod',
+        async () => {
+            const liteProvider = createProviderByType('google')
+            const proProvider = createProviderByType('google-pro')
 
-        await liteProvider.generateContent({ prompt: 'hi' })
-        await proProvider.generateContent({ prompt: 'hi' })
+            await liteProvider.generateContent({ prompt: 'hi' })
+            await proProvider.generateContent({ prompt: 'hi' })
 
-        expect(fetchMock.mock.calls[0][0]).toContain('key=test-google-key')
-        expect(fetchMock.mock.calls[1][0]).toContain('key=test-google-key')
+            expect(fetchMock.mock.calls[0][0])
+                .toContain('key=test-google-key')
+            expect(fetchMock.mock.calls[1][0])
+                .toContain('key=test-google-key')
+        }
+    )
+
+    describe('dev/preview free-tier key', () => {
+        it(
+            'google uses GOOGLE_FREE_AI_API_KEY when not prod and it is set',
+            () => {
+                configModule.isProd = false
+                configModule.aiConfig.googleFreeApiKey = 'free-tier-key'
+
+                expect(getApiKeyForProvider('google'))
+                    .toBe('free-tier-key')
+            }
+        )
+
+        it(
+            'google falls back to the paid key when not prod but no free key is set',
+            () => {
+                configModule.isProd = false
+                configModule.aiConfig.googleFreeApiKey = ''
+
+                expect(getApiKeyForProvider('google'))
+                    .toBe('test-google-key')
+            }
+        )
+
+        it(
+            'google ignores the free key in prod even if one is set',
+            () => {
+                configModule.isProd = true
+                configModule.aiConfig.googleFreeApiKey = 'free-tier-key'
+
+                expect(getApiKeyForProvider('google'))
+                    .toBe('test-google-key')
+            }
+        )
+
+        it(
+            'google-pro always uses the paid key, never the free-tier one',
+            () => {
+                configModule.isProd = false
+                configModule.aiConfig.googleFreeApiKey = 'free-tier-key'
+
+                expect(getApiKeyForProvider('google-pro'))
+                    .toBe('test-google-key')
+            }
+        )
     })
 })

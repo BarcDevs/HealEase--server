@@ -72,12 +72,13 @@ const googleOAuthConfig: GoogleOAuthConfig = {
 const aiConfig: AIConfig = {
     provider: config.get<string>('ai.provider'),
     anthropicModel: config.get<string>('ai.anthropicModel'),
+    googleFreeModel: config.get<string>('ai.googleFreeModel'),
     googleModel: config.get<string>('ai.googleModel'),
-    googleProModel: config.get<string>('ai.googleProModel'),
     openaiModel: config.get<string>('ai.openaiModel'),
     openaiApiKey: config.get<string>('ai.openaiApiKey'),
     anthropicApiKey: config.get<string>('ai.anthropicApiKey'),
     googleApiKey: config.get<string>('ai.googleApiKey'),
+    googleFreeApiKey: config.get<string>('ai.googleFreeApiKey'),
     fallbackOrder: config.get<string>('ai.fallbackOrder')
 }
 
