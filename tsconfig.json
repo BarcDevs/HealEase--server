@@ -13,6 +13,7 @@
       "ES2023"
     ],
     "module": "CommonJS",
+    "rewriteRelativeImportExtensions": true,
     "sourceMap": true,
     "outDir": "dist",
     "esModuleInterop": true,
