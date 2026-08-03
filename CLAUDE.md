@@ -37,6 +37,18 @@ scenarios cover the current insight types, prompts match `insightsPrompts.ts`,
 model ids match config defaults. Update the eval scripts in the same change if
 they've drifted — don't let them silently test stale prompts/models.
 
+## AWS EC2 Migration — Pre-Deploy Checklist
+Before deploying off Render to AWS EC2, resolve these items deferred in
+`docs/review/07-fix-plan.md` (blocked on this migration, not actionable under Render):
+- ~~REVIEW #4 — pick one bundler~~ Done: `tsc` is the only bundler now (Dockerfile builder
+  stage already used it). Removed webpack toolchain, `start:prod`/`prod` scripts, and
+  `webpack.config.ts` — all were Render-only leftovers.
+- DECIDE #5 / REVIEW #3 — decide whether `prisma` (CLI) can move from `dependencies` to
+  `devDependencies`. Depends on which image runs `npm run release`
+  (`prisma migrate deploy`) in the EC2 pipeline — only safe if that step runs from an
+  image that still has full `devDependencies`. Not yet decided: EC2 deploy pipeline
+  (how `release` gets invoked — CI step, SSH command, ECS/EB task, etc.) isn't built yet.
+
 ## Project Roadmap
 [Pulse Roadmap](https://www.notion.so/Pulse-Development-Timeline-3129e15469d28100be18df6e1ce0a984?source=copy_link)
 
