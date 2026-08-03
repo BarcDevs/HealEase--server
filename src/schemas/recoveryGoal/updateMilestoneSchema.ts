@@ -12,3 +12,6 @@ export const updateMilestoneSchema = z.object({
         .min(1)
         .optional()
 })
+
+export type UpdateMilestoneType
+    = z.infer<typeof updateMilestoneSchema>

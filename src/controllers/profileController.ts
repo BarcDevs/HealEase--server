@@ -1,13 +1,16 @@
 import type { Request, Response } from 'express'
 
-import { ValidationError }
-    from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
+import type { UpdateProfileType }
+    from '../schemas/profile/updateProfileSchema'
 import { updateProfileSchema }
     from '../schemas/profile/updateProfileSchema'
 import * as profileService
     from '../services/profileService'
-import { extractUserId } from '../utils/controllerHelpers'
+import {
+    extractUserId,
+    validateAndExtract
+} from '../utils/controllerHelpers'
 
 export const getProfile = async (
     req: Request,
@@ -35,12 +38,10 @@ export const updateProfile = async (
 ) => {
     const userId = extractUserId(req)
 
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            updateProfileSchema.safeParse(
-                req.body
-            )
-        )
+    const validatedData = validateAndExtract<UpdateProfileType>(
+        updateProfileSchema,
+        req.body
+    )
 
     const profile =
         await profileService.updateProfile(

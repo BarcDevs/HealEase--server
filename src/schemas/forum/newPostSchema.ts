@@ -8,3 +8,5 @@ export const newPostSchema = z.object({
     category: z.string('Category is required'),
     tags: tagsField
 })
+
+export type NewPostType = z.infer<typeof newPostSchema>

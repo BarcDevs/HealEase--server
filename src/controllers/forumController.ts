@@ -3,22 +3,32 @@ import type { Request, Response } from 'express'
 import { FORUM_PAGINATION } from '../constants/forum/pagination'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { errorFactory } from '../errors/factory/ErrorFactory'
-import { ValidationError } from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
+import type { NewPostType } from '../schemas/forum/newPostSchema'
 import { newPostSchema } from '../schemas/forum/newPostSchema'
+import type { NewReplyType } from '../schemas/forum/newReplySchema'
 import { newReplySchema } from '../schemas/forum/newReplySchema'
+import type { PostQueryType } from '../schemas/forum/postQuerySchema'
 import { postQuerySchema } from '../schemas/forum/postQuerySchema'
+import type { ReplyQueryType } from '../schemas/forum/replyQuerySchema'
 import { replyQuerySchema } from '../schemas/forum/replyQuerySchema'
+import type { TagQueryType } from '../schemas/forum/tagQuerySchema'
 import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
+import type { UnknownTagType } from '../schemas/forum/unknownTagSchema'
 import { unknownTagSchema } from '../schemas/forum/unknownTagSchema'
+import type { UpdatePostType } from '../schemas/forum/updatePostSchema'
 import { updatePostSchema } from '../schemas/forum/updatePostSchema'
+import type { UpdateReplyType } from '../schemas/forum/updateReplySchema'
 import { updateReplySchema } from '../schemas/forum/updateReplySchema'
 import * as forumService from '../services/forumService'
 import type { PostType } from '../types/data/PostType'
 import type { ReplyType } from '../types/data/ReplyType'
 import type { TagType } from '../types/data/TagType'
 import type { PaginatedType } from '../types/PaginatedType'
-import { extractUserId } from '../utils/controllerHelpers'
+import {
+    extractUserId,
+    validateAndExtract
+} from '../utils/controllerHelpers'
 
 // region Posts
 export const getPosts = async (
@@ -27,8 +37,9 @@ export const getPosts = async (
 ) => {
     const validatedQuery =
         req.query
-        && ValidationError.catchValidationErrors(
-            postQuerySchema.safeParse(req.query)
+        && validateAndExtract<PostQueryType>(
+            postQuerySchema,
+            req.query
         )
 
     const data = (
@@ -61,10 +72,10 @@ export const createPost = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            newPostSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<NewPostType>(
+        newPostSchema,
+        req.body
+    )
     const userId = extractUserId(req)
 
     const data = await forumService.createPost({
@@ -84,8 +95,9 @@ export const getPost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { limit } = ValidationError.catchValidationErrors(
-        replyQuerySchema.safeParse(req.query)
+    const { limit } = validateAndExtract<ReplyQueryType>(
+        replyQuerySchema,
+        req.query
     )
 
     const resolvedLimit = limit ?? FORUM_PAGINATION.DEFAULT_REPLY_LIMIT
@@ -107,10 +119,10 @@ export const updatePost = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            updatePostSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdatePostType>(
+        updatePostSchema,
+        req.body
+    )
     const { postId } = req.params as { postId: string }
     const userId = extractUserId(req)
 
@@ -173,10 +185,10 @@ export const createReply = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            newReplySchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<NewReplyType>(
+        newReplySchema,
+        req.body
+    )
     const { userId } = req || {}
     const { postId } = req.params as { postId: string }
 
@@ -204,10 +216,10 @@ export const getReplies = async (
     const { postId } = req.params as {
         postId: string
     }
-    const { limit, page } =
-        ValidationError.catchValidationErrors(
-            replyQuerySchema.safeParse(req.query)
-        )
+    const { limit, page } = validateAndExtract<ReplyQueryType>(
+        replyQuerySchema,
+        req.query
+    )
 
     const resolvedLimit = limit ?? FORUM_PAGINATION.DEFAULT_REPLY_LIMIT
     const resolvedPage = page ?? 1
@@ -241,10 +253,10 @@ export const updateReply = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            updateReplySchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdateReplyType>(
+        updateReplySchema,
+        req.body
+    )
     const { replyId, postId } = req.params as {
         replyId: string
         postId: string
@@ -364,8 +376,9 @@ export const getSavedPosts = async (
 
     const validatedQuery =
         req.query
-        && ValidationError.catchValidationErrors(
-            postQuerySchema.safeParse(req.query)
+        && validateAndExtract<PostQueryType>(
+            postQuerySchema,
+            req.query
         )
 
     const data = await forumService
@@ -386,8 +399,9 @@ export const getTags = async (
 ) => {
     const validatedQuery =
         req.query
-        && ValidationError.catchValidationErrors(
-            tagQuerySchema.safeParse(req.query)
+        && validateAndExtract<TagQueryType>(
+            tagQuerySchema,
+            req.query
         )
 
     const data = await forumService
@@ -426,10 +440,10 @@ export const reportUnknownTag = async (
     req: Request,
     res: Response
 ) => {
-    const { tagName } =
-        ValidationError.catchValidationErrors(
-            unknownTagSchema.safeParse(req.body)
-        )
+    const { tagName } = validateAndExtract<UnknownTagType>(
+        unknownTagSchema,
+        req.body
+    )
 
     await forumService.reportUnknownTag(tagName)
 

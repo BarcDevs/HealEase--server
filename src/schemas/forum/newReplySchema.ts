@@ -4,3 +4,5 @@ export const newReplySchema = z.object({
     body: z.string('Body is required')
         .min(1)
 })
+
+export type NewReplyType = z.infer<typeof newReplySchema>

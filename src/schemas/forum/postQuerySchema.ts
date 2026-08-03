@@ -10,3 +10,5 @@ export const postQuerySchema = z.object({
     tag: z.string().optional(),
     category: z.string().optional()
 })
+
+export type PostQueryType = z.infer<typeof postQuerySchema>

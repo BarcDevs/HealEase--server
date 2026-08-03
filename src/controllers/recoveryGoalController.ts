@@ -3,12 +3,15 @@ import type { Request, Response } from 'express'
 import { type GoalStatus } from '../../prisma/generated/prisma/enums'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { errorFactory } from '../errors/factory/ErrorFactory'
-import { ValidationError } from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
+import type { GetGoalsQueryType } from '../schemas/recoveryGoal/getGoalsQuerySchema'
 import { getGoalsQuerySchema } from '../schemas/recoveryGoal/getGoalsQuerySchema'
+import type { NewGoalType } from '../schemas/recoveryGoal/newGoalSchema'
 import { newGoalSchema } from '../schemas/recoveryGoal/newGoalSchema'
+import type { NewMilestoneType } from '../schemas/recoveryGoal/newMilestoneSchema'
 import { newMilestoneSchema } from '../schemas/recoveryGoal/newMilestoneSchema'
 import { updateGoalSchema } from '../schemas/recoveryGoal/updateGoalSchema'
+import type { UpdateMilestoneType } from '../schemas/recoveryGoal/updateMilestoneSchema'
 import { updateMilestoneSchema } from '../schemas/recoveryGoal/updateMilestoneSchema'
 import * as recoveryGoalService from '../services/recoveryGoalService'
 import type {
@@ -16,7 +19,10 @@ import type {
     RecoveryGoalWithProgress,
     UpdateRecoveryGoalType
 } from '../types/data/RecoveryGoalType'
-import { extractUserId } from '../utils/controllerHelpers'
+import {
+    extractUserId,
+    validateAndExtract
+} from '../utils/controllerHelpers'
 
 const validateId = (
     id: string | undefined,
@@ -35,10 +41,10 @@ export const createGoal = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData = ValidationError
-        .catchValidationErrors(
-            newGoalSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<NewGoalType>(
+        newGoalSchema,
+        req.body
+    )
     const userId = extractUserId(req)
 
     const goal = await (
@@ -61,8 +67,9 @@ export const getGoals = async (
 ) => {
     const userId = extractUserId(req)
 
-    const { status } = ValidationError.catchValidationErrors(
-        getGoalsQuerySchema.safeParse(req.query)
+    const { status } = validateAndExtract<GetGoalsQueryType>(
+        getGoalsQuerySchema,
+        req.query
     )
 
     const statusFilter = status?.toUpperCase() as GoalStatus | undefined
@@ -108,10 +115,9 @@ export const updateGoal = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData = ValidationError
-        .catchValidationErrors(
-            updateGoalSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<
+        UpdateRecoveryGoalType
+    >(updateGoalSchema, req.body)
     const userId = extractUserId(req)
     const { goalId } = req.params as Record<
         string,
@@ -123,7 +129,7 @@ export const updateGoal = async (
         recoveryGoalService.updateGoal(
             goalId,
             userId,
-            validatedData as UpdateRecoveryGoalType
+            validatedData
         )
     )
     successResponse<RecoveryGoalWithProgress>(
@@ -161,10 +167,10 @@ export const createMilestones = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData = ValidationError
-        .catchValidationErrors(
-            newMilestoneSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<NewMilestoneType>(
+        newMilestoneSchema,
+        req.body
+    )
     const userId = extractUserId(req)
     const { goalId } = req.params as Record<
         string,
@@ -206,10 +212,10 @@ export const updateMilestone = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData = ValidationError
-        .catchValidationErrors(
-            updateMilestoneSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdateMilestoneType>(
+        updateMilestoneSchema,
+        req.body
+    )
     const userId = extractUserId(req)
     const { milestoneId } = req.params as Record<
         string,

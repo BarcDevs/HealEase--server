@@ -10,3 +10,5 @@ export const updatePasswordSchema = z.object({
             'Password must contain at least 8 characters, including letters and numbers'
         )
 })
+export type UpdatePasswordType
+    = z.infer<typeof updatePasswordSchema>

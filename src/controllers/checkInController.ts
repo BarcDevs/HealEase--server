@@ -1,10 +1,12 @@
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
-import { ValidationError } from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
+import type { CheckInQueryType } from '../schemas/checkIn/checkInQuerySchema'
 import { checkInQuerySchema } from '../schemas/checkIn/checkInQuerySchema'
+import type { NewCheckInType } from '../schemas/checkIn/newCheckInSchema'
 import { newCheckInSchema } from '../schemas/checkIn/newCheckInSchema'
+import type { UpdateCheckInType } from '../schemas/checkIn/updateCheckInSchema'
 import { updateCheckInSchema } from '../schemas/checkIn/updateCheckInSchema'
 import * as checkInService from '../services/checkInService'
 import * as progressInsightsService from '../services/progressInsightsService'
@@ -13,7 +15,7 @@ import type {
     CheckInType
 } from '../types/data/CheckInType'
 import type { ProgressInsight } from '../types/data/ProgressInsightType'
-import { extractUserId } from '../utils/controllerHelpers'
+import { extractUserId, validateAndExtract } from '../utils/controllerHelpers'
 
 export const getCheckIns = async (
     req: Request,
@@ -21,10 +23,10 @@ export const getCheckIns = async (
 ) => {
     const userId = extractUserId(req)
 
-    const validatedQuery =
-        ValidationError.catchValidationErrors(
-            checkInQuerySchema.safeParse(req.query)
-        )
+    const validatedQuery = validateAndExtract<CheckInQueryType>(
+        checkInQuerySchema,
+        req.query
+    )
 
     const data = await checkInService.getCheckIns(
         userId,
@@ -44,10 +46,10 @@ export const createCheckIn = async (
 ) => {
     const userId = extractUserId(req)
 
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            newCheckInSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<NewCheckInType>(
+        newCheckInSchema,
+        req.body
+    )
 
     const {
         checkIn,
@@ -75,10 +77,10 @@ export const updateCheckIn = async (
 ) => {
     const userId = extractUserId(req)
 
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            updateCheckInSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdateCheckInType>(
+        updateCheckInSchema,
+        req.body
+    )
 
     const data = await checkInService.updateCheckIn({
         ...validatedData,

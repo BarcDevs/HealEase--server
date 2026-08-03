@@ -8,3 +8,6 @@ export const newCheckInSchema = z.object({
     activities: z.array(activityItemField).optional(),
     notes: z.string().max(500).optional()
 })
+
+export type NewCheckInType
+    = z.infer<typeof newCheckInSchema>
