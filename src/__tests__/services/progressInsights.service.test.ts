@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-ignore-file */
 import * as cache from '../../lib/cache/progressInsightsCache'
 import * as authModel from '../../models/authModel'
@@ -52,7 +51,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -101,7 +100,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -152,7 +151,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -203,7 +202,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -254,7 +253,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -296,7 +295,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -306,7 +305,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getCheckInsForDateRange'
-                ).mockResolvedValue(currentCheckIns)
+                ).mockResolvedValue(currentCheckIns as never)
 
                 const firstCall = await progressInsightsService
                     .generateProgressInsight(mockUserId)
@@ -316,7 +315,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -343,7 +342,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getProfileIdForUser'
-                ).mockResolvedValue(mockProfileId)
+                ).mockResolvedValue(mockProfileId as never)
 
                 jest.spyOn(
                     checkInModel,
@@ -353,7 +352,7 @@ describe('Progress Insights Service', () => {
                 jest.spyOn(
                     checkInModel,
                     'getCheckInsForDateRange'
-                ).mockResolvedValue(currentCheckIns)
+                ).mockResolvedValue(currentCheckIns as never)
 
                 const result = await progressInsightsService
                     .generateProgressInsight(mockUserId)

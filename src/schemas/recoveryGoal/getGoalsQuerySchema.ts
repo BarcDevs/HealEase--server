@@ -10,3 +10,6 @@ export const getGoalsQuerySchema = z.object({
         'abandoned'
     ]).optional()
 })
+
+export type GetGoalsQueryType
+    = z.infer<typeof getGoalsQuerySchema>

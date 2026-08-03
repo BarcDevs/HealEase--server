@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { loggerMiddleware } from '../../middlewares/loggerMiddleWare'
 import logger from '../../utils/logger'
 import {
@@ -45,7 +44,7 @@ describe('loggerMiddleware', () => {
             path: '/api/check-in',
             userId: 'user-123'
         } as any
-        let finishHandler: () => void
+        let finishHandler!: () => void
         const res = {
             on: jest.fn((event: string, cb: () => void) => {
                 if (event === 'finish') finishHandler = cb
@@ -64,7 +63,7 @@ describe('loggerMiddleware', () => {
 
     it('uses dash for userId when not set', () => {
         const req = { method: 'GET', path: '/api/test' } as any
-        let finishHandler: () => void
+        let finishHandler!: () => void
         const res = {
             on: jest.fn((event: string, cb: () => void) => {
                 if (event === 'finish') finishHandler = cb

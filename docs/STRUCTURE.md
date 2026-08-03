@@ -1,11 +1,12 @@
 # Project Structure
 
 ```
-config/          # Environment config (see config/CLAUDE.md)
+config/          # node-config env-mapped runtime config (see config/CLAUDE.md)
 prisma/          # Prisma schema & migrations
 src/
 ├── app.ts
 ├── __tests__/   # Jest tests (see src/__tests__/CLAUDE.md)
+├── config/      # Plain-TS app constants (brandConfig, checkInConfig) — distinct from top-level config/
 ├── constants/
 ├── controllers/ # HTTP handlers (see src/controllers/CLAUDE.md)
 ├── errors/      # Custom errors & factories (see src/errors/CLAUDE.md)

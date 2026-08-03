@@ -1,4 +1,4 @@
-import { appConfig } from '../../config/app'
+import { brandConfig } from '../../config/app'
 import { resolveLanguage } from '../../locales'
 import type { ObservationType } from '../../types/data/DailyObservationType'
 
@@ -48,7 +48,7 @@ const patternHint = (
 }
 
 const injectBrandName = (prompt: string): string =>
-    prompt.replaceAll('{{brandName}}', appConfig.brandName)
+    prompt.replaceAll('{{brandName}}', brandConfig.brandName)
 
 export const buildObservationPrompt = ({
     type,

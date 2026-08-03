@@ -1,8 +1,8 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { dayInMs } from '../../constants/time'
 import * as insightService from '../../services/insightService'
 import * as recommendationsService from '../../services/recommendationsService'
@@ -35,7 +35,7 @@ const createMockCheckIn = (
     updatedAt: null,
     insights: [],
     ...overrides
-})
+} as unknown as CheckInType)
 
 describe('Check-in Routes', () => {
     beforeEach(() => {
@@ -45,17 +45,17 @@ describe('Check-in Routes', () => {
                 id: 'test-profile-id-123',
                 userId: 'test-user-id-123',
                 timezone: null
-            })
+            } as never)
         prismaMock.profile.update
-            .mockImplementation(async (args) => ({
+            .mockImplementation((async (args: { data: Record<string, unknown> }) => ({
                 id: 'test-profile-id-123',
                 userId: 'test-user-id-123',
                 ...args.data
-            }))
+            })) as never)
         jest.mocked(recommendationsService.generateRecommendationsSafely)
-            .mockResolvedValue(undefined)
+            .mockResolvedValue(undefined as never)
         jest.mocked(insightService.generateInsightSafely)
-            .mockResolvedValue(undefined)
+            .mockResolvedValue(undefined as never)
     })
 
     // ==================== GET CHECK-INS ====================
@@ -74,7 +74,7 @@ describe('Check-in Routes', () => {
                     })
                 ]
                 prismaMock.dailyCheckIn.findMany
-                    .mockResolvedValue(mockCheckIns)
+                    .mockResolvedValue(mockCheckIns as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -82,7 +82,7 @@ describe('Check-in Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.data)
@@ -98,7 +98,7 @@ describe('Check-in Routes', () => {
                 const mockUser = createMockUser()
                 const token = createAuthToken(mockUser)
                 prismaMock.dailyCheckIn.findMany
-                    .mockResolvedValue([createMockCheckIn()])
+                    .mockResolvedValue([createMockCheckIn()] as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -107,7 +107,7 @@ describe('Check-in Routes', () => {
                     ])
                     .query({ limit: 5 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -117,7 +117,7 @@ describe('Check-in Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -134,7 +134,7 @@ describe('Check-in Routes', () => {
                     ])
                     .query({ limit: 200 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -164,10 +164,10 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValueOnce(null)
-                    .mockResolvedValueOnce(mockCheckIn)
+                    .mockResolvedValueOnce(null as never)
+                    .mockResolvedValueOnce(mockCheckIn as never)
                 prismaMock.dailyCheckIn.create
-                    .mockResolvedValue(mockCheckIn)
+                    .mockResolvedValue(mockCheckIn as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -176,7 +176,7 @@ describe('Check-in Routes', () => {
                     csrfToken
                 ).send(validBody)
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.message)
                     .toBe('Check-in created successfully')
                 expect(response.body.data.id)
@@ -200,9 +200,9 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValueOnce(existingCheckIn)
+                    .mockResolvedValueOnce(existingCheckIn as never)
                 prismaMock.dailyCheckIn.update
-                    .mockResolvedValue(existingCheckIn)
+                    .mockResolvedValue(existingCheckIn as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -211,7 +211,7 @@ describe('Check-in Routes', () => {
                     csrfToken
                 ).send(validBody)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -222,7 +222,7 @@ describe('Check-in Routes', () => {
                     .post(endpoint)
                     .send(validBody)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -239,7 +239,7 @@ describe('Check-in Routes', () => {
                     ])
                     .send(validBody)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -265,7 +265,7 @@ describe('Check-in Routes', () => {
                         activities: ['walking']
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('moodScore')
             }
@@ -293,7 +293,7 @@ describe('Check-in Routes', () => {
                         activities: ['walking']
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('painLevel')
             }
@@ -318,7 +318,7 @@ describe('Check-in Routes', () => {
                     .set('x-csrf-token', csrfToken)
                     .send({ ...validBody, moodScore: 11 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('moodScore')
             }
@@ -343,7 +343,7 @@ describe('Check-in Routes', () => {
                     .set('x-csrf-token', csrfToken)
                     .send({ ...validBody, painLevel: 0 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('painLevel')
             }
@@ -380,10 +380,10 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValueOnce(createMockCheckIn())
-                    .mockResolvedValueOnce(updated)
+                    .mockResolvedValueOnce(createMockCheckIn() as never)
+                    .mockResolvedValueOnce(updated as never)
                 prismaMock.dailyCheckIn.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const response = await supertest(App)
                     .patch(endpoint)
@@ -394,7 +394,7 @@ describe('Check-in Routes', () => {
                     .set('x-csrf-token', csrfToken)
                     .send(validBody)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('Check-in updated successfully')
                 expect(response.body.data.moodScore).toBe(9)
@@ -414,7 +414,7 @@ describe('Check-in Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.dailyCheckIn.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .patch(endpoint)
@@ -425,7 +425,7 @@ describe('Check-in Routes', () => {
                     .set('x-csrf-token', csrfToken)
                     .send(validBody)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
 
@@ -436,7 +436,7 @@ describe('Check-in Routes', () => {
                     .patch(endpoint)
                     .send(validBody)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -453,7 +453,7 @@ describe('Check-in Routes', () => {
                     ])
                     .send(validBody)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -476,7 +476,7 @@ describe('Check-in Routes', () => {
                     .set('x-csrf-token', csrfToken)
                     .send({})
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -519,7 +519,7 @@ describe('Check-in Routes', () => {
                     updatedAt: null,
                     insights: []
                 }
-            ])
+            ] as never)
 
             const response = await supertest(App)
                 .get(endpoint)
@@ -527,7 +527,7 @@ describe('Check-in Routes', () => {
                     `accessToken=${token}`
                 ])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data).toMatchObject({
                 totalCheckIns: 2,
                 averageMoodScore: 7,
@@ -556,7 +556,7 @@ describe('Check-in Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data).toMatchObject({
                     totalCheckIns: 0,
                     averageMoodScore: 0,
@@ -597,7 +597,7 @@ describe('Check-in Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.currentStreak).toBe(2)
         })
 
@@ -607,7 +607,7 @@ describe('Check-in Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })

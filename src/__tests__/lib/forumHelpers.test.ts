@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ensurePostExists, extractRemovedTags, validateOwnerHelper } from '../../lib/forumHelpers'
 import * as forumModel from '../../models/forumModel'
 
@@ -52,7 +51,7 @@ describe('ensurePostExists', () => {
 // ==================== extractRemovedTags ====================
 describe('extractRemovedTags', () => {
     const makeTags = (labels: string[]) =>
-        labels.map((l) => ({ id: l, label: { en: l } }))
+        labels.map((l) => ({ id: l, label: { en: l } })) as never
 
     it('returns undefined when prevTags is undefined', () => {
         expect(extractRemovedTags(undefined, ['tag1'])).toBeUndefined()

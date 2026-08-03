@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { detectHighlights } from '../../../lib/progressInsights/highlightDetector'
 import type { TrendMetrics } from '../../../lib/progressInsights/trendClassifier'
 

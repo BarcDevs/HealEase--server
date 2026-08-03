@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as checkInModel from '../../models/checkInModel'
 import { prismaMock } from '../setup/jestSetup'
 
@@ -10,7 +9,7 @@ jest.mock('../../errors/factory/ErrorFactory', () => ({
     }
 }))
 
-const mockProfile = { id: 'profile-id', userId: 'user-id', timezone: 'UTC' }
+const mockProfile = { id: 'profile-id', userId: 'user-id', timezone: 'UTC' } as never
 const mockCheckIn = {
     id: 'checkin-id',
     profileId: 'profile-id',
@@ -19,7 +18,7 @@ const mockCheckIn = {
     painLevel: 3,
     activities: [],
     insights: []
-}
+} as never
 
 describe('CheckInModel', () => {
     describe('getProfileIdForUser', () => {

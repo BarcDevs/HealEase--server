@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as cache from '../../lib/cache/progressInsightsCache'
 import type { ProgressInsight } from '../../types/data/ProgressInsightType'
 

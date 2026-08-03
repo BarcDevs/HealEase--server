@@ -2,6 +2,7 @@ import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as dailyObservationService from '../../services/dailyObservationService'
 import {
     createAuthToken,
@@ -26,7 +27,7 @@ describe('Insight Routes', () => {
     describe(`GET /api/${serverConfig.apiVersion}/insight/observation`, () => {
         it('returns 401 when not authenticated', async () => {
             const response = await supertest(App).get(endpoint)
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('returns 200 with observation data when authenticated', async () => {
@@ -44,7 +45,7 @@ describe('Insight Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.message).toBe('Observation retrieved')
             expect(response.body.data).toMatchObject({
                 title: 'Something noticed',
@@ -64,7 +65,7 @@ describe('Insight Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.message).toBe('Observation retrieved')
             expect(response.body.data).toBeNull()
         })
@@ -76,7 +77,7 @@ describe('Insight Routes', () => {
                 .get(endpoint)
                 .set('Cookie', [`accessToken=${token}`])
 
-            expect(response.status).toBe(500)
+            expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
         })
 
         it('returns 401 with invalid token', async () => {
@@ -84,7 +85,7 @@ describe('Insight Routes', () => {
                 .get(endpoint)
                 .set('Cookie', ['accessToken=invalid.token.here'])
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it('calls service with correct userId', async () => {

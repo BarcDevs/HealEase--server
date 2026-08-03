@@ -26,6 +26,31 @@ Architecture: MVC — Controller → Service → Model → Database.
 ## File Structure
 See `docs/STRUCTURE.md` for the full directory layout and subdirectory rules.
 
+## Docs Sync
+New feature added → update server PRD, server README, AND client README same time, every time.
+
+## AI Eval Sync
+Any change to AI provider logic, prompts, insight types, or generation config
+(`src/services/aiProviders/`, `src/lib/aiInsight/`, `aiInsightGeneratorService.ts`,
+`config/default.ts` ai section) → check `scripts/eval-ai-models/` still reflects it:
+scenarios cover the current insight types, prompts match `insightsPrompts.ts`,
+model ids match config defaults. Update the eval scripts in the same change if
+they've drifted — don't let them silently test stale prompts/models.
+
+## AWS EC2 Migration — Pre-Deploy Checklist
+Before deploying off Render to AWS EC2, resolve these items deferred in
+`docs/review/07-fix-plan.md` (blocked on this migration, not actionable under Render):
+- ~~REVIEW #4 — pick one bundler~~ Done: `tsc` is the only bundler now (Dockerfile builder
+  stage already used it). Removed webpack toolchain, `start:prod`/`prod` scripts, and
+  `webpack.config.ts` — all were Render-only leftovers.
+- ~~DECIDE #5 / REVIEW #3 — prisma CLI dependency placement~~ Done: moved `prisma` to
+  `devDependencies` (`@prisma/client`/`@prisma/adapter-pg` stay in `dependencies` — the
+  runtime needs those, not the CLI). `npm run release` (`prisma migrate deploy`) now
+  runs from the Dockerfile's `builder` target (full devDependencies) as a one-off step
+  before rolling out the `runner` image — see comment above `CMD` in the Dockerfile.
+  Verified: runner image has no `prisma` CLI in `node_modules/.bin`, builder stage
+  builds clean.
+
 ## Project Roadmap
 [Pulse Roadmap](https://www.notion.so/Pulse-Development-Timeline-3129e15469d28100be18df6e1ce0a984?source=copy_link)
 
@@ -51,8 +76,18 @@ Full rules there. Key constraint: never invoke `/commit` skill on small fixes, f
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 
+**`graphify` is not a bare PATH command in this environment.** The CLI is a Python package installed to a uv/pipx venv, not on PATH here. `graphify query ...` will fail with "command not found" if invoked directly — that failure is not a signal that the graph is unavailable, it just means the wrong invocation was used. Before concluding graphify isn't available, always try:
+
+```bash
+$(cat graphify-out/.graphify_python) -m graphify query "<question>"
+```
+
+`graphify-out/.graphify_python` holds the absolute path to the Python interpreter that has graphify installed (saved by the graphify skill itself). Same pattern for `path`/`explain`/`update`. Only fall back to inline NetworkX traversal of `graphify-out/graph.json` (see the graphify skill's `references/query.md`) if that invocation itself errors.
+
 Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- For codebase questions, first run the query above when graphify-out/graph.json exists. Use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- **Do not spawn an Explore/general-purpose subagent for a codebase question until graphify has been tried (with the correct invocation above) and either failed or come up short.** Spawning an agent to do raw file exploration when the graph could have answered directly wastes tokens for nothing — try graphify first, every time, no exceptions for "seems faster to just delegate."
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- `explain "<name>"` needs a bare node name with no file extension (e.g. `explain "forumRoute"`, not `explain "forumRoute.ts"`) — extension-qualified names reliably fail with "no node matching." `path "<A>" "<B>"` accepts either form fine.
+- After modifying code, run `$(cat graphify-out/.graphify_python) -m graphify update .` to keep the graph current (AST-only, no API cost).

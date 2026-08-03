@@ -22,16 +22,19 @@ model User {
   password                String
   resetPasswordOTP        Int?
   resetPasswordExpiration DateTime?
+  resetPasswordAttempts   Int       @default(0)
   passwordUpdatedAt       DateTime  @default(now())
   deletedAt               DateTime?
+
+  confirmEmailOTP        Int?
+  confirmEmailExpiration DateTime?
+  confirmEmailAttempts   Int       @default(0)
 
   pendingEmail          String?
   emailChangeOTP        Int?
   emailChangeExpiration DateTime?
 
   profile Profile?
-
-  @@index([email, createdAt, active])
 }
 
 model Profile {
@@ -45,12 +48,12 @@ model Profile {
   updatedAt  DateTime @updatedAt
   dateFormat String?  @default("dd/mm/yyyy")
 
-  anonymousParticipation Boolean   @default(true)
-  communityAlerts        Boolean   @default(false)
-  dailyReminder          Boolean   @default(true)
-  language               String    @default("he-IL")
-  profileVisibility      String    @default("friends")
-  theme                  String    @default("light")
+  anonymousParticipation Boolean           @default(true)
+  communityAlerts        Boolean           @default(false)
+  dailyReminder          Boolean           @default(true)
+  language               String            @default("he-IL")
+  profileVisibility      ProfileVisibility @default(friends)
+  theme                  ProfileTheme      @default(light)
   lastCheckInAt          DateTime?
 
   dateOfBirth  DateTime?
@@ -140,17 +143,17 @@ model PostRecommendation {
 }
 
 model AIInsight {
-  id             String       @id @default(uuid())
+  id             String                @id @default(uuid())
   checkInId      String
   type           InsightType
   content        String
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime              @default(now())
   title          String
   userId         String
   metadata       Json?
-  classification String       @default("baseline")
-  priority       String       @default("normal")
-  checkIn        DailyCheckIn @relation(fields: [checkInId], references: [id])
+  classification InsightClassification @default(baseline)
+  priority       InsightPriority       @default(normal)
+  checkIn        DailyCheckIn          @relation(fields: [checkInId], references: [id], onDelete: Cascade)
 
   @@unique([checkInId, type])
   @@index([userId, createdAt])
@@ -288,4 +291,26 @@ enum InsightType {
   MOTIVATIONAL
   WEEKLY_SUMMARY
   BAD_DAY_SUPPORT
+}
+
+enum InsightClassification {
+  baseline
+  intervention
+}
+
+enum InsightPriority {
+  normal
+  elevated
+  high
+}
+
+enum ProfileTheme {
+  light
+  dark
+}
+
+enum ProfileVisibility {
+  onlyMe
+  friends
+  public
 }

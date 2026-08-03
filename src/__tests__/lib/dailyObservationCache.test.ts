@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as cache from '../../lib/cache/dailyObservationCache'
 import type { TodayObservationResponse } from '../../types/data/DailyObservationType'
 

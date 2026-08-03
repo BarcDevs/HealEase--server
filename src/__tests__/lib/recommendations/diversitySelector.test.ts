@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { selectDiversePosts } from '../../../lib/recommendations/diversitySelector'
 
 const makePost = (id: string, overrides: Record<string, unknown> = {}) => ({
@@ -25,7 +24,7 @@ const makePost = (id: string, overrides: Record<string, unknown> = {}) => ({
 describe('selectDiversePosts', () => {
     it('returns all posts when fewer than 5', () => {
         const posts = [makePost('1'), makePost('2'), makePost('3')]
-        const result = selectDiversePosts(posts, 5)
+        const result = selectDiversePosts(posts as never, 5)
         expect(result).toHaveLength(3)
     })
 
@@ -35,14 +34,14 @@ describe('selectDiversePosts', () => {
             makePost('2', { score: 0.9 }),
             makePost('3', { score: 0.6 })
         ]
-        const result = selectDiversePosts(posts, 3)
+        const result = selectDiversePosts(posts as never, 3)
         expect(result[0].score).toBe(0.9)
         expect(result[1].score).toBe(0.6)
     })
 
     it('returns at most n posts', () => {
         const posts = Array.from({ length: 10 }, (_, i) => makePost(`${i}`))
-        const result = selectDiversePosts(posts, 3)
+        const result = selectDiversePosts(posts as never, 3)
         expect(result.length).toBeLessThanOrEqual(3)
     })
 
@@ -123,7 +122,7 @@ describe('selectDiversePosts', () => {
             })
         ]
 
-        const result = selectDiversePosts(posts, 5)
+        const result = selectDiversePosts(posts as never, 5)
         expect(result.length).toBeGreaterThan(0)
         expect(result.length).toBeLessThanOrEqual(5)
 
@@ -134,7 +133,7 @@ describe('selectDiversePosts', () => {
 
     it('does not include duplicate post ids', () => {
         const posts = Array.from({ length: 8 }, (_, i) => makePost(`${i}`))
-        const result = selectDiversePosts(posts, 5)
+        const result = selectDiversePosts(posts as never, 5)
         const ids = result.map((p) => p.post.id)
         expect(new Set(ids).size).toBe(ids.length)
     })
@@ -143,7 +142,7 @@ describe('selectDiversePosts', () => {
         const posts = Array.from({ length: 20 }, (_, i) =>
             makePost(`${i}`, { score: 1 - i * 0.01 })
         )
-        const result = selectDiversePosts(posts, 4)
+        const result = selectDiversePosts(posts as never, 4)
         expect(result.length).toBeLessThanOrEqual(4)
     })
 })

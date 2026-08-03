@@ -2,7 +2,6 @@ import type { ZodError } from 'zod'
 
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 
-import { errorFactory } from './factory/ErrorFactory'
 import { CustomError } from './CustomError'
 
 export class ValidationError extends CustomError {
@@ -30,7 +29,7 @@ export class ValidationError extends CustomError {
         const issue = result.error!.issues[0]
         const errorProperty = String(issue.path[0]) || 'unknown'
 
-        throw errorFactory.validation.generic(
+        throw new ValidationError(
             issue.message,
             errorProperty
         )

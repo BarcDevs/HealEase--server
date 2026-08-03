@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as aiInsightModel from '../../models/aiInsightModel'
 import { prismaMock } from '../setup/jestSetup'
 
@@ -26,9 +25,9 @@ const baseInput = {
 describe('aiInsightModel', () => {
     describe('createInsight', () => {
         it('upserts and returns the insight', async () => {
-            prismaMock.aIInsight.upsert.mockResolvedValue(mockInsight)
+            prismaMock.aIInsight.upsert.mockResolvedValue(mockInsight as never)
 
-            const result = await aiInsightModel.createInsight(baseInput)
+            const result = await aiInsightModel.createInsight(baseInput as never)
 
             expect(prismaMock.aIInsight.upsert).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -44,9 +43,9 @@ describe('aiInsightModel', () => {
         })
 
         it('applies default classification=baseline and priority=normal', async () => {
-            prismaMock.aIInsight.upsert.mockResolvedValue(mockInsight)
+            prismaMock.aIInsight.upsert.mockResolvedValue(mockInsight as never)
 
-            await aiInsightModel.createInsight(baseInput)
+            await aiInsightModel.createInsight(baseInput as never)
 
             const call = prismaMock.aIInsight.upsert.mock.calls[0][0]
             expect(call.create.classification).toBe('baseline')
@@ -58,13 +57,13 @@ describe('aiInsightModel', () => {
                 ...mockInsight,
                 classification: 'intervention',
                 priority: 'high'
-            })
+            } as never)
 
             await aiInsightModel.createInsight({
                 ...baseInput,
                 classification: 'intervention',
                 priority: 'high'
-            })
+            } as never)
 
             const call = prismaMock.aIInsight.upsert.mock.calls[0][0]
             expect(call.create.classification).toBe('intervention')
@@ -76,9 +75,9 @@ describe('aiInsightModel', () => {
             prismaMock.aIInsight.upsert.mockResolvedValue({
                 ...mockInsight,
                 metadata: meta
-            })
+            } as never)
 
-            await aiInsightModel.createInsight({ ...baseInput, metadata: meta })
+            await aiInsightModel.createInsight({ ...baseInput, metadata: meta } as never)
 
             const call = prismaMock.aIInsight.upsert.mock.calls[0][0]
             expect(call.create.metadata).toEqual(meta)
@@ -86,9 +85,9 @@ describe('aiInsightModel', () => {
         })
 
         it('omits metadata key when not provided', async () => {
-            prismaMock.aIInsight.upsert.mockResolvedValue(mockInsight)
+            prismaMock.aIInsight.upsert.mockResolvedValue(mockInsight as never)
 
-            await aiInsightModel.createInsight(baseInput)
+            await aiInsightModel.createInsight(baseInput as never)
 
             const call = prismaMock.aIInsight.upsert.mock.calls[0][0]
             expect(call.create).not.toHaveProperty('metadata')
@@ -99,7 +98,7 @@ describe('aiInsightModel', () => {
             prismaMock.aIInsight.upsert.mockRejectedValue(new Error('DB error'))
 
             await expect(
-                aiInsightModel.createInsight(baseInput)
+                aiInsightModel.createInsight(baseInput as never)
             ).rejects.toThrow('DB error')
         })
 
@@ -108,7 +107,7 @@ describe('aiInsightModel', () => {
             prismaMock.aIInsight.upsert.mockRejectedValue(err)
 
             await expect(
-                aiInsightModel.createInsight(baseInput)
+                aiInsightModel.createInsight(baseInput as never)
             ).rejects.toMatchObject({ code: 'P2002' })
         })
     })
@@ -116,7 +115,7 @@ describe('aiInsightModel', () => {
     describe('getInsightsByUserId', () => {
         it('returns insights ordered by createdAt desc', async () => {
             const insights = [mockInsight, { ...mockInsight, id: 'insight-2' }]
-            prismaMock.aIInsight.findMany.mockResolvedValue(insights)
+            prismaMock.aIInsight.findMany.mockResolvedValue(insights as never)
 
             const result = await aiInsightModel.getInsightsByUserId('user-1')
 
@@ -129,7 +128,7 @@ describe('aiInsightModel', () => {
         })
 
         it('uses custom limit', async () => {
-            prismaMock.aIInsight.findMany.mockResolvedValue([mockInsight])
+            prismaMock.aIInsight.findMany.mockResolvedValue([mockInsight] as never)
 
             await aiInsightModel.getInsightsByUserId('user-1', 5)
 
@@ -157,7 +156,7 @@ describe('aiInsightModel', () => {
 
     describe('getInsightByCheckInId', () => {
         it('returns insight when found', async () => {
-            prismaMock.aIInsight.findFirst.mockResolvedValue(mockInsight)
+            prismaMock.aIInsight.findFirst.mockResolvedValue(mockInsight as never)
 
             const result = await aiInsightModel.getInsightByCheckInId('checkin-1')
 

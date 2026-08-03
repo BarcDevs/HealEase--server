@@ -7,3 +7,5 @@ export const tagQuerySchema = z.object({
     filter: z.literal('popular').optional(),
     search: z.string().optional()
 })
+
+export type TagQueryType = z.infer<typeof tagQuerySchema>

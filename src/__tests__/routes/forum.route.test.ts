@@ -1,9 +1,9 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import { Prisma } from '../../../prisma/generated/prisma/client'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { prismaMock } from '../setup/jestSetup'
 import {
     createAuthenticatedRequest,
@@ -32,7 +32,7 @@ describe('Forum Routes', () => {
                 ]
                 prismaMock.post.findMany
                     .mockResolvedValue(
-                        mockPosts
+                        mockPosts as never
                     )
 
                 const response =
@@ -40,8 +40,8 @@ describe('Forum Routes', () => {
                         .get(postsEndpoint)
 
                 expect(response.status)
-                    .toBe(200)
-                expect(response.body.data)
+                    .toBe(HttpStatusCodes.OK)
+                expect(response.body.data.items)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
                     .toContain('posts found')
@@ -53,7 +53,7 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [createMockPost()]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
@@ -62,7 +62,7 @@ describe('Forum Routes', () => {
                         page: 1
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -77,13 +77,13 @@ describe('Forum Routes', () => {
                     })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ tag: 'test-tag' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -94,13 +94,13 @@ describe('Forum Routes', () => {
                     createMockPost({ category: 'health' })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ category: 'health' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -111,13 +111,13 @@ describe('Forum Routes', () => {
                     createMockPost({ title: 'Search Test' })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ search: 'Search' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -126,13 +126,13 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [createMockPost()]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ filter: 'newest' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -143,13 +143,13 @@ describe('Forum Routes', () => {
                     createMockPost({ views: 100 })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ filter: 'popular' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -158,13 +158,13 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [createMockPost()]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ filter: 'hot' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -173,17 +173,17 @@ describe('Forum Routes', () => {
             async () => {
                 const mockPosts = [
                     createMockPost({
-                        _count: { replies: 0 }
+                        _count: { replies: 0, likes: 0 }
                     })
                 ]
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(postsEndpoint)
                     .query({ filter: 'unanswered' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -196,7 +196,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(postsEndpoint)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -209,7 +209,7 @@ describe('Forum Routes', () => {
                     .get(postsEndpoint)
                     .query({ limit: 200 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -238,7 +238,7 @@ describe('Forum Routes', () => {
                 prismaMock.tag.findMany
                     .mockResolvedValue([])
                 prismaMock.post.create
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(postsEndpoint),
@@ -255,7 +255,7 @@ describe('Forum Routes', () => {
                     ]
                 })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.message)
                     .toBe('Post created successfully')
             }
@@ -273,7 +273,7 @@ describe('Forum Routes', () => {
                         tags: ['tag1']
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -295,7 +295,7 @@ describe('Forum Routes', () => {
                         tags: ['tag1']
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -320,7 +320,7 @@ describe('Forum Routes', () => {
                     tags: ['tag1']
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('title')
             }
@@ -347,7 +347,7 @@ describe('Forum Routes', () => {
                     tags: ['tag1']
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('body')
             }
@@ -374,7 +374,7 @@ describe('Forum Routes', () => {
                     tags: ['tag1']
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('category')
             }
@@ -398,7 +398,7 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.create
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(postsEndpoint),
@@ -411,7 +411,7 @@ describe('Forum Routes', () => {
                     category: 'general'
                 })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
             }
         )
     })
@@ -421,12 +421,12 @@ describe('Forum Routes', () => {
         it('should return 200 and single post', async () => {
             const mockPost = createMockPost()
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const response = await supertest(App)
                 .get(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.id)
                 .toBe('test-post-id-123')
         })
@@ -435,12 +435,12 @@ describe('Forum Routes', () => {
             'should return 404 for non-existent post',
             async () => {
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts/non-existent-id`)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -462,12 +462,12 @@ describe('Forum Routes', () => {
                     }
                 })
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.author.image).toBeNull()
             }
         )
@@ -495,11 +495,11 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
                 prismaMock.post.update.mockResolvedValue({
                     ...mockPost,
                     title: 'Updated Title'
-                })
+                } as never)
                 prismaMock.tag.findMany
                     .mockResolvedValue([])
 
@@ -514,7 +514,7 @@ describe('Forum Routes', () => {
                     title: 'Updated Title'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -527,7 +527,7 @@ describe('Forum Routes', () => {
                         title: 'Updated Title'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -549,7 +549,7 @@ describe('Forum Routes', () => {
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const response = await supertest(App)
                 .put(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`)
@@ -562,7 +562,7 @@ describe('Forum Routes', () => {
                     title: 'Updated Title'
                 })
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
 
         it(
@@ -582,7 +582,7 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).put(
@@ -595,7 +595,7 @@ describe('Forum Routes', () => {
                     title: 'Updated Title'
                 })
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
     })
@@ -622,9 +622,9 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
                 prismaMock.post.delete
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).delete(
@@ -635,7 +635,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toContain('deleted')
             }
@@ -649,7 +649,7 @@ describe('Forum Routes', () => {
                         `/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123`
                     )
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -671,7 +671,7 @@ describe('Forum Routes', () => {
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
 
             const response = await supertest(App)
                 .delete(
@@ -683,7 +683,7 @@ describe('Forum Routes', () => {
                 ])
                 .set('x-csrf-token', csrfToken)
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
         })
     })
 
@@ -696,21 +696,21 @@ describe('Forum Routes', () => {
                 createMockReply({ id: 'reply-2' })
             ]
             prismaMock.post.findUnique
-                .mockResolvedValue(mockPost)
+                .mockResolvedValue(mockPost as never)
             prismaMock.reply.findMany
-                .mockResolvedValue(mockReplies)
+                .mockResolvedValue(mockReplies as never)
 
             const response = await supertest(App)
                 .get(
                     `/api/${serverConfig.apiVersion}/forum/posts/test-post-id-123/replies`
                 )
 
-            expect(response.status).toBe(200)
-            expect(response.body.data)
+            expect(response.status).toBe(HttpStatusCodes.OK)
+            expect(response.body.data.items)
                 .toBeInstanceOf(Array)
-            expect(response.body.data.length)
+            expect(response.body.data.items.length)
                 .toBeGreaterThan(0)
-            response.body.data.forEach((reply: unknown) => {
+            response.body.data.items.forEach((reply: unknown) => {
                 expect(reply).toHaveProperty('_count')
                 expect((reply as { _count: unknown })._count)
                     .toHaveProperty('likes')
@@ -721,14 +721,14 @@ describe('Forum Routes', () => {
             'should return 404 when post not found',
             async () => {
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(
                         `/api/${serverConfig.apiVersion}/forum/posts/non-existent/replies`
                     )
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
     })
@@ -736,7 +736,7 @@ describe('Forum Routes', () => {
     // ==================== CREATE REPLY ====================
     describe(`POST /api/${serverConfig.apiVersion}/forum/posts/:postId/replies`, () => {
         it(
-            'should return 200 for valid reply creation',
+            'should return 201 for valid reply creation',
             async () => {
                 const mockUser = createMockUser()
                 const mockPost = createMockPost()
@@ -752,11 +752,11 @@ describe('Forum Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.post.findUnique
-                    .mockResolvedValue(mockPost)
+                    .mockResolvedValue(mockPost as never)
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.reply.create
-                    .mockResolvedValue(mockReply)
+                    .mockResolvedValue(mockReply as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(
@@ -769,7 +769,7 @@ describe('Forum Routes', () => {
                     body: 'This is a reply'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.message)
                     .toBe('Reply created successfully')
             }
@@ -786,7 +786,7 @@ describe('Forum Routes', () => {
                         body: 'This is a reply'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -809,7 +809,7 @@ describe('Forum Routes', () => {
                 .set('x-csrf-token', csrfToken)
                 .send({})
 
-            expect(response.status).toBe(400)
+            expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             expect(response.body.error[0].statusType)
                 .toBe('Validation Error')
         })
@@ -839,11 +839,11 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
                     prismaMock.reply.update.mockResolvedValue({
                         ...mockReply,
                         body: 'Updated reply'
-                    })
+                    } as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).put(
@@ -856,7 +856,7 @@ describe('Forum Routes', () => {
                         body: 'Updated reply'
                     })
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                 }
             )
 
@@ -880,7 +880,7 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).put(
@@ -893,7 +893,7 @@ describe('Forum Routes', () => {
                         body: 'Updated reply'
                     })
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 }
             )
 
@@ -914,7 +914,7 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(null)
+                        .mockResolvedValue(null as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).put(
@@ -927,7 +927,7 @@ describe('Forum Routes', () => {
                         body: 'Updated reply'
                     })
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 }
             )
         }
@@ -960,9 +960,9 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
                     prismaMock.reply.delete
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -972,7 +972,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', csrfToken)
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                     expect(response.body.message)
                         .toContain('deleted')
                 }
@@ -1001,7 +1001,7 @@ describe('Forum Routes', () => {
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1011,7 +1011,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', csrfToken)
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(response.body.error[0].error)
                         .toContain('not the author')
                 }
@@ -1028,7 +1028,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(null)
+                        .mockResolvedValue(null as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1038,7 +1038,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', csrfToken)
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 }
             )
 
@@ -1048,7 +1048,7 @@ describe('Forum Routes', () => {
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 }
             )
 
@@ -1065,7 +1065,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1074,7 +1074,7 @@ describe('Forum Routes', () => {
                             `_csrf=${csrfSecret}`
                         ])
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(response.body.error[0].error)
                         .toContain('CSRF')
                 }
@@ -1093,7 +1093,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(mockReply)
+                        .mockResolvedValue(mockReply as never)
 
                     const response = await supertest(App)
                         .delete(deleteReplyEndpoint)
@@ -1103,7 +1103,7 @@ describe('Forum Routes', () => {
                         ])
                         .set('x-csrf-token', 'invalid-token')
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(response.body.error[0].error)
                         .toContain('CSRF')
                 }
@@ -1121,7 +1121,7 @@ describe('Forum Routes', () => {
             userId: string
         }) => {
             prismaMock.post.findUnique
-                .mockResolvedValue(createMockPost())
+                .mockResolvedValue(createMockPost() as never)
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
         }
@@ -1142,11 +1142,11 @@ describe('Forum Routes', () => {
 
                 setupLikeMocks(mockProfile)
                 prismaMock.postLike.deleteMany
-                    .mockResolvedValue({ count: 0 })
+                    .mockResolvedValue({ count: 0 } as never)
                 prismaMock.postLike.create
                     .mockResolvedValue({} as never)
                 prismaMock.postLike.count
-                    .mockResolvedValue(1)
+                    .mockResolvedValue(1 as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(likeEndpoint),
@@ -1155,7 +1155,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.liked).toBe(true)
                 expect(response.body.data.likes).toBe(1)
                 expect(response.body.message).toBe('Post liked')
@@ -1178,9 +1178,9 @@ describe('Forum Routes', () => {
 
                 setupLikeMocks(mockProfile)
                 prismaMock.postLike.deleteMany
-                    .mockResolvedValue({ count: 1 })
+                    .mockResolvedValue({ count: 1 } as never)
                 prismaMock.postLike.count
-                    .mockResolvedValue(0)
+                    .mockResolvedValue(0 as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(likeEndpoint),
@@ -1189,7 +1189,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.liked).toBe(false)
                 expect(response.body.data.likes).toBe(0)
                 expect(response.body.message).toBe('Post unliked')
@@ -1202,7 +1202,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(likeEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1216,7 +1216,7 @@ describe('Forum Routes', () => {
                     .post(likeEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1231,7 +1231,7 @@ describe('Forum Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(likeEndpoint),
@@ -1240,7 +1240,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1261,7 +1261,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(shareEndpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.shareCount).toBe(1)
                 expect(response.body.message)
                     .toBe('Post test-post-id-123 shared')
@@ -1281,7 +1281,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(`/api/${serverConfig.apiVersion}/forum/posts/test-post-id-404/share`)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1310,15 +1310,15 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(createMockReply())
+                        .mockResolvedValue(createMockReply() as never)
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.replyLike.deleteMany
-                        .mockResolvedValue({ count: 0 })
+                        .mockResolvedValue({ count: 0 } as never)
                     prismaMock.replyLike.create
                         .mockResolvedValue({} as never)
                     prismaMock.replyLike.count
-                        .mockResolvedValue(1)
+                        .mockResolvedValue(1 as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).post(likeReplyEndpoint),
@@ -1327,7 +1327,7 @@ describe('Forum Routes', () => {
                         csrfToken
                     )
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                     expect(response.body.data.liked).toBe(true)
                     expect(response.body.data.likes).toBe(1)
                     expect(response.body.message)
@@ -1350,13 +1350,13 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(createMockReply())
+                        .mockResolvedValue(createMockReply() as never)
                     prismaMock.profile.findUnique
                         .mockResolvedValue(mockProfile as never)
                     prismaMock.replyLike.deleteMany
-                        .mockResolvedValue({ count: 1 })
+                        .mockResolvedValue({ count: 1 } as never)
                     prismaMock.replyLike.count
-                        .mockResolvedValue(0)
+                        .mockResolvedValue(0 as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).post(likeReplyEndpoint),
@@ -1365,7 +1365,7 @@ describe('Forum Routes', () => {
                         csrfToken
                     )
 
-                    expect(response.status).toBe(200)
+                    expect(response.status).toBe(HttpStatusCodes.OK)
                     expect(response.body.data.liked).toBe(false)
                     expect(response.body.message)
                         .toBe('Reply unliked')
@@ -1378,7 +1378,7 @@ describe('Forum Routes', () => {
                     const response = await supertest(App)
                         .post(likeReplyEndpoint)
 
-                    expect(response.status).toBe(401)
+                    expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 }
             )
 
@@ -1393,7 +1393,7 @@ describe('Forum Routes', () => {
                     } = createAuthenticatedRequest(mockUser)
 
                     prismaMock.reply.findUnique
-                        .mockResolvedValue(null)
+                        .mockResolvedValue(null as never)
 
                     const response = await withCsrfAuth(
                         supertest(App).post(likeReplyEndpoint),
@@ -1402,7 +1402,7 @@ describe('Forum Routes', () => {
                         csrfToken
                     )
 
-                    expect(response.status).toBe(404)
+                    expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                     expect(response.body.error[0].statusType)
                         .toBe('Not Found')
                 }
@@ -1420,7 +1420,7 @@ describe('Forum Routes', () => {
             userId: string
         }) => {
             prismaMock.post.findUnique
-                .mockResolvedValue(createMockPost())
+                .mockResolvedValue(createMockPost() as never)
             prismaMock.profile.findUnique
                 .mockResolvedValue(mockProfile as never)
         }
@@ -1441,7 +1441,7 @@ describe('Forum Routes', () => {
 
                 setupSaveMocks(mockProfile)
                 prismaMock.savedPost.deleteMany
-                    .mockResolvedValue({ count: 0 })
+                    .mockResolvedValue({ count: 0 } as never)
                 prismaMock.savedPost.create
                     .mockResolvedValue({} as never)
 
@@ -1452,7 +1452,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.saved).toBe(true)
                 expect(response.body.message).toBe('Post saved')
             }
@@ -1474,7 +1474,7 @@ describe('Forum Routes', () => {
 
                 setupSaveMocks(mockProfile)
                 prismaMock.savedPost.deleteMany
-                    .mockResolvedValue({ count: 1 })
+                    .mockResolvedValue({ count: 1 } as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(saveEndpoint),
@@ -1483,7 +1483,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.saved).toBe(false)
                 expect(response.body.message).toBe('Post unsaved')
             }
@@ -1495,7 +1495,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .post(saveEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1509,7 +1509,7 @@ describe('Forum Routes', () => {
                     .post(saveEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1524,7 +1524,7 @@ describe('Forum Routes', () => {
                 } = createAuthenticatedRequest(mockUser)
 
                 prismaMock.post.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(saveEndpoint),
@@ -1533,7 +1533,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 )
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1561,13 +1561,13 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findMany
-                    .mockResolvedValue(mockPosts)
+                    .mockResolvedValue(mockPosts as never)
 
                 const response = await supertest(App)
                     .get(savedEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.data).toHaveLength(2)
@@ -1595,7 +1595,7 @@ describe('Forum Routes', () => {
                     .get(savedEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data).toEqual([])
                 expect(response.body.message)
                     .toBe('0 saved posts found')
@@ -1615,14 +1615,14 @@ describe('Forum Routes', () => {
                 prismaMock.profile.findUnique
                     .mockResolvedValue(mockProfile as never)
                 prismaMock.post.findMany
-                    .mockResolvedValue([createMockPost()])
+                    .mockResolvedValue([createMockPost()] as never)
 
                 const response = await supertest(App)
                     .get(savedEndpoint)
                     .set('Cookie', [`accessToken=${token}`])
                     .query({ limit: 5, page: 1 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1632,7 +1632,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(savedEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -1651,7 +1651,7 @@ describe('Forum Routes', () => {
             const response = await supertest(App)
                 .get(tagsEndpoint)
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data)
                 .toBeInstanceOf(Array)
         })
@@ -1666,7 +1666,7 @@ describe('Forum Routes', () => {
                     .get(tagsEndpoint)
                     .query({ search: 'java' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1680,7 +1680,7 @@ describe('Forum Routes', () => {
                     .get(tagsEndpoint)
                     .query({ filter: 'popular' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1697,7 +1697,7 @@ describe('Forum Routes', () => {
                         page: 1
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1710,7 +1710,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(tagsEndpoint)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
             }
         )
     })
@@ -1724,7 +1724,7 @@ describe('Forum Routes', () => {
             const response = await supertest(App)
                 .get(`/api/${serverConfig.apiVersion}/forum/tags/test-tag-id-123`)
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.data.id)
                 .toBe('test-tag-id-123')
         })
@@ -1733,12 +1733,12 @@ describe('Forum Routes', () => {
             'should return 404 for non-existent tag',
             async () => {
                 prismaMock.tag.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/tags/non-existent-id`)
 
-                expect(response.status).toBe(404)
+                expect(response.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(response.body.error[0].statusType)
                     .toBe('Not Found')
             }
@@ -1775,7 +1775,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 ).send({ tagName: 'non-existent-tag' })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('Tag attempt recorded')
             }
@@ -1788,7 +1788,7 @@ describe('Forum Routes', () => {
                     .post(endpoint)
                     .send({ tagName: 'some-tag' })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1803,7 +1803,7 @@ describe('Forum Routes', () => {
                     .set('Cookie', [`accessToken=${token}`])
                     .send({ tagName: 'some-tag' })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1824,7 +1824,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 ).send({})
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].property)
                     .toBe('tagName')
             }
@@ -1847,7 +1847,7 @@ describe('Forum Routes', () => {
                     csrfToken
                 ).send({ tagName: '' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -1859,7 +1859,7 @@ describe('Forum Routes', () => {
         it(
             'should return 200 and category counts array',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([
                         { category: 'therapy', _count: { category: 4 } },
                         { category: 'wellness', _count: { category: 2 } }
@@ -1868,7 +1868,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
@@ -1879,7 +1879,7 @@ describe('Forum Routes', () => {
         it(
             'should include "all" as first item with total count',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([
                         { category: 'therapy', _count: { category: 4 } },
                         { category: 'wellness', _count: { category: 2 } }
@@ -1888,7 +1888,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data[0].category).toBe('all')
                 expect(response.body.data[0].count).toBe(6)
             }
@@ -1897,7 +1897,7 @@ describe('Forum Routes', () => {
         it(
             'should return items with category and count fields',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([
                         { category: 'therapy', _count: { category: 4 } }
                     ] as never)
@@ -1905,7 +1905,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data[1])
                     .toHaveProperty('category')
                 expect(response.body.data[1])
@@ -1918,13 +1918,13 @@ describe('Forum Routes', () => {
         it(
             'should return only "all" with count 0 when no posts',
             async () => {
-                prismaMock.post.groupBy
+                ;(prismaMock.post.groupBy as jest.Mock)
                     .mockResolvedValue([] as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data).toEqual([
                     { category: 'all', count: 0 }
                 ])
@@ -1970,7 +1970,7 @@ describe('Forum Routes', () => {
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toBeInstanceOf(Array)
                 expect(response.body.message)
@@ -1984,7 +1984,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(endpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -2005,7 +2005,7 @@ describe('Forum Routes', () => {
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(response.status).toBe(403)
+                expect(response.status).toBe(HttpStatusCodes.FORBIDDEN)
             }
         )
     })
@@ -2035,7 +2035,7 @@ describe('Forum Routes', () => {
                         tags: []
                     })
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
 
@@ -2048,7 +2048,7 @@ describe('Forum Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/forum/posts`)
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
     })

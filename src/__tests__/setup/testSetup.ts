@@ -65,10 +65,14 @@ export const createMockUser = (
     password: hashPassword('Password123!'),
     resetPasswordOTP: undefined,
     resetPasswordExpiration: undefined,
+    resetPasswordAttempts: 0,
     passwordUpdatedAt: new Date(),
     createdAt: new Date(),
     active: true,
     deletedAt: undefined,
+    confirmEmailOTP: undefined,
+    confirmEmailExpiration: undefined,
+    confirmEmailAttempts: 0,
     ...overrides
 })
 

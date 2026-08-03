@@ -1,3 +1,4 @@
+import { DUMMY_PASSWORD_HASH } from '../constants/auth/authRules'
 import { errorFactory } from '../errors/factory/ErrorFactory'
 import {
     comparePassword,
@@ -60,16 +61,13 @@ export const login = async (
     const user: ServerUserType | null =
         await getUser('email', email)
 
-    if (!user) {
-        throw errorFactory.auth.credentials(
-            'User not found!'
-        )
-    }
+    const passwordMatches = comparePassword(
+        password,
+        user?.password ?? DUMMY_PASSWORD_HASH
+    )
 
-    if (!comparePassword(password, user.password)) {
-        throw errorFactory.auth.credentials(
-            'Invalid password!'
-        )
+    if (!user || !passwordMatches) {
+        throw errorFactory.auth.credentials()
     }
 
     await applyDetectedTimezone(

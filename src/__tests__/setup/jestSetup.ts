@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     type DeepMockProxy,
     mockDeep,
@@ -27,6 +26,7 @@ jest.mock('../../utils/emailSender', () => ({
 jest.mock('../../middlewares/rateLimiting', () => ({
     rateLimiter: jest.fn((_req, _res, next) => next()),
     otpRateLimiter: jest.fn((_req, _res, next) => next()),
+    loginRateLimiter: jest.fn((_req, _res, next) => next()),
     sharePostRateLimiter: jest.fn((_req, _res, next) => next())
 }))
 

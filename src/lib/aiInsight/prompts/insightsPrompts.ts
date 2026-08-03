@@ -1,4 +1,4 @@
-import { appConfig } from '../../../config/app'
+import { brandConfig } from '../../../config/app'
 import { getMessages, resolveLanguage } from '../../../locales'
 import type { CheckInType } from '../../../types/data/CheckInType'
 import type { InsightType } from '../../../types/insight'
@@ -25,7 +25,7 @@ const languageInstruction = (
 }
 
 const injectBrandName = (prompt: string): string =>
-    prompt.replaceAll('{{brandName}}', appConfig.brandName)
+    prompt.replaceAll('{{brandName}}', brandConfig.brandName)
 
 // region Prompt Builders
 

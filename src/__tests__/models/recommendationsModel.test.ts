@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as recommendationsModel from '../../models/recommendationsModel'
 import { prismaMock } from '../setup/jestSetup'
 
@@ -8,7 +7,7 @@ jest.mock('../../models/queries/postQuery', () => ({
 
 const mockItems = [
     { postId: 'post-1', score: 0.9, reason: 'tag match' }
-]
+] as never[]
 
 const mockSnapshot = {
     id: 'rec-1',
@@ -203,7 +202,7 @@ describe('recommendationsModel', () => {
         }
 
         it('returns posts matching filters', async () => {
-            prismaMock.post.findMany.mockResolvedValue([mockPost])
+            prismaMock.post.findMany.mockResolvedValue([mockPost] as never)
 
             const result = await recommendationsModel.getCandidatePosts(
                 ['wellness'],
@@ -216,12 +215,12 @@ describe('recommendationsModel', () => {
         })
 
         it('returns all active posts when all filters empty', async () => {
-            prismaMock.post.findMany.mockResolvedValue([mockPost])
+            prismaMock.post.findMany.mockResolvedValue([mockPost] as never)
 
             await recommendationsModel.getCandidatePosts([], [], [])
 
             const call = prismaMock.post.findMany.mock.calls[0][0]
-            expect(call.where).not.toHaveProperty('OR')
+            expect(call?.where).not.toHaveProperty('OR')
         })
 
         it('uses default limit=50', async () => {

@@ -7,3 +7,4 @@ export const checkInQuerySchema = z.object({
         .max(100)
         .optional()
 })
+export type CheckInQueryType = z.infer<typeof checkInQuerySchema>

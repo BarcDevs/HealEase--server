@@ -80,11 +80,11 @@ export const getPostsCount = async (
     const postQuery =
         query
             ? postQueryBuilder(query)
-            : {}
+            : undefined
 
     return {
         count: await Prisma.post.count({
-            ...postQuery
+            where: postQuery?.where
         })
     } as {count: number}
 }
@@ -250,6 +250,14 @@ export const getReplies = async (
                 })
         })
     ) as unknown as ReplyType[]
+
+export const getRepliesCount = async (
+    postId: string
+): Promise<{count: number}> => ({
+    count: await Prisma.reply.count({
+        where: { postId }
+    })
+})
 
 export const updateReply = async (
     replyId: string,

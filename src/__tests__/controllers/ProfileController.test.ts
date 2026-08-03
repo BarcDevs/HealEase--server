@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
 import * as profileController from '../../controllers/profileController'
@@ -22,6 +21,14 @@ const mockProfile = () => ({
     healthInterests: [],
     activityPreferences: []
 })
+
+const asGetProfileResult = (
+    profile: ReturnType<typeof mockProfile>
+) => profile as unknown as Awaited<ReturnType<typeof profileService.getProfile>>
+
+const asUpdateProfileResult = (
+    profile: ReturnType<typeof mockProfile>
+) => profile as unknown as Awaited<ReturnType<typeof profileService.updateProfile>>
 
 describe('ProfileController', () => {
     let res: Response
@@ -49,7 +56,9 @@ describe('ProfileController', () => {
         })
 
         it('getHealthInterests propagates service error', async () => {
-            jest.spyOn(profileService, 'getAvailableHealthInterests').mockRejectedValue(new Error('DB error'))
+            jest.spyOn(profileService, 'getAvailableHealthInterests').mockImplementation(() => {
+                throw new Error('DB error')
+            })
             const req = createMockRequest() as unknown as Request
             await expect(profileController.getHealthInterests(req, res)).rejects.toThrow('DB error')
         })
@@ -67,7 +76,7 @@ describe('ProfileController', () => {
 
         it('passes includePosts=false by default', async () => {
             const profile = mockProfile()
-            jest.spyOn(profileService, 'getProfile').mockResolvedValue(profile)
+            jest.spyOn(profileService, 'getProfile').mockResolvedValue(asGetProfileResult(profile))
 
             const req = createMockRequest({ userId: USER_ID }) as unknown as Request
 
@@ -78,7 +87,7 @@ describe('ProfileController', () => {
 
         it('passes includePosts=true when query param set', async () => {
             const profile = mockProfile()
-            jest.spyOn(profileService, 'getProfile').mockResolvedValue(profile)
+            jest.spyOn(profileService, 'getProfile').mockResolvedValue(asGetProfileResult(profile))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -92,7 +101,7 @@ describe('ProfileController', () => {
 
         it('returns profile in response', async () => {
             const profile = mockProfile()
-            jest.spyOn(profileService, 'getProfile').mockResolvedValue(profile)
+            jest.spyOn(profileService, 'getProfile').mockResolvedValue(asGetProfileResult(profile))
 
             const req = createMockRequest({ userId: USER_ID }) as unknown as Request
 
@@ -118,7 +127,7 @@ describe('ProfileController', () => {
 
         it('calls service with userId and validated data', async () => {
             const updated = mockProfile()
-            jest.spyOn(profileService, 'updateProfile').mockResolvedValue(updated)
+            jest.spyOn(profileService, 'updateProfile').mockResolvedValue(asUpdateProfileResult(updated))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -143,8 +152,8 @@ describe('ProfileController', () => {
             const interests = [
                 { id: 'i1', slug: 'sleep', name: 'Sleep' },
                 { id: 'i2', slug: 'nutrition', name: 'Nutrition' }
-            ]
-            jest.spyOn(profileService, 'getAvailableHealthInterests').mockResolvedValue(interests)
+            ] as unknown as ReturnType<typeof profileService.getAvailableHealthInterests>
+            jest.spyOn(profileService, 'getAvailableHealthInterests').mockReturnValue(interests)
 
             const req = createMockRequest() as unknown as Request
 
@@ -162,7 +171,9 @@ describe('ProfileController', () => {
         it('returns available activity preferences', () => {
             const activities = [
                 { id: 'a1', slug: 'walking', name: 'Walking' }
-            ]
+            ] as unknown as ReturnType<
+                typeof profileService.getAvailableActivityPreferences
+            >
             jest.spyOn(profileService, 'getAvailableActivityPreferences').mockReturnValue(activities)
 
             const req = createMockRequest() as unknown as Request

@@ -8,6 +8,7 @@ jest.mock('../../../utils/emailSender', () => ({
 jest.mock('../../../middlewares/rateLimiting', () => ({
     rateLimiter: jest.fn((_req: unknown, _res: unknown, next: () => void) => next()),
     otpRateLimiter: jest.fn((_req: unknown, _res: unknown, next: () => void) => next()),
+    loginRateLimiter: jest.fn((_req: unknown, _res: unknown, next: () => void) => next()),
     sharePostRateLimiter: jest.fn((_req: unknown, _res: unknown, next: () => void) => next())
 }))
 

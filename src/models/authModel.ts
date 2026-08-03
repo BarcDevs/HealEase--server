@@ -75,7 +75,7 @@ export const createUser = async (
 ): Promise<ServerUserType> => {
     const user =
         await Prisma.$transaction(
-            async (tx: typeof Prisma) => {
+            async (tx) => {
                 const createdUser =
                     await tx.user.create({
                         data: newUser
@@ -111,6 +111,7 @@ export const setUserOTP = (
     data: {
         resetPasswordOTP: number | null
         resetPasswordExpiration: Date | null
+        resetPasswordAttempts?: number
         passwordUpdatedAt?: Date
     }
 ): Promise<ServerUserType> =>
@@ -120,6 +121,52 @@ export const setUserOTP = (
             active: true
         },
         data
+    }) as Promise<ServerUserType>
+
+export const incrementResetPasswordAttempts = (
+    userId: string
+): Promise<ServerUserType> =>
+    Prisma.user.update({
+        where: {
+            id: userId,
+            active: true
+        },
+        data: {
+            resetPasswordAttempts: {
+                increment: 1
+            }
+        }
+    }) as Promise<ServerUserType>
+
+export const setConfirmEmailOTP = (
+    userId: string,
+    data: {
+        confirmEmailOTP: number | null
+        confirmEmailExpiration: Date | null
+        confirmEmailAttempts?: number
+    }
+): Promise<ServerUserType> =>
+    Prisma.user.update({
+        where: {
+            id: userId,
+            active: true
+        },
+        data
+    }) as Promise<ServerUserType>
+
+export const incrementConfirmEmailAttempts = (
+    userId: string
+): Promise<ServerUserType> =>
+    Prisma.user.update({
+        where: {
+            id: userId,
+            active: true
+        },
+        data: {
+            confirmEmailAttempts: {
+                increment: 1
+            }
+        }
     }) as Promise<ServerUserType>
 
 export const updatePassword = (
@@ -200,6 +247,91 @@ export const linkGoogleId = (
             googleId
         }
     }) as Promise<ServerUserType>
+
+export const getUserByGoogleId = async (
+    googleId: string
+): Promise<ServerUserType | null> => {
+    const user = await Prisma.user.findUnique({
+        where: {
+            googleId,
+            active: true
+        }
+    })
+
+    return user as ServerUserType | null
+}
+
+export const createGoogleUser = async (
+    data: NewUserType & {
+        googleId: string
+        picture: string | null
+    }
+): Promise<ServerUserType> => {
+    const user = await Prisma.$transaction(
+        async (tx) => {
+            const createdUser = await tx.user.create({
+                data: {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    username: data.username,
+                    email: data.email,
+                    password: data.password,
+                    googleId: data.googleId
+                }
+            })
+
+            await tx.profile.create({
+                data: {
+                    userId: createdUser.id,
+                    image: data.picture
+                }
+            })
+
+            return createdUser
+        }
+    )
+
+    return user as ServerUserType
+}
+
+export const linkGoogleAccount = async (
+    userId: string,
+    googleId: string,
+    picture: string | null
+): Promise<ServerUserType> => {
+    const user = await Prisma.$transaction(
+        async (tx) => {
+            const updatedUser = await tx.user.update({
+                where: {
+                    id: userId,
+                    active: true
+                },
+                data: {
+                    googleId
+                }
+            })
+
+            if (picture) {
+                const profile =
+                    await tx.profile.findUnique({
+                        where: { userId },
+                        select: { image: true }
+                    })
+
+                if (!profile?.image) {
+                    await tx.profile.update({
+                        where: { userId },
+                        data: { image: picture }
+                    })
+                }
+            }
+
+            return updatedUser
+        }
+    )
+
+    return user as ServerUserType
+}
 
 export const getUserTimezone = async (
     userId: string

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { generateFallbackSummary } from '../../../lib/progressInsights/fallbackSummaryGenerator'
 import type { PeriodMetrics } from '../../../lib/progressInsights/metricAggregator'
 

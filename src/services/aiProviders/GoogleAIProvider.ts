@@ -7,12 +7,18 @@ import logger from '../../utils/logger'
 import {
     type AIErrorResponse,
     AIProvider,
+    type AIProviderConfig,
     type GenerateContentInput,
     type GenerateContentOutput
 } from './AIProvider'
 
 export class GoogleAIProvider extends AIProvider {
-    private readonly modelId = aiConfig.googleModel
+    private readonly modelId: string
+
+    constructor(config: AIProviderConfig) {
+        super(config)
+        this.modelId = config.modelId || aiConfig.googleFreeModel
+    }
 
     validateConfiguration(): void {
         if (!this.apiKey) {
@@ -79,7 +85,7 @@ export class GoogleAIProvider extends AIProvider {
 
         if (data.candidates?.[0]?.finishReason !== 'STOP') {
             logger.warn(
-                `Google AI: incomplete response — finishReason=${data.candidates?.[0]?.finishReason}, tokens=${data.usageMetadata?.totalTokenCount}`
+                `Google AI: incomplete response - finishReason=${data.candidates?.[0]?.finishReason}, tokens=${data.usageMetadata?.totalTokenCount}`
             )
         }
 

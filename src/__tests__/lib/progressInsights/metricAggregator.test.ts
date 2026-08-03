@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { computePeriodMetrics } from '../../../lib/progressInsights/metricAggregator'
 import type { CheckInType } from '../../../types/data/CheckInType'
 

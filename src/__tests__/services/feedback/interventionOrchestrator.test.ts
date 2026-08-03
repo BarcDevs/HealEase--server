@@ -1,11 +1,10 @@
-// @ts-nocheck
 import { detectLowState } from '../../../services/feedback/interventionEngine'
 import { logInterventionDecision } from '../../../services/feedback/interventionLogger'
 import { generateInterventionInsight } from '../../../services/feedback/interventionOrchestrator'
 import { renderInterventionMessage } from '../../../services/feedback/messageRenderer'
 
 jest.mock('../../../services/feedback/contextBuilder', () => ({
-    buildInterventionContext: jest.fn().mockReturnValue({ context: 'mock' })
+    buildInterventionContext: jest.fn().mockReturnValue({ context: 'mock' } as never)
 }))
 
 jest.mock('../../../services/feedback/interventionEngine', () => ({
@@ -37,7 +36,7 @@ describe('generateInterventionInsight', () => {
         ;(detectLowState as jest.Mock).mockReturnValue({
             lowState: { isLowState: false, reasons: [], trendDuration: 0 },
             ruleResults: []
-        })
+        } as never)
 
         const result = await generateInterventionInsight(
             'user-id',
@@ -60,8 +59,8 @@ describe('generateInterventionInsight', () => {
                 trendDuration: 3
             },
             ruleResults: [{ triggered: true, weight: 0.8 }]
-        })
-        ;(renderInterventionMessage as jest.Mock).mockResolvedValue(mockMessage)
+        } as never)
+        ;(renderInterventionMessage as jest.Mock).mockResolvedValue(mockMessage as never)
 
         const result = await generateInterventionInsight(
             'user-id',
@@ -83,8 +82,8 @@ describe('generateInterventionInsight', () => {
                 trendDuration: 2
             },
             ruleResults: [{ triggered: true, weight: 0.5 }]
-        })
-        ;(renderInterventionMessage as jest.Mock).mockResolvedValue({ text: 'msg' })
+        } as never)
+        ;(renderInterventionMessage as jest.Mock).mockResolvedValue({ text: 'msg' } as never)
 
         await generateInterventionInsight(
             'user-id',
@@ -106,7 +105,7 @@ describe('generateInterventionInsight', () => {
         ;(detectLowState as jest.Mock).mockReturnValue({
             lowState: { isLowState: false, reasons: [], trendDuration: 0 },
             ruleResults: []
-        })
+        } as never)
 
         await generateInterventionInsight(
             'user-id',
@@ -128,8 +127,8 @@ describe('generateInterventionInsight', () => {
                 trendDuration: 1
             },
             ruleResults: [{ triggered: true, weight: 0.3 }]
-        })
-        ;(renderInterventionMessage as jest.Mock).mockResolvedValue({ text: 'msg' })
+        } as never)
+        ;(renderInterventionMessage as jest.Mock).mockResolvedValue({ text: 'msg' } as never)
         const prevIntervention = { id: 'prev', type: 'supportive' }
 
         await generateInterventionInsight(

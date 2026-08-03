@@ -9,11 +9,13 @@ import type {
     EmailConfig,
     EnvConfig,
     GoogleOAuthConfig,
+    LoggingConfig,
     ServerConfig
 } from '../src/types/configType'
 
 const env: EnvConfig = config.get<EnvConfig>('env')
 const isDev = (env as string) === 'development'
+const isProd = (env as string) === 'production'
 
 const serverConfig: ServerConfig = {
     url: config.get<string>('server.url'),
@@ -32,6 +34,12 @@ const authConfig: AuthConfig = {
     jwtSecret: config.get<string>('auth.jwtSecret'),
     expiresIn: config.get<number>('auth.expiresIn'),
     otp_expiration: config.get<number>('auth.otp_expiration')
+}
+
+if (authConfig.jwtSecret.length < 32) {
+    throw new Error(
+        'JWT_SECRET is missing or too short (min 32 chars) — refusing to start'
+    )
 }
 
 const databaseConfig: DatabaseConfig = {
@@ -64,12 +72,22 @@ const googleOAuthConfig: GoogleOAuthConfig = {
 const aiConfig: AIConfig = {
     provider: config.get<string>('ai.provider'),
     anthropicModel: config.get<string>('ai.anthropicModel'),
+    googleFreeModel: config.get<string>('ai.googleFreeModel'),
     googleModel: config.get<string>('ai.googleModel'),
     openaiModel: config.get<string>('ai.openaiModel'),
     openaiApiKey: config.get<string>('ai.openaiApiKey'),
     anthropicApiKey: config.get<string>('ai.anthropicApiKey'),
-    googleApiKey: config.get<string>('ai.googleApiKey')
+    googleApiKey: config.get<string>('ai.googleApiKey'),
+    googleFreeApiKey: config.get<string>('ai.googleFreeApiKey'),
+    fallbackOrder: config.get<string>('ai.fallbackOrder')
 }
+
+const aiFallbackOrder: string[] = aiConfig.fallbackOrder
+    ? aiConfig.fallbackOrder
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean)
+    : []
 
 const aiGenerationConfig: AIGenerationConfig = {
     maxOutputTokens: config.get<number>(
@@ -80,8 +98,13 @@ const aiGenerationConfig: AIGenerationConfig = {
     )
 }
 
+const loggingConfig: LoggingConfig = {
+    dir: config.get<string>('logging.dir')
+}
+
 export {
     aiConfig,
+    aiFallbackOrder,
     aiGenerationConfig,
     appConfig,
     authConfig,
@@ -90,5 +113,7 @@ export {
     env,
     googleOAuthConfig,
     isDev,
+    isProd,
+    loggingConfig,
     serverConfig
 }

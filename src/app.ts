@@ -9,6 +9,8 @@ import {
 
 import exposeProductionApp from './middlewares/exposeProductionApp'
 import { declareRoutes } from './routes/declare_routes'
+import logger from './utils/logger'
+import prisma from './utils/prismaClient'
 import { declareMiddlewares } from './middlewares'
 
 const {
@@ -32,7 +34,7 @@ exposeProductionApp(app)
 
 // Only start server when not in test environment
 if (env !== 'test') {
-    app.listen(port, host, () => {
+    const server = app.listen(port, host, () => {
         const serverUrl = url
             .replace(/\{protocol}/g, protocol)
             .replace(/\{host}/g, host)
@@ -40,8 +42,25 @@ if (env !== 'test') {
 
         const message = `${start.replace(/\{0}/g, serverUrl)}`
 
-        console.info(message)
+        logger.info(message)
     })
+
+    const shutdown = (signal: string) => {
+        logger.info(`${signal} received, shutting down gracefully`)
+
+        server.close(() => {
+            prisma.$disconnect()
+                .then(() => {
+                    logger.info('Shutdown complete')
+                })
+                .catch((err: Error) => {
+                    logger.error('Error during shutdown', { message: err.message })
+                })
+        })
+    }
+
+    process.on('SIGTERM', () => shutdown('SIGTERM'))
+    process.on('SIGINT', () => shutdown('SIGINT'))
 }
 
 export default app

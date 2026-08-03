@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { newPostSchema } from '../../schemas/forum/newPostSchema'
 import { newReplySchema } from '../../schemas/forum/newReplySchema'
 import { postQuerySchema } from '../../schemas/forum/postQuerySchema'
@@ -94,7 +93,7 @@ describe('Forum Schemas', () => {
             })
 
             expect(result.error).toBeUndefined()
-            expect(result.data.tags).toHaveLength(4)
+            expect(result.data!.tags).toHaveLength(4)
         })
     })
 

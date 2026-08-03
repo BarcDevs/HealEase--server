@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express'
 import { env, serverConfig } from '../../../config'
 import { getServerStatus } from '../../controllers/serverController'
 import { swagger } from '../../controllers/swaggerController'
+import { errorFactory } from '../../errors/factory/ErrorFactory'
 import { errorHandler } from '../../middlewares/errorHandler'
 import { swaggerSpec } from '../../utils/swagger'
 import authRoute from '../authRoute'
@@ -19,6 +20,7 @@ declare module 'express-serve-static-core' {
     interface Request {
         userId?: string
         csrfToken?: string
+        requestId?: string
     }
 }
 
@@ -28,14 +30,18 @@ const baseRoute = (route: string) =>
 export const declareRoutes = (app: Express) => {
     app.get('/api/status', getServerStatus)
 
-    app.use(
-        '/api-docs',
-        swagger,
-        swaggerUi.serve,
-        swaggerUi.setup(swaggerSpec)
-    )
+    if (env !== 'production') {
+        app.use(
+            '/api-docs',
+            swagger,
+            swaggerUi.serve,
+            swaggerUi.setup(swaggerSpec)
+        )
+    }
 
-    app.use('/dev', devRoute)
+    if (env !== 'production') {
+        app.use('/dev', devRoute)
+    }
 
 
     app.use(baseRoute('auth'), authRoute)
@@ -45,6 +51,10 @@ export const declareRoutes = (app: Express) => {
     app.use(baseRoute('profile'), profileRoute)
     app.use(baseRoute('recovery-goals'), recoveryGoalRoute)
     app.use(baseRoute('users'), userRoute)
+
+    app.use(() => {
+        throw errorFactory.generic.notFound('Route')
+    })
 
     app.use(errorHandler)
 }

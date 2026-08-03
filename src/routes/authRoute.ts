@@ -19,7 +19,10 @@ import {
     extractCsrfToken
 } from '../middlewares/csrf'
 import { isAuthenticated } from '../middlewares/isAuthenticated'
-import { otpRateLimiter } from '../middlewares/rateLimiting'
+import {
+    loginRateLimiter,
+    otpRateLimiter
+} from '../middlewares/rateLimiting'
 
 const router = Router()
 
@@ -77,7 +80,10 @@ const router = Router()
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.route('/login').post(login)
+router.route('/login').post(
+    loginRateLimiter,
+    login
+)
 
 /**
  * @swagger

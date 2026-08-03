@@ -1,8 +1,8 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { sendEmail } from '../../utils/emailSender'
 import { prismaMock } from '../setup/jestSetup'
 import {
@@ -22,7 +22,7 @@ describe('Auth Routes', () => {
             async () => {
                 const mockUser = createMockUser()
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await supertest(App)
                     .post(loginEndpoint)
@@ -31,7 +31,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('user logged in!')
                 expect(response.body.data)
@@ -50,7 +50,7 @@ describe('Auth Routes', () => {
             async () => {
                 const mockUser = createMockUser()
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await supertest(App)
                     .post(loginEndpoint)
@@ -60,7 +60,7 @@ describe('Auth Routes', () => {
                         remember: true
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data)
                     .toHaveProperty('token')
             }
@@ -75,7 +75,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].error)
@@ -94,7 +94,7 @@ describe('Auth Routes', () => {
                         email: 'test@test.com'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].error)
@@ -114,7 +114,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -132,7 +132,7 @@ describe('Auth Routes', () => {
                         password: 'short'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -144,7 +144,7 @@ describe('Auth Routes', () => {
             'should return 401 for user not found',
             async () => {
                 prismaMock.user.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .post(loginEndpoint)
@@ -153,11 +153,11 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
                 expect(response.body.error[0].error)
-                    .toBe('User not found!')
+                    .toBe('Invalid credentials! please try again!')
             }
         )
 
@@ -166,7 +166,7 @@ describe('Auth Routes', () => {
             async () => {
                 const mockUser = createMockUser()
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await supertest(App)
                     .post(loginEndpoint)
@@ -175,7 +175,7 @@ describe('Auth Routes', () => {
                         password: 'WrongPassword123!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
             }
@@ -187,9 +187,9 @@ describe('Auth Routes', () => {
         const signupEndpoint = `/api/${serverConfig.apiVersion}/auth/signup`
 
         it('should return 201 for valid signup', async () => {
-            prismaMock.user.findUnique.mockResolvedValue(null)
+            prismaMock.user.findUnique.mockResolvedValue(null as never)
             prismaMock.user.create
-                .mockResolvedValue(createMockUser())
+                .mockResolvedValue(createMockUser() as never as never)
 
             const response = await supertest(App)
                 .post(signupEndpoint)
@@ -200,7 +200,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-            expect(response.status).toBe(201)
+            expect(response.status).toBe(HttpStatusCodes.CREATED)
             expect(response.body.message)
                 .toBe('user created!')
             expect(response.body.data)
@@ -213,11 +213,11 @@ describe('Auth Routes', () => {
             'should return 201 with optional username',
             async () => {
                 prismaMock.user.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
                 prismaMock.user.create.mockResolvedValue(
                     createMockUser(
                         { username: 'customuser' }
-                    )
+                    ) as never
                 )
 
                 const response = await supertest(App)
@@ -230,7 +230,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
             }
         )
 
@@ -245,7 +245,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -264,7 +264,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -283,7 +283,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -302,7 +302,7 @@ describe('Auth Routes', () => {
                         email: 'john@test.com'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -322,7 +322,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -342,7 +342,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -354,7 +354,7 @@ describe('Auth Routes', () => {
             'should return 409 for existing user',
             async () => {
                 prismaMock.user.findUnique
-                    .mockResolvedValue(createMockUser())
+                    .mockResolvedValue(createMockUser() as never as never)
 
                 const response = await supertest(App)
                     .post(signupEndpoint)
@@ -365,7 +365,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(409)
+                expect(response.status).toBe(HttpStatusCodes.CONFLICT)
                 expect(response.body.error[0].statusType)
                     .toBe('Conflict')
                 expect(response.body.error[0].error)
@@ -377,11 +377,11 @@ describe('Auth Routes', () => {
             'should return 409 for existing username',
             async () => {
                 prismaMock.user.findUnique
-                    .mockResolvedValueOnce(null)
+                    .mockResolvedValueOnce(null as never)
                     .mockResolvedValueOnce(
                         createMockUser(
                             { username: 'existinguser' }
-                        )
+                        ) as never
                     )
 
                 const response = await supertest(App)
@@ -394,7 +394,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(409)
+                expect(response.status).toBe(HttpStatusCodes.CONFLICT)
                 expect(response.body.error[0].statusType)
                     .toBe('Conflict')
                 expect(response.body.error[0].error)
@@ -411,7 +411,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/auth/logout`)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('user logged out!')
             }
@@ -423,10 +423,10 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/auth/logout`)
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
 
                 const setCookieHeaders =
-                    response.headers['set-cookie'] || []
+                    ([] as string[]).concat(response.headers['set-cookie'] || [])
 
                 const cookieHeaderText =
                     setCookieHeaders.join('; ')
@@ -449,7 +449,7 @@ describe('Auth Routes', () => {
             async () => {
                 const mockUser = createMockUser()
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const token = createAuthToken(mockUser)
 
@@ -459,7 +459,7 @@ describe('Auth Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('user info!')
                 expect(response.body.data)
@@ -479,7 +479,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(meEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Unauthorized')
             }
@@ -492,7 +492,7 @@ describe('Auth Routes', () => {
                     .get(meEndpoint)
                     .set('Cookie', ['accessToken='])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Unauthorized')
             }
@@ -505,7 +505,7 @@ describe('Auth Routes', () => {
                     .get(meEndpoint)
                     .set('Cookie', ['accessToken=invalid-token'])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Unauthorized')
             }
@@ -523,7 +523,7 @@ describe('Auth Routes', () => {
                         `accessToken=${expiredToken}`
                     ])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -548,13 +548,13 @@ describe('Auth Routes', () => {
                 // First call with user1
                 const token1 = createAuthToken(user1)
                 prismaMock.user.findUnique
-                    .mockResolvedValue(user1)
+                    .mockResolvedValue(user1 as never)
 
                 const response1 = await supertest(App)
                     .get(meEndpoint)
                     .set('Cookie', [`accessToken=${token1}`])
 
-                expect(response1.status).toBe(200)
+                expect(response1.status).toBe(HttpStatusCodes.OK)
                 expect(response1.body.data.user.id)
                     .toBe('user-1')
 
@@ -562,13 +562,13 @@ describe('Auth Routes', () => {
                 // This should NOT return user1's cached data
                 const token2 = createAuthToken(user2)
                 prismaMock.user.findUnique
-                    .mockResolvedValue(user2)
+                    .mockResolvedValue(user2 as never)
 
                 const response2 = await supertest(App)
                     .get(meEndpoint)
                     .set('Cookie', [`accessToken=${token2}`])
 
-                expect(response2.status).toBe(200)
+                expect(response2.status).toBe(HttpStatusCodes.OK)
                 expect(response2.body.data.user.id)
                     .toBe('user-2')
                 expect(response2.body.data.user.email)
@@ -597,7 +597,7 @@ describe('Auth Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('CSRF token generated!')
                 expect(response.body.data)
@@ -613,7 +613,7 @@ describe('Auth Routes', () => {
                 const response = await supertest(App)
                     .get(csrfEndpoint)
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -625,16 +625,16 @@ describe('Auth Routes', () => {
             async () => {
                 const mockUser = createMockUser()
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
                 prismaMock.user.update
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await supertest(App)
                     .get(
                         `/api/${serverConfig.apiVersion}/auth/forgot-password/test@test.com`
                     )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -642,14 +642,14 @@ describe('Auth Routes', () => {
             'should return 200 even when email is not registered',
             async () => {
                 prismaMock.user.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const response = await supertest(App)
                     .get(
                         `/api/${serverConfig.apiVersion}/auth/forgot-password/notfound@test.com`
                     )
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -661,7 +661,7 @@ describe('Auth Routes', () => {
                         `/api/${serverConfig.apiVersion}/auth/forgot-password/invalid-email`
                     )
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -681,11 +681,11 @@ describe('Auth Routes', () => {
                 prismaMock.user.findUnique.mockResolvedValue(
                     {
                         ...mockUser,
-                        resetPasswordOTP: OTP,
-                        resetPasswordExpiration: new Date(
+                        confirmEmailOTP: OTP,
+                        confirmEmailExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
-                    }
+                    } as never
                 )
 
                 const response = await supertest(App)
@@ -695,7 +695,7 @@ describe('Auth Routes', () => {
                         OTP
                     })
 
-                expect(response.status).toBe(201)
+                expect(response.status).toBe(HttpStatusCodes.CREATED)
                 expect(response.body.data.user.email).toBe(
                     mockUser.email
                 )
@@ -711,11 +711,11 @@ describe('Auth Routes', () => {
                 prismaMock.user.findUnique.mockResolvedValue(
                     {
                         ...mockUser,
-                        resetPasswordOTP: OTP,
-                        resetPasswordExpiration: new Date(
+                        confirmEmailOTP: OTP,
+                        confirmEmailExpiration: new Date(
                             Date.now() - 1000
                         )
-                    }
+                    } as never
                 )
 
                 const response = await supertest(App)
@@ -725,7 +725,7 @@ describe('Auth Routes', () => {
                         OTP
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -738,11 +738,11 @@ describe('Auth Routes', () => {
                 prismaMock.user.findUnique.mockResolvedValue(
                     {
                         ...mockUser,
-                        resetPasswordOTP: OTP,
-                        resetPasswordExpiration: new Date(
+                        confirmEmailOTP: OTP,
+                        confirmEmailExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
-                    }
+                    } as never
                 )
 
                 const response = await supertest(App)
@@ -752,7 +752,7 @@ describe('Auth Routes', () => {
                         OTP: 999999
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -770,7 +770,7 @@ describe('Auth Routes', () => {
                         OTP: 123456
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -783,7 +783,7 @@ describe('Auth Routes', () => {
                         OTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -796,7 +796,7 @@ describe('Auth Routes', () => {
                         email: 'test@test.com'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -810,7 +810,7 @@ describe('Auth Routes', () => {
                         OTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -827,10 +827,10 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValueOnce(mockUser) // getUser by id
-                    .mockResolvedValueOnce(null)     // email not taken
+                    .mockResolvedValueOnce(mockUser as never) // getUser by id
+                    .mockResolvedValueOnce(null as never)     // email not taken
                 prismaMock.user.update
-                    .mockResolvedValue(mockUser)     // setEmailChangeOTP
+                    .mockResolvedValue(mockUser as never)     // setEmailChangeOTP
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -840,7 +840,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message).toBe(
                     'Verification code sent to your new email address!'
                 )
@@ -857,7 +857,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -873,7 +873,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ password: 'Password123!' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -893,7 +893,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({ newEmail: 'newemail@test.com' })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -916,7 +916,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
                 expect(response.body.error[0].property)
@@ -932,7 +932,7 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -942,7 +942,7 @@ describe('Auth Routes', () => {
                     password: 'WrongPassword123!'
                 })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(response.body.error[0].statusType)
                     .toBe('Authentication Error')
             }
@@ -956,8 +956,8 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValueOnce(mockUser)          // getUser by id
-                    .mockResolvedValueOnce(createMockUser())  // email taken
+                    .mockResolvedValueOnce(mockUser as never)          // getUser by id
+                    .mockResolvedValueOnce(createMockUser() as never as never)  // email taken
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
@@ -967,7 +967,7 @@ describe('Auth Routes', () => {
                     password: 'Password123!'
                 })
 
-                expect(response.status).toBe(409)
+                expect(response.status).toBe(HttpStatusCodes.CONFLICT)
                 expect(response.body.error[0].statusType)
                     .toBe('Conflict')
             }
@@ -994,16 +994,16 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
                 prismaMock.user.update
-                    .mockResolvedValue({ ...mockUser, email: pendingEmail })
+                    .mockResolvedValue({ ...mockUser, email: pendingEmail } as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
                     token, csrfSecret, csrfToken
                 ).send({ OTP })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.message)
                     .toBe('Email updated successfully!')
                 expect(response.body.data.user.email)
@@ -1018,7 +1018,7 @@ describe('Auth Routes', () => {
                     .post(endpoint)
                     .send({ OTP: 123456 })
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -1034,7 +1034,7 @@ describe('Auth Routes', () => {
                     token, csrfSecret, csrfToken
                 ).send({})
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -1055,14 +1055,14 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
                     token, csrfSecret, csrfToken
                 ).send({ OTP: 999999 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -1083,14 +1083,14 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
                     token, csrfSecret, csrfToken
                 ).send({ OTP })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(response.body.error[0].statusType)
                     .toBe('Validation Error')
             }
@@ -1104,14 +1104,14 @@ describe('Auth Routes', () => {
                     createAuthenticatedRequest(mockUser)
 
                 prismaMock.user.findUnique
-                    .mockResolvedValue(mockUser)
+                    .mockResolvedValue(mockUser as never)
 
                 const response = await withCsrfAuth(
                     supertest(App).post(endpoint),
                     token, csrfSecret, csrfToken
                 ).send({ OTP: 123456 })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -1134,14 +1134,14 @@ describe('Auth Routes', () => {
                         resetPasswordExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
-                    }
+                    } as never
                 )
 
                 prismaMock.user.update.mockResolvedValue({
                     ...mockUser,
                     password: 'hashed-password',
                     passwordUpdatedAt: new Date()
-                })
+                } as never)
 
                 const response = await supertest(App)
                     .put(resetPasswordEndpoint)
@@ -1151,7 +1151,7 @@ describe('Auth Routes', () => {
                         userOTP: OTP
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.user.email).toBe(
                     mockUser.email
                 )
@@ -1181,7 +1181,7 @@ describe('Auth Routes', () => {
                         resetPasswordExpiration: new Date(
                             Date.now() - 1000
                         )
-                    }
+                    } as never
                 )
 
                 const response = await supertest(App)
@@ -1192,7 +1192,7 @@ describe('Auth Routes', () => {
                         userOTP: OTP
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1209,7 +1209,7 @@ describe('Auth Routes', () => {
                         resetPasswordExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
-                    }
+                    } as never
                 )
 
                 const response = await supertest(App)
@@ -1220,7 +1220,7 @@ describe('Auth Routes', () => {
                         userOTP: 999999
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1239,7 +1239,7 @@ describe('Auth Routes', () => {
                         userOTP: 123456
                     })
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
             }
         )
 
@@ -1256,7 +1256,7 @@ describe('Auth Routes', () => {
                         resetPasswordExpiration: new Date(
                             Date.now() + 10 * 60000
                         )
-                    }
+                    } as never
                 )
 
                 const response = await supertest(App)
@@ -1267,7 +1267,7 @@ describe('Auth Routes', () => {
                         userOTP: OTP
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1281,7 +1281,7 @@ describe('Auth Routes', () => {
                         userOTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1295,7 +1295,7 @@ describe('Auth Routes', () => {
                         userOTP: 123456
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -1309,7 +1309,7 @@ describe('Auth Routes', () => {
                         newPassword: 'NewPassword456!'
                     })
 
-                expect(response.status).toBe(400)
+                expect(response.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
     })
@@ -1320,21 +1320,21 @@ describe('Auth Routes', () => {
             'GET /forgot-password returns 500 when email send fails',
             async () => {
                 const mockUser = createMockUser()
-                prismaMock.user.findUnique.mockResolvedValue(mockUser)
-                prismaMock.user.update.mockResolvedValue(mockUser)
+                prismaMock.user.findUnique.mockResolvedValue(mockUser as never)
+                prismaMock.user.update.mockResolvedValue(mockUser as never)
                 jest.mocked(sendEmail).mockRejectedValue(new Error('ECONNREFUSED'))
 
                 const response = await supertest(App)
                     .get(`/api/${serverConfig.apiVersion}/auth/forgot-password/test@test.com`)
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
 
         it(
             'POST /signup returns 500 when Prisma create throws connection error',
             async () => {
-                prismaMock.user.findUnique.mockResolvedValue(null)
+                prismaMock.user.findUnique.mockResolvedValue(null as never)
                 prismaMock.user.create.mockRejectedValue(new Error('ECONNREFUSED'))
 
                 const response = await supertest(App)
@@ -1346,7 +1346,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
 
@@ -1362,7 +1362,7 @@ describe('Auth Routes', () => {
                         password: 'Password123!'
                     })
 
-                expect(response.status).toBe(500)
+                expect(response.status).toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
             }
         )
     })

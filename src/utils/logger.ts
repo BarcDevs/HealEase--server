@@ -1,6 +1,11 @@
+import path from 'path'
 import winston from 'winston'
 
-import { isDev } from '../../config'
+import { isDev, loggingConfig } from '../../config'
+
+const logDir = path.isAbsolute(loggingConfig.dir)
+    ? loggingConfig.dir
+    : path.resolve(process.cwd(), loggingConfig.dir)
 
 const consoleFormat = winston.format.combine(
     winston.format.colorize(),
@@ -23,11 +28,11 @@ const consoleFormat = winston.format.combine(
 
 const transports: winston.transport[] = [
     new winston.transports.File({
-        filename: 'logs/error.log',
+        filename: path.join(logDir, 'error.log'),
         level: 'error'
     }),
     new winston.transports.File({
-        filename: 'logs/warn.log',
+        filename: path.join(logDir, 'warn.log'),
         level: 'warn'
     })
 ]

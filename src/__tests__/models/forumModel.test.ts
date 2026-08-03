@@ -1,11 +1,10 @@
-// @ts-nocheck
 import * as forumModel from '../../models/forumModel'
 import { prismaMock } from '../setup/jestSetup'
 
 jest.mock('../../models/queries/postQuery', () => ({
     postQueryBuilder: jest.fn(() => ({})),
     postInclude: jest.fn(() => ({})),
-    connectTags: jest.fn((tags) => ({ connect: tags.map((id) => ({ id })) }))
+    connectTags: jest.fn((tags: string[]) => ({ connect: tags.map((id: string) => ({ id })) }))
 }))
 
 const rawPost = {
@@ -32,7 +31,7 @@ const rawTag = {
     name: 'Health',
     nameHe: 'בריאות',
     slug: 'health'
-}
+} as never
 
 const rawReply = {
     id: 'reply-1',
@@ -40,12 +39,12 @@ const rawReply = {
     body: 'A reply',
     authorId: 'profile-1',
     createdAt: new Date('2026-01-01')
-}
+} as never
 
 describe('forumModel', () => {
     describe('getPosts', () => {
         it('returns mapped posts', async () => {
-            prismaMock.post.findMany.mockResolvedValue([rawPost])
+            prismaMock.post.findMany.mockResolvedValue([rawPost] as never)
 
             const result = await forumModel.getPosts()
 
@@ -119,12 +118,12 @@ describe('forumModel', () => {
 
     describe('getPost', () => {
         it('returns mapped post when found', async () => {
-            prismaMock.post.findUnique.mockResolvedValue(rawPost)
+            prismaMock.post.findUnique.mockResolvedValue(rawPost as never)
 
             const result = await forumModel.getPost('post-1')
 
             expect(result).not.toBeNull()
-            expect(result.tags[0].label.en).toBe('Health')
+            expect(result?.tags[0].label.en).toBe('Health')
         })
 
         it('returns null when not found', async () => {
@@ -144,7 +143,7 @@ describe('forumModel', () => {
 
     describe('createPost', () => {
         it('creates post and returns mapped result', async () => {
-            prismaMock.post.create.mockResolvedValue(rawPost)
+            prismaMock.post.create.mockResolvedValue(rawPost as never)
 
             const result = await forumModel.createPost({
                 authorId: 'profile-1',
@@ -159,7 +158,7 @@ describe('forumModel', () => {
         })
 
         it('creates post with empty tags', async () => {
-            prismaMock.post.create.mockResolvedValue({ ...rawPost, tags: [] })
+            prismaMock.post.create.mockResolvedValue({ ...rawPost, tags: [] } as never)
 
             const result = await forumModel.createPost({
                 authorId: 'profile-1',
@@ -187,7 +186,7 @@ describe('forumModel', () => {
 
     describe('updatePost', () => {
         it('updates post and returns mapped result', async () => {
-            prismaMock.post.update.mockResolvedValue(rawPost)
+            prismaMock.post.update.mockResolvedValue(rawPost as never)
 
             const result = await forumModel.updatePost('post-1', {
                 title: 'Updated'
@@ -200,7 +199,7 @@ describe('forumModel', () => {
         })
 
         it('sets tags when provided', async () => {
-            prismaMock.post.update.mockResolvedValue(rawPost)
+            prismaMock.post.update.mockResolvedValue(rawPost as never)
 
             await forumModel.updatePost('post-1', { tags: ['tag-1', 'tag-2'] })
 
@@ -222,7 +221,7 @@ describe('forumModel', () => {
 
     describe('deletePost', () => {
         it('calls Prisma delete with correct id', async () => {
-            prismaMock.post.delete.mockResolvedValue(rawPost)
+            prismaMock.post.delete.mockResolvedValue(rawPost as never)
 
             await forumModel.deletePost('post-1')
 
@@ -240,7 +239,7 @@ describe('forumModel', () => {
 
     describe('getReply', () => {
         it('returns reply when found', async () => {
-            prismaMock.reply.findUnique.mockResolvedValue(rawReply)
+            prismaMock.reply.findUnique.mockResolvedValue(rawReply as never)
 
             const result = await forumModel.getReply('post-1', 'reply-1')
 
@@ -295,7 +294,7 @@ describe('forumModel', () => {
 
     describe('updateReply', () => {
         it('updates reply with correct args', async () => {
-            prismaMock.reply.update.mockResolvedValue(rawReply)
+            prismaMock.reply.update.mockResolvedValue(rawReply as never)
 
             const result = await forumModel.updateReply('reply-1', 'post-1', { body: 'edited' })
 
@@ -319,7 +318,7 @@ describe('forumModel', () => {
 
     describe('deleteReply', () => {
         it('deletes reply with correct args', async () => {
-            prismaMock.reply.delete.mockResolvedValue(rawReply)
+            prismaMock.reply.delete.mockResolvedValue(rawReply as never)
 
             await forumModel.deleteReply('reply-1', 'post-1')
 
@@ -385,7 +384,7 @@ describe('forumModel', () => {
 
     describe('getTag', () => {
         it('returns mapped tag with _count when found', async () => {
-            const raw = { ...rawTag, _count: { posts: 5, followers: 2 } }
+            const raw = { id: 'tag-1', name: 'Health', nameHe: 'בריאות', slug: 'health', _count: { posts: 5, followers: 2 } } as never
             prismaMock.tag.findUnique.mockResolvedValue(raw)
 
             const result = await forumModel.getTag('tag-1')
@@ -426,7 +425,7 @@ describe('forumModel', () => {
 
     describe('getExistingTagsByName', () => {
         it('returns matching tag names', async () => {
-            prismaMock.tag.findMany.mockResolvedValue([{ name: 'Health' }])
+            prismaMock.tag.findMany.mockResolvedValue([{ name: 'Health' }] as never)
 
             const result = await forumModel.getExistingTagsByName(['Health', 'Unknown'])
 
@@ -444,7 +443,7 @@ describe('forumModel', () => {
 
     describe('getTagIdsByNames', () => {
         it('returns matching tag ids', async () => {
-            prismaMock.tag.findMany.mockResolvedValue([{ id: 'tag-1' }])
+            prismaMock.tag.findMany.mockResolvedValue([{ id: 'tag-1' }] as never)
 
             const result = await forumModel.getTagIdsByNames(['Health'])
 
@@ -454,7 +453,7 @@ describe('forumModel', () => {
 
     describe('trackUnknownTagAttempts', () => {
         it('upserts each tag name', async () => {
-            prismaMock.unknownTagAttempt.upsert.mockResolvedValue({})
+            prismaMock.unknownTagAttempt.upsert.mockResolvedValue({} as never)
 
             await forumModel.trackUnknownTagAttempts(['foo', 'bar'])
 
@@ -479,7 +478,7 @@ describe('forumModel', () => {
     describe('getUnknownTagAttempts', () => {
         it('returns attempts ordered by count desc', async () => {
             const rows = [{ tagName: 'foo', count: 5 }]
-            prismaMock.unknownTagAttempt.findMany.mockResolvedValue(rows)
+            prismaMock.unknownTagAttempt.findMany.mockResolvedValue(rows as never)
 
             const result = await forumModel.getUnknownTagAttempts()
 
@@ -492,7 +491,7 @@ describe('forumModel', () => {
 
     describe('getCategoryStats', () => {
         it('returns all categories plus total', async () => {
-            prismaMock.post.groupBy.mockResolvedValue([
+            (prismaMock.post.groupBy as jest.Mock).mockResolvedValue([
                 { category: 'general', _count: { category: 3 } },
                 { category: 'support', _count: { category: 7 } }
             ])
@@ -505,7 +504,7 @@ describe('forumModel', () => {
         })
 
         it('returns only all=0 when no posts', async () => {
-            prismaMock.post.groupBy.mockResolvedValue([])
+            (prismaMock.post.groupBy as jest.Mock).mockResolvedValue([])
 
             const result = await forumModel.getCategoryStats()
 
@@ -516,7 +515,7 @@ describe('forumModel', () => {
     describe('togglePostLike', () => {
         it('creates like when not yet liked', async () => {
             prismaMock.postLike.deleteMany.mockResolvedValue({ count: 0 })
-            prismaMock.postLike.create.mockResolvedValue({})
+            prismaMock.postLike.create.mockResolvedValue({} as never)
             prismaMock.postLike.count.mockResolvedValue(5)
 
             const result = await forumModel.togglePostLike('profile-1', 'post-1')
@@ -559,7 +558,7 @@ describe('forumModel', () => {
     describe('toggleReplyLike', () => {
         it('creates reply like when not yet liked', async () => {
             prismaMock.replyLike.deleteMany.mockResolvedValue({ count: 0 })
-            prismaMock.replyLike.create.mockResolvedValue({})
+            prismaMock.replyLike.create.mockResolvedValue({} as never)
             prismaMock.replyLike.count.mockResolvedValue(3)
 
             const result = await forumModel.toggleReplyLike('profile-1', 'reply-1')
@@ -589,7 +588,7 @@ describe('forumModel', () => {
     describe('toggleSavePost', () => {
         it('saves post when not yet saved', async () => {
             prismaMock.savedPost.deleteMany.mockResolvedValue({ count: 0 })
-            prismaMock.savedPost.create.mockResolvedValue({})
+            prismaMock.savedPost.create.mockResolvedValue({} as never)
 
             const result = await forumModel.toggleSavePost('profile-1', 'post-1')
 
@@ -616,7 +615,7 @@ describe('forumModel', () => {
 
     describe('getSavedPosts', () => {
         it('returns mapped saved posts', async () => {
-            prismaMock.post.findMany.mockResolvedValue([rawPost])
+            prismaMock.post.findMany.mockResolvedValue([rawPost] as never)
 
             const result = await forumModel.getSavedPosts('profile-1')
 
@@ -635,7 +634,7 @@ describe('forumModel', () => {
 
     describe('createReply', () => {
         it('creates and returns reply', async () => {
-            prismaMock.reply.create.mockResolvedValue(rawReply)
+            prismaMock.reply.create.mockResolvedValue(rawReply as never)
 
             const result = await forumModel.createReply({
                 authorId: 'profile-1',

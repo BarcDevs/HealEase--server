@@ -1,8 +1,8 @@
-// @ts-nocheck
 import request from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import { prismaMock } from '../setup/jestSetup'
 import {
     createAuthenticatedRequest,
@@ -46,7 +46,7 @@ describe('Profile Routes', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         prismaMock.profile.findUnique
-            .mockResolvedValue(mockProfile)
+            .mockResolvedValue(mockProfile as never)
         prismaMock.postLike.findMany
             .mockResolvedValue([])
         prismaMock.replyLike.findMany
@@ -68,7 +68,7 @@ describe('Profile Routes', () => {
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(res.body.data).toBeDefined()
                 expect(res.body.data.userId).toBe(
                     mockUser.id
@@ -87,13 +87,13 @@ describe('Profile Routes', () => {
                     .mockResolvedValue(createMockProfile({
                         userId: mockUser.id,
                         healthInterests: ['mental-health']
-                    }))
+                    }) as never)
 
                 const res = await request(App)
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(
                     res.body.data.healthInterests
                 ).toBeInstanceOf(Array)
@@ -106,7 +106,7 @@ describe('Profile Routes', () => {
                 const res = await request(App)
                     .get(endpoint)
 
-                expect(res.status).toBe(401)
+                expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
                 expect(res.body.error).toBeDefined()
             }
         )
@@ -116,13 +116,13 @@ describe('Profile Routes', () => {
             async () => {
                 const token = createAuthToken(mockUser)
                 prismaMock.profile.findUnique
-                    .mockResolvedValue(null)
+                    .mockResolvedValue(null as never)
 
                 const res = await request(App)
                     .get(endpoint)
                     .set('Cookie', [`accessToken=${token}`])
 
-                expect(res.status).toBe(404)
+                expect(res.status).toBe(HttpStatusCodes.NOT_FOUND)
                 expect(res.body.error[0].statusType).toBe('Not Found')
             }
         )
@@ -141,7 +141,7 @@ describe('Profile Routes', () => {
                     timezone: 'America/New_York'
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -159,7 +159,7 @@ describe('Profile Routes', () => {
                     timezone: 'America/New_York'
                 })
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(res.body.data.bio).toBe(
                     'Updated bio'
                 )
@@ -177,7 +177,7 @@ describe('Profile Routes', () => {
                     theme: 'dark'
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -192,7 +192,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ theme: 'dark' })
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(res.body.data.theme).toBe('dark')
             }
         )
@@ -207,7 +207,7 @@ describe('Profile Routes', () => {
                     image: imageUrl
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -222,7 +222,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ image: imageUrl })
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(res.body.data.image).toBe(
                     imageUrl
                 )
@@ -237,7 +237,7 @@ describe('Profile Routes', () => {
                     profileVisibility: 'public'
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -254,7 +254,7 @@ describe('Profile Routes', () => {
                     profileVisibility: 'public'
                 })
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(
                     res.body.data.profileVisibility
                 ).toBe('public')
@@ -272,7 +272,7 @@ describe('Profile Routes', () => {
                     communityAlerts: true
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -292,7 +292,7 @@ describe('Profile Routes', () => {
                     communityAlerts: true
                 })
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(res.body.data.bio).toBe('My bio')
                 expect(
                     res.body.data.location
@@ -324,7 +324,7 @@ describe('Profile Routes', () => {
                     timezone: 'invalid-timezone'
                 })
 
-                expect(res.status).toBe(400)
+                expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(
                     res.body.error[0].property
                 ).toBe('timezone')
@@ -347,7 +347,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ theme: 'invalid' })
 
-                expect(res.status).toBe(400)
+                expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(
                     res.body.error[0].property
                 ).toBe('theme')
@@ -371,7 +371,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ bio: longBio })
 
-                expect(res.status).toBe(400)
+                expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(
                     res.body.error[0].property
                 ).toBe('bio')
@@ -387,7 +387,7 @@ describe('Profile Routes', () => {
                     dateOfBirth: dob
                 }
                 prismaMock.profile.update
-                    .mockResolvedValue(updated)
+                    .mockResolvedValue(updated as never)
 
                 const {
                     token,
@@ -402,7 +402,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ dateOfBirth: '1990-01-15' })
 
-                expect(res.status).toBe(200)
+                expect(res.status).toBe(HttpStatusCodes.OK)
                 expect(
                     res.body.data.dateOfBirth
                 ).toBeDefined()
@@ -425,7 +425,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ dateOfBirth: 'not-a-date' })
 
-                expect(res.status).toBe(400)
+                expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
                 expect(
                     res.body.error[0].property
                 ).toBe('dateOfBirth')
@@ -448,7 +448,7 @@ describe('Profile Routes', () => {
                     csrfToken
                 ).send({ image: 'not-a-url' })
 
-                expect(res.status).toBe(400)
+                expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
             }
         )
 
@@ -459,7 +459,7 @@ describe('Profile Routes', () => {
                     .patch(endpoint)
                     .send({ bio: 'Updated' })
 
-                expect(res.status).toBe(401)
+                expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -477,7 +477,7 @@ describe('Profile Routes', () => {
                     .set('x-csrf-token', 'invalid-token')
                     .send({ bio: 'Updated' })
 
-                expect(res.status).toBe(401)
+                expect(res.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
     })
@@ -496,7 +496,7 @@ describe('Profile Routes', () => {
                         healthInterests: ['mental-health', 'fitness']
                     }
                     prismaMock.profile.update
-                        .mockResolvedValue(updated)
+                        .mockResolvedValue(updated as never)
 
                     const {
                         token,
@@ -513,7 +513,7 @@ describe('Profile Routes', () => {
                         healthInterests: ['mental-health', 'fitness']
                     })
 
-                    expect(res.status).toBe(200)
+                    expect(res.status).toBe(HttpStatusCodes.OK)
                     expect(
                         res.body.data.healthInterests
                     ).toEqual(['mental-health', 'fitness'])
@@ -538,7 +538,7 @@ describe('Profile Routes', () => {
                         healthInterests: ['not-a-valid-slug']
                     })
 
-                    expect(res.status).toBe(400)
+                    expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
                     expect(res.body.error).toBeDefined()
                 }
             )
@@ -558,7 +558,7 @@ describe('Profile Routes', () => {
                         activityPreferences: ['walking', 'mindfulness']
                     }
                     prismaMock.profile.update
-                        .mockResolvedValue(updated)
+                        .mockResolvedValue(updated as never)
 
                     const {
                         token,
@@ -575,7 +575,7 @@ describe('Profile Routes', () => {
                         activityPreferences: ['walking', 'mindfulness']
                     })
 
-                    expect(res.status).toBe(200)
+                    expect(res.status).toBe(HttpStatusCodes.OK)
                     expect(
                         res.body.data.activityPreferences
                     ).toEqual(['walking', 'mindfulness'])
@@ -600,7 +600,7 @@ describe('Profile Routes', () => {
                         activityPreferences: ['not-a-valid-slug']
                     })
 
-                    expect(res.status).toBe(400)
+                    expect(res.status).toBe(HttpStatusCodes.BAD_REQUEST)
                     expect(res.body.error).toBeDefined()
                 }
             )
@@ -620,7 +620,7 @@ describe('Profile Routes', () => {
                     const res = await request(App)
                         .get(endpoint)
 
-                    expect(res.status).toBe(200)
+                    expect(res.status).toBe(HttpStatusCodes.OK)
                     expect(
                         res.body.data
                     ).toHaveLength(24)
@@ -639,7 +639,7 @@ describe('Profile Routes', () => {
                     const res = await request(App)
                         .get(endpoint)
 
-                    expect(res.status).toBe(200)
+                    expect(res.status).toBe(HttpStatusCodes.OK)
                 }
             )
         }
@@ -657,7 +657,7 @@ describe('Profile Routes', () => {
                     const res = await request(App)
                         .get(endpoint)
 
-                    expect(res.status).toBe(200)
+                    expect(res.status).toBe(HttpStatusCodes.OK)
                     expect(
                         res.body.data
                     ).toHaveLength(16)
@@ -676,7 +676,7 @@ describe('Profile Routes', () => {
                     const res = await request(App)
                         .get(endpoint)
 
-                    expect(res.status).toBe(200)
+                    expect(res.status).toBe(HttpStatusCodes.OK)
                 }
             )
         }

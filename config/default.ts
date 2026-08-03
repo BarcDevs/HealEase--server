@@ -1,5 +1,5 @@
 export default {
-    env: 'NODE_ENV',
+    env: 'development',
     app: {
         start: 'Server is running on {0}'
     },
@@ -12,7 +12,7 @@ export default {
         apiVersion: 'v1'
     },
     auth: {
-        jwtSecret: 'JWT_SECRET',
+        jwtSecret: '',
         expiresIn: '1d',
         otp_expiration: '10m'
     },
@@ -34,16 +34,22 @@ export default {
     },
     ai: {
         provider: 'google',
-        anthropicModel: 'claude-3-5-sonnet-20241022',
-        googleModel: 'gemini-3.1-flash-lite',
-        openaiModel: 'gpt-4o-mini',
+        anthropicModel: 'claude-sonnet-5',
+        googleFreeModel: 'gemini-3.1-flash-lite',
+        googleModel: 'gemini-3.1-pro-preview',
+        openaiModel: 'gpt-5.6-sol',
         openaiApiKey: '',
         anthropicApiKey: '',
-        googleApiKey: ''
+        googleApiKey: '',
+        googleFreeApiKey: '',
+        fallbackOrder: ''
     },
     aiGeneration: {
         maxOutputTokens: 1000,
         temperature: 0.7
+    },
+    logging: {
+        dir: 'logs'
     }
 }
 
