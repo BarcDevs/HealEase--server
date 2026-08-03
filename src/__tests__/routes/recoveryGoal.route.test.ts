@@ -86,6 +86,9 @@ describe('Recovery Goals Routes', () => {
 
         it('should create goal with all fields', async () => {
             const mockUser = createMockUser()
+            const futureTargetDate = new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+            )
             const mockGoal = createMockRecoveryGoal({
                 profileId: 'test-profile-id-123',
                 title: 'Build strength',
@@ -93,7 +96,7 @@ describe('Recovery Goals Routes', () => {
                 category: 'PHYSICAL',
                 isPrimary: true,
                 status: GoalStatus.ACTIVE,
-                targetDate: new Date('2026-07-23')
+                targetDate: futureTargetDate
             })
             const {
                 token,
@@ -113,7 +116,7 @@ describe('Recovery Goals Routes', () => {
                 description: 'Physical recovery goal',
                 category: 'PHYSICAL',
                 isPrimary: true,
-                targetDate: '2026-07-23T00:00:00Z'
+                targetDate: futureTargetDate.toISOString()
             })
 
             expect(response.status).toBe(HttpStatusCodes.CREATED)
