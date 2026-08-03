@@ -1,8 +1,8 @@
-// @ts-nocheck
 import supertest from 'supertest'
 
 import { serverConfig } from '../../../config'
 import App from '../../app'
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import {
     createAuthToken,
     createMockUser
@@ -48,7 +48,7 @@ describe('Progress Insights Routes', () => {
                 '../../services/progressInsightsService'
             )
             progressInsightsService.generateProgressInsight
-                .mockResolvedValue(mockInsights)
+                .mockResolvedValue(mockInsights as never)
 
             const response = await supertest(App)
                 .get(endpoint)
@@ -56,7 +56,7 @@ describe('Progress Insights Routes', () => {
                     `accessToken=${token}`
                 ])
 
-            expect(response.status).toBe(200)
+            expect(response.status).toBe(HttpStatusCodes.OK)
             expect(response.body.message).toBe(
                 'Progress insights generated'
             )
@@ -110,7 +110,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -118,7 +118,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.summary).toBeTruthy()
                 expect(response.body.data.summary.length).toBeGreaterThan(0)
             }
@@ -157,7 +157,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -165,7 +165,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.trend).toBe(trend)
             }
         })
@@ -202,7 +202,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -210,7 +210,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(new Date(response.body.data.period.currentStart))
                     .toEqual(currentStart)
                 expect(new Date(response.body.data.period.currentEnd))
@@ -257,7 +257,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -265,7 +265,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.highlights.improvements).toEqual([])
                 expect(response.body.data.highlights.regressions).toEqual([])
             }
@@ -303,7 +303,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -311,7 +311,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.highlights.improvements.length)
                     .toBeGreaterThan(0)
             }
@@ -344,7 +344,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -352,7 +352,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(typeof response.body.data.metadata.moodDelta)
                     .toBe('number')
                 expect(typeof response.body.data.metadata.painDelta)
@@ -370,7 +370,7 @@ describe('Progress Insights Routes', () => {
             const response = await supertest(App)
                 .get(endpoint)
 
-            expect(response.status).toBe(401)
+            expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             expect(response.body.error).toBeDefined()
         })
 
@@ -383,7 +383,7 @@ describe('Progress Insights Routes', () => {
                         'accessToken=invalid-token'
                     ])
 
-                expect(response.status).toBe(401)
+                expect(response.status).toBe(HttpStatusCodes.UNAUTHORIZED)
             }
         )
 
@@ -416,7 +416,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -424,7 +424,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.trend).toBe('stable')
                 expect(response.body.data.summary).toContain(
                     'Not enough data'
@@ -464,7 +464,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -472,7 +472,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.trend).toBe('declining')
                 expect(response.body.data.highlights.regressions.length)
                     .toBeGreaterThan(0)
@@ -508,7 +508,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -516,7 +516,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body.data.trend).toBe('mixed')
                 expect(response.body.data.highlights.improvements.length)
                     .toBeGreaterThan(0)
@@ -552,7 +552,7 @@ describe('Progress Insights Routes', () => {
                     '../../services/progressInsightsService'
                 )
                 progressInsightsService.generateProgressInsight
-                    .mockResolvedValue(mockInsights)
+                    .mockResolvedValue(mockInsights as never)
 
                 const response = await supertest(App)
                     .get(endpoint)
@@ -560,7 +560,7 @@ describe('Progress Insights Routes', () => {
                         `accessToken=${token}`
                     ])
 
-                expect(response.status).toBe(200)
+                expect(response.status).toBe(HttpStatusCodes.OK)
                 expect(response.body).toHaveProperty('message')
                 expect(response.body).toHaveProperty('data')
                 expect(response.body.data).toHaveProperty('summary')

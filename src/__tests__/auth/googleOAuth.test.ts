@@ -1,4 +1,3 @@
-// @ts-nocheck
 import crypto from 'crypto'
 import supertest from 'supertest'
 
@@ -271,7 +270,7 @@ describe('Google OAuth', () => {
                             .get(googleSignInEndpoint)
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     expect(cookies).toBeDefined()
 
                     const hasStateCookie =
@@ -298,7 +297,7 @@ describe('Google OAuth', () => {
                             .get(googleSignInEndpoint)
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     const stateCookie = cookies?.find(
                         (c: string) =>
                             c.includes('oauth_state')
@@ -389,7 +388,7 @@ describe('Google OAuth', () => {
                             ])
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     const hasAccessToken =
                         cookies?.some(
                             (c: string) =>
@@ -428,7 +427,7 @@ describe('Google OAuth', () => {
                             ])
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     const hasCsrf = cookies?.some(
                         (c: string) =>
                             c.includes('_csrf')
@@ -524,7 +523,7 @@ describe('Google OAuth', () => {
                             ])
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     const clearedStateCookie =
                         cookies?.some(
                             (c: string) =>
@@ -631,7 +630,7 @@ describe('Google OAuth', () => {
                             ])
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     const clearedRedirectCookie =
                         cookies?.some(
                             (c: string) =>
@@ -665,7 +664,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -691,7 +690,7 @@ describe('Google OAuth', () => {
                             })
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -722,7 +721,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -752,7 +751,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -793,7 +792,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -832,7 +831,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -871,7 +870,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -910,7 +909,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(401)
+                        .toBe(HttpStatusCodes.UNAUTHORIZED)
                     expect(
                         response.body.error[0].error
                     ).toContain(
@@ -949,7 +948,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(500)
+                        .toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
                 }
             )
 
@@ -978,7 +977,7 @@ describe('Google OAuth', () => {
                             ])
 
                     expect(response.status)
-                        .toBe(500)
+                        .toBe(HttpStatusCodes.INTERNAL_SERVER_ERROR)
                 }
             )
 
@@ -1055,7 +1054,7 @@ describe('Google OAuth', () => {
                             ])
 
                     const cookies =
-                        response.headers['set-cookie']
+                        ([] as string[]).concat(response.headers['set-cookie'] || [])
                     const clearedStateCookie =
                         cookies?.some(
                             (c: string) =>

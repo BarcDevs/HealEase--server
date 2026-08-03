@@ -1,32 +1,33 @@
 import type { Request, Response } from 'express'
 
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
-import { errorFactory } from '../errors/factory/ErrorFactory'
-import { ValidationError } from '../errors/ValidationError'
 import {
     sanitizeUserData,
     updateUserData,
     updateUserPassword
 } from '../lib/authHelpers'
 import { successResponse } from '../responses/success'
+import type { UpdatePasswordType } from '../schemas/user/updatePasswordSchema'
 import { updatePasswordSchema } from '../schemas/user/updatePasswordSchema'
+import type { UpdateUserType } from '../schemas/user/updateUserSchema'
 import { updateUserSchema } from '../schemas/user/updateUserSchema'
 import { deactivateUser } from '../services/authService'
 import type { UserType } from '../types/data/UserType'
+import {
+    extractUserId,
+    validateAndExtract
+} from '../utils/controllerHelpers'
 
 export const updateUser = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
+    const userId = extractUserId(req)
 
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
-
-    const validatedData = ValidationError
-        .catchValidationErrors(
-            updateUserSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdateUserType>(
+        updateUserSchema,
+        req.body
+    )
 
     const updatedUser =
         await updateUserData(
@@ -45,15 +46,12 @@ export const updatePassword = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
+    const userId = extractUserId(req)
 
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
-
-    const validatedData = ValidationError
-        .catchValidationErrors(
-            updatePasswordSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdatePasswordType>(
+        updatePasswordSchema,
+        req.body
+    )
 
     const updatedUser = await updateUserPassword(
         userId,
@@ -72,10 +70,7 @@ export const deleteUser = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await deactivateUser(userId)
 
@@ -86,6 +81,6 @@ export const deleteUser = async (
         res,
         null,
         'User account deactivated successfully',
-        HttpStatusCodes.NO_CONTENT
+        HttpStatusCodes.OK
     )
 }

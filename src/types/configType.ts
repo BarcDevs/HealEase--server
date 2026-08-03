@@ -41,16 +41,23 @@ type GoogleOAuthConfig = {
 type AIConfig = {
     provider: string
     anthropicModel: string
+    googleFreeModel: string
     googleModel: string
     openaiModel: string
     openaiApiKey: string
     anthropicApiKey: string
     googleApiKey: string
+    googleFreeApiKey: string
+    fallbackOrder: string
 }
 
 type AIGenerationConfig = {
     maxOutputTokens: number
     temperature: number
+}
+
+type LoggingConfig = {
+    dir: string
 }
 
 export type {
@@ -62,5 +69,6 @@ export type {
     EmailConfig,
     EnvConfig,
     GoogleOAuthConfig,
+    LoggingConfig,
     ServerConfig
 }

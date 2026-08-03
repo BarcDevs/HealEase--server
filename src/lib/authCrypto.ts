@@ -7,7 +7,7 @@ import type { ServerUserType } from '../types/data/UserType'
 export const hashPassword = (
     password: string
 ): string =>
-    bcrypt.hashSync(password, 10)
+    bcrypt.hashSync(password, 12)
 
 export const comparePassword = (
     password: string,
@@ -33,7 +33,7 @@ export const createToken = (
 
     return jwt.sign(
         payload,
-        authConfig.jwtSecret!,
+        authConfig.jwtSecret,
         options
     )
 }

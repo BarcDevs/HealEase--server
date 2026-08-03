@@ -12,8 +12,7 @@ export const signupSchema = z.object({
         .max(30, 'Username must be 30 characters or fewer')
         .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores')
         .optional(),
-    email: z.string('Email is required')
-        .email(),
+    email: z.email('Email is required'),
     password: z.string('Password is required')
         .min(8, 'Password must be at least 8 characters')
         .regex(
@@ -21,3 +20,5 @@ export const signupSchema = z.object({
             'Must contain uppercase, lowercase, number, and special character'
         )
 })
+
+export type SignupType = z.infer<typeof signupSchema>

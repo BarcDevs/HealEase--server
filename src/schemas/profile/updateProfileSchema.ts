@@ -56,3 +56,5 @@ export const updateProfileSchema = z.object({
         })
     ).optional()
 })
+
+export type UpdateProfileType = z.infer<typeof updateProfileSchema>

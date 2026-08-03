@@ -1,4 +1,8 @@
-import type { Role } from '../../../prisma/generated/prisma/enums'
+import type {
+    ProfileTheme,
+    ProfileVisibility,
+    Role
+} from '../../../prisma/generated/prisma/enums'
 import type { Prettify } from '../index'
 
 export type ProfileType = {
@@ -9,11 +13,11 @@ export type ProfileType = {
     location?: string | null
     timezone: string
     dateFormat?: string | null
-    theme: string
+    theme: ProfileTheme
     language: string
     dailyReminder: boolean
     communityAlerts: boolean
-    profileVisibility: string
+    profileVisibility: ProfileVisibility
     anonymousParticipation: boolean
     lastCheckInAt?: Date | null
     dateOfBirth?: Date
@@ -43,8 +47,12 @@ export type ServerUserType = Prettify<
         password: string
         resetPasswordOTP?: number | null
         resetPasswordExpiration?: Date | null
+        resetPasswordAttempts: number
         passwordUpdatedAt: Date
         deletedAt?: Date | null
+        confirmEmailOTP?: number | null
+        confirmEmailExpiration?: Date | null
+        confirmEmailAttempts: number
         pendingEmail?: string | null
         emailChangeOTP?: number | null
         emailChangeExpiration?: Date | null

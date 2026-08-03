@@ -1,8 +1,5 @@
 export default {
     env: 'production',
-    database: {
-        url: process.env.DATABASE_URL || ''
-    },
     server: {
         port: process.env.PORT || 8080,
         protocol: 'https',
@@ -17,5 +14,9 @@ export default {
     email: {
         port: 587,
         secure: true
+    },
+    ai: {
+        provider: 'anthropic',
+        fallbackOrder: 'anthropic,google-pro,openai'
     }
 }

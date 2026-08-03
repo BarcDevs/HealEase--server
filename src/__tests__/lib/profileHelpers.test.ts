@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ensureProfileExists } from '../../lib/profileHelpers'
 import * as profileModel from '../../models/profileModel'
 

@@ -1,6 +1,6 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as userController from '../../controllers/userController'
 import * as authHelpers from '../../lib/authHelpers'
 import * as authService from '../../services/authService'
@@ -140,7 +140,7 @@ describe('UserController', () => {
             expect(authService.deactivateUser).toHaveBeenCalledWith(USER_ID)
             expect(res.clearCookie).toHaveBeenCalledWith('accessToken')
             expect(res.clearCookie).toHaveBeenCalledWith('_csrf')
-            expect(res.status).toHaveBeenCalledWith(204)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.OK)
         })
     })
 })

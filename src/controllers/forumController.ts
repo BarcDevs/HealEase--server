@@ -3,20 +3,32 @@ import type { Request, Response } from 'express'
 import { FORUM_PAGINATION } from '../constants/forum/pagination'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
 import { errorFactory } from '../errors/factory/ErrorFactory'
-import { ValidationError } from '../errors/ValidationError'
 import { successResponse } from '../responses/success'
+import type { NewPostType } from '../schemas/forum/newPostSchema'
 import { newPostSchema } from '../schemas/forum/newPostSchema'
+import type { NewReplyType } from '../schemas/forum/newReplySchema'
 import { newReplySchema } from '../schemas/forum/newReplySchema'
+import type { PostQueryType } from '../schemas/forum/postQuerySchema'
 import { postQuerySchema } from '../schemas/forum/postQuerySchema'
+import type { ReplyQueryType } from '../schemas/forum/replyQuerySchema'
 import { replyQuerySchema } from '../schemas/forum/replyQuerySchema'
+import type { TagQueryType } from '../schemas/forum/tagQuerySchema'
 import { tagQuerySchema } from '../schemas/forum/tagQuerySchema'
+import type { UnknownTagType } from '../schemas/forum/unknownTagSchema'
 import { unknownTagSchema } from '../schemas/forum/unknownTagSchema'
+import type { UpdatePostType } from '../schemas/forum/updatePostSchema'
 import { updatePostSchema } from '../schemas/forum/updatePostSchema'
+import type { UpdateReplyType } from '../schemas/forum/updateReplySchema'
 import { updateReplySchema } from '../schemas/forum/updateReplySchema'
 import * as forumService from '../services/forumService'
 import type { PostType } from '../types/data/PostType'
 import type { ReplyType } from '../types/data/ReplyType'
 import type { TagType } from '../types/data/TagType'
+import type { PaginatedType } from '../types/PaginatedType'
+import {
+    extractUserId,
+    validateAndExtract
+} from '../utils/controllerHelpers'
 
 // region Posts
 export const getPosts = async (
@@ -25,8 +37,9 @@ export const getPosts = async (
 ) => {
     const validatedQuery =
         req.query
-        && ValidationError.catchValidationErrors(
-            postQuerySchema.safeParse(req.query)
+        && validateAndExtract<PostQueryType>(
+            postQuerySchema,
+            req.query
         )
 
     const data = (
@@ -36,9 +49,21 @@ export const getPosts = async (
     if (!data)
         throw errorFactory.generic.notFound('Posts')
 
-    return successResponse<PostType[]>(
+    const { count } = await forumService.getPostsCount(validatedQuery)
+    const page = validatedQuery?.page ?? 1
+    const limit = validatedQuery?.limit ?? 10
+
+    return successResponse<PaginatedType<PostType>>(
         res,
-        data,
+        {
+            items: data,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                hasMore: page * limit < count
+            }
+        },
         `${data.length} posts found`
     )
 }
@@ -47,14 +72,11 @@ export const createPost = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            newPostSchema.safeParse(req.body)
-        )
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const validatedData = validateAndExtract<NewPostType>(
+        newPostSchema,
+        req.body
+    )
+    const userId = extractUserId(req)
 
     const data = await forumService.createPost({
         ...validatedData,
@@ -73,8 +95,9 @@ export const getPost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { limit } = ValidationError.catchValidationErrors(
-        replyQuerySchema.safeParse(req.query)
+    const { limit } = validateAndExtract<ReplyQueryType>(
+        replyQuerySchema,
+        req.query
     )
 
     const resolvedLimit = limit ?? FORUM_PAGINATION.DEFAULT_REPLY_LIMIT
@@ -96,15 +119,12 @@ export const updatePost = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            updatePostSchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdatePostType>(
+        updatePostSchema,
+        req.body
+    )
     const { postId } = req.params as { postId: string }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'post',
@@ -127,10 +147,7 @@ export const deletePost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'post',
@@ -168,10 +185,10 @@ export const createReply = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            newReplySchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<NewReplyType>(
+        newReplySchema,
+        req.body
+    )
     const { userId } = req || {}
     const { postId } = req.params as { postId: string }
 
@@ -187,7 +204,8 @@ export const createReply = async (
     return successResponse<ReplyType>(
         res,
         data,
-        'Reply created successfully'
+        'Reply created successfully',
+        HttpStatusCodes.CREATED
     )
 }
 
@@ -198,24 +216,35 @@ export const getReplies = async (
     const { postId } = req.params as {
         postId: string
     }
-    const { limit, page } =
-        ValidationError.catchValidationErrors(
-            replyQuerySchema.safeParse(req.query)
-        )
+    const { limit, page } = validateAndExtract<ReplyQueryType>(
+        replyQuerySchema,
+        req.query
+    )
 
     const resolvedLimit = limit ?? FORUM_PAGINATION.DEFAULT_REPLY_LIMIT
+    const resolvedPage = page ?? 1
 
     const data = (
         await forumService.getReplies(
             postId,
             resolvedLimit,
-            page)
+            resolvedPage)
 
     ) as ReplyType[]
 
-    return successResponse<ReplyType[]>(
+    const { count } = await forumService.getRepliesCount(postId)
+
+    return successResponse<PaginatedType<ReplyType>>(
         res,
-        data,
+        {
+            items: data,
+            pagination: {
+                total: count,
+                page: resolvedPage,
+                limit: resolvedLimit,
+                hasMore: resolvedPage * resolvedLimit < count
+            }
+        },
         `found ${data.length} replies for post ${postId}`
     )
 }
@@ -224,18 +253,15 @@ export const updateReply = async (
     req: Request,
     res: Response
 ) => {
-    const validatedData =
-        ValidationError.catchValidationErrors(
-            updateReplySchema.safeParse(req.body)
-        )
+    const validatedData = validateAndExtract<UpdateReplyType>(
+        updateReplySchema,
+        req.body
+    )
     const { replyId, postId } = req.params as {
         replyId: string
         postId: string
     }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'reply',
@@ -265,10 +291,7 @@ export const deleteReply = async (
         replyId: string
         postId: string
     }
-    const { userId } = req || {}
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     await forumService.validateOwner(
         'reply',
@@ -293,10 +316,7 @@ export const likePost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService
         .togglePostLike(postId, userId)
@@ -316,10 +336,7 @@ export const likeReply = async (
         postId: string
         replyId: string
     }
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService.toggleReplyLike(
         postId,
@@ -339,10 +356,7 @@ export const savePost = async (
     res: Response
 ) => {
     const { postId } = req.params as { postId: string }
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const data = await forumService
         .toggleSavePost(postId, userId)
@@ -358,15 +372,13 @@ export const getSavedPosts = async (
     req: Request,
     res: Response
 ) => {
-    const { userId } = req
-
-    if (!userId)
-        throw errorFactory.auth.unauthorized()
+    const userId = extractUserId(req)
 
     const validatedQuery =
         req.query
-        && ValidationError.catchValidationErrors(
-            postQuerySchema.safeParse(req.query)
+        && validateAndExtract<PostQueryType>(
+            postQuerySchema,
+            req.query
         )
 
     const data = await forumService
@@ -387,8 +399,9 @@ export const getTags = async (
 ) => {
     const validatedQuery =
         req.query
-        && ValidationError.catchValidationErrors(
-            tagQuerySchema.safeParse(req.query)
+        && validateAndExtract<TagQueryType>(
+            tagQuerySchema,
+            req.query
         )
 
     const data = await forumService
@@ -427,10 +440,10 @@ export const reportUnknownTag = async (
     req: Request,
     res: Response
 ) => {
-    const { tagName } =
-        ValidationError.catchValidationErrors(
-            unknownTagSchema.safeParse(req.body)
-        )
+    const { tagName } = validateAndExtract<UnknownTagType>(
+        unknownTagSchema,
+        req.body
+    )
 
     await forumService.reportUnknownTag(tagName)
 

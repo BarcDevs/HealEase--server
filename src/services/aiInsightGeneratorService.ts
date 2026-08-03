@@ -1,4 +1,9 @@
 import {
+    aiConfig,
+    aiFallbackOrder,
+    isProd
+} from '../../config'
+import {
     buildPromptByType,
     generateTitle
 } from '../lib/aiInsight/prompts/insightsPrompts'
@@ -13,7 +18,11 @@ import type {
 import type { InsightDecisionResult } from '../types/insight'
 import logger from '../utils/logger'
 
-import { createProvider } from './aiProviders/ProviderFactory'
+import {
+    createProviderByType,
+    getApiKeyForProvider,
+    type ProviderType
+} from './aiProviders/ProviderFactory'
 
 export type GenerateInsightInput = {
     decision: InsightDecisionResult
@@ -44,35 +53,47 @@ export const generateInsight = async (
         decision.metadata
     )
 
-    const provider = createProvider()
     const title = generateTitle(decision.type, language)
+    const providerChain = buildProviderChain()
 
-    let generatedContent: string
+    let generatedContent: string | undefined
 
-    try {
-        const result = await retryAsync(
-            () => provider.generateContent({ prompt }),
-            { maxRetries: 2, delayMs: 1000 }
-        )
+    for (const providerType of providerChain) {
+        try {
+            const provider = createProviderByType(providerType)
+            const result = await retryAsync(
+                () => provider.generateContent({ prompt }),
+                { maxRetries: 1, delayMs: 1000 }
+            )
 
-        generatedContent = result.content
-
-        if (
-            !generatedContent
-            || generatedContent.trim().length === 0
-        ) {
-            throw new Error('Failed to generate insight content')
-        }
-    } catch (error) {
-        const errorMsg = error instanceof Error
-            ? error.message
-            : 'Unknown error'
-        logger.error(
-            'AI generation failed after retries, using fallback',
-            {
-                insightType: decision.type,
-                error: errorMsg
+            if (
+                !result.content
+                || result.content.trim().length === 0
+            ) {
+                throw new Error('Failed to generate insight content')
             }
+
+            generatedContent = result.content
+            break
+        } catch (error) {
+            const errorMsg = error instanceof Error
+                ? error.message
+                : 'Unknown error'
+            logger.error(
+                `AI generation failed for provider ${providerType}, trying next`,
+                {
+                    insightType: decision.type,
+                    provider: providerType,
+                    error: errorMsg
+                }
+            )
+        }
+    }
+
+    if (!generatedContent) {
+        logger.error(
+            'AI generation failed for all providers in chain, using fallback',
+            { insightType: decision.type }
         )
         const fallbackContent = getFallbackContent(
             decision.type,
@@ -110,4 +131,35 @@ export const generateInsight = async (
         title,
         content: trimmedContent
     }
+}
+
+const hasApiKeyForProvider = (providerType: ProviderType): boolean =>
+    Boolean(getApiKeyForProvider(providerType))
+
+const buildProviderChain = (): ProviderType[] => {
+    // Render forces NODE_ENV=production on preview builds, which also
+    // merges in config/production.ts (provider: anthropic + fallbackOrder).
+    // isProd is resolved from APP_ENV, so preview correctly falls back to
+    // plain google-lite here instead of inheriting the prod chain.
+    if (!isProd) {
+        return ['google']
+    }
+
+    const primary = (aiConfig.provider as ProviderType) || 'google'
+    const chain = [
+        primary,
+        ...aiFallbackOrder as ProviderType[]
+    ]
+    const seen = new Set<ProviderType>()
+    const dedup: ProviderType[] = []
+
+    for (const providerType of chain) {
+        if (seen.has(providerType)) continue
+        seen.add(providerType)
+        if (hasApiKeyForProvider(providerType)) {
+            dedup.push(providerType)
+        }
+    }
+
+    return dedup
 }

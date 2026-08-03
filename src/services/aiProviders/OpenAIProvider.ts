@@ -43,10 +43,8 @@ export class OpenAIProvider extends AIProvider {
                             content: input.prompt
                         }
                     ],
-                    max_tokens:
-                        aiGenerationConfig.maxOutputTokens,
-                    temperature:
-                        aiGenerationConfig.temperature
+                    max_completion_tokens:
+                        aiGenerationConfig.maxOutputTokens
                 })
             }
         )

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as dailyObservationCache from '../../lib/cache/dailyObservationCache'
 import * as dateHelpers from '../../lib/checkInDateHelpers'
 import * as observationAiGenerator from '../../lib/dailyObservation/observationAiGenerator'
@@ -18,7 +17,7 @@ jest.mock('../../models/checkInModel')
 jest.mock('../../locales', () => ({
     getMessages: jest.fn().mockReturnValue({
         observation: { title: 'Your Daily Observation' }
-    })
+    } as never)
 }))
 jest.mock('../../utils/logger', () => ({
     __esModule: true,
@@ -53,7 +52,7 @@ describe('DailyObservationService', () => {
         jest.spyOn(checkInModel, 'getProfileContext').mockResolvedValue({
             id: PROFILE_ID,
             timezone: TIMEZONE
-        })
+        } as never)
         jest.spyOn(authModel, 'getUserLanguage').mockResolvedValue('en')
         jest.spyOn(dateHelpers, 'toLocalDateTimeStr').mockReturnValue('2026-06-04T00:00:00')
     })
@@ -61,7 +60,7 @@ describe('DailyObservationService', () => {
     describe('getTodayObservation', () => {
         it('returns cached result without fetching when cache hit', async () => {
             const cached = { title: 'Cached', type: 'consistent_mood', observation: 'cached obs' }
-            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(cached)
+            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(cached as never)
 
             const result = await getTodayObservation(USER_ID)
 
@@ -70,10 +69,10 @@ describe('DailyObservationService', () => {
         })
 
         it('returns null and caches null when no detection', async () => {
-            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined)
+            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined as never)
             jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue([mockCheckIn()])
-            jest.spyOn(observationDetectors, 'detectObservationType').mockReturnValue(null)
-            const setSpy = jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined)
+            jest.spyOn(observationDetectors, 'detectObservationType').mockReturnValue(null as never)
+            const setSpy = jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined as never)
 
             const result = await getTodayObservation(USER_ID)
 
@@ -82,13 +81,13 @@ describe('DailyObservationService', () => {
         })
 
         it('generates observation via AI and returns result', async () => {
-            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined)
+            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined as never)
             jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue([mockCheckIn(['yoga'])])
             jest.spyOn(observationDetectors, 'detectObservationType').mockReturnValue({
                 type: 'consistent_mood'
-            })
-            jest.spyOn(observationAiGenerator, 'generateObservation').mockResolvedValue(aiPayload)
-            jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined)
+            } as never)
+            jest.spyOn(observationAiGenerator, 'generateObservation').mockResolvedValue(aiPayload as never)
+            jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined as never)
 
             const result = await getTodayObservation(USER_ID)
 
@@ -99,15 +98,15 @@ describe('DailyObservationService', () => {
         })
 
         it('falls back to template when AI generation fails', async () => {
-            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined)
+            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined as never)
             jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue([mockCheckIn()])
             jest.spyOn(observationDetectors, 'detectObservationType').mockReturnValue({
                 type: 'active_lifestyle'
-            })
+            } as never)
             jest.spyOn(observationAiGenerator, 'generateObservation')
                 .mockRejectedValue(new Error('AI down'))
-            jest.spyOn(observationTemplates, 'getObservationTemplate').mockReturnValue(aiPayload)
-            jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined)
+            jest.spyOn(observationTemplates, 'getObservationTemplate').mockReturnValue(aiPayload as never)
+            jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined as never)
 
             const result = await getTodayObservation(USER_ID)
 
@@ -117,13 +116,13 @@ describe('DailyObservationService', () => {
         })
 
         it('caches the generated result', async () => {
-            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined)
+            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined as never)
             jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue([mockCheckIn()])
             jest.spyOn(observationDetectors, 'detectObservationType').mockReturnValue({
                 type: 'consistent_mood'
-            })
-            jest.spyOn(observationAiGenerator, 'generateObservation').mockResolvedValue(aiPayload)
-            const setSpy = jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined)
+            } as never)
+            jest.spyOn(observationAiGenerator, 'generateObservation').mockResolvedValue(aiPayload as never)
+            const setSpy = jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined as never)
 
             await getTodayObservation(USER_ID)
 
@@ -135,17 +134,17 @@ describe('DailyObservationService', () => {
         })
 
         it('picks top activity from check-in data', async () => {
-            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined)
+            jest.spyOn(dailyObservationCache, 'get').mockReturnValue(undefined as never)
             jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue([
                 mockCheckIn(['yoga', 'walking']),
                 mockCheckIn(['yoga'])
             ])
             jest.spyOn(observationDetectors, 'detectObservationType').mockReturnValue({
                 type: 'active_lifestyle'
-            })
+            } as never)
             const generateSpy = jest.spyOn(observationAiGenerator, 'generateObservation')
-                .mockResolvedValue(aiPayload)
-            jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined)
+                .mockResolvedValue(aiPayload as never)
+            jest.spyOn(dailyObservationCache, 'set').mockReturnValue(undefined as never)
 
             await getTodayObservation(USER_ID)
 

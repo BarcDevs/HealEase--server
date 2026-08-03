@@ -11,7 +11,6 @@ import {
     minuteInMs
 } from '../constants/time'
 import { errorFactory } from '../errors/factory/ErrorFactory'
-import { ValidationError } from '../errors/ValidationError'
 import {
     comparePassword,
     createToken
@@ -23,18 +22,28 @@ import {
     sanitizeUserData
 } from '../lib/authHelpers'
 import {
+    recordFailedConfirmEmailAttempt,
+    recordFailedResetPasswordAttempt,
+    removeConfirmEmailOTP,
     removeResetPasswordOTP,
     sendEmailChangeOTP,
     sendForgotPasswordOTP,
     verifyOTP
 } from '../lib/authOTP'
 import { successResponse } from '../responses/success'
+import type { ChangeEmailType } from '../schemas/auth/changeEmailSchema'
 import { changeEmailSchema } from '../schemas/auth/changeEmailSchema'
+import type { ConfirmEmailChangeType } from '../schemas/auth/confirmEmailChangeSchema'
 import { confirmEmailChangeSchema } from '../schemas/auth/confirmEmailChangeSchema'
+import type { ConfirmEmailType } from '../schemas/auth/confirmEmailSchema'
 import { confirmEmailSchema } from '../schemas/auth/confirmEmailSchema'
+import type { ForgotPasswordType } from '../schemas/auth/forgotPasswordSchema'
 import { forgotPasswordSchema } from '../schemas/auth/forgotPasswordSchema'
+import type { LoginType } from '../schemas/auth/loginSchema'
 import { loginSchema } from '../schemas/auth/loginSchema'
+import type { ResetPasswordType } from '../schemas/auth/resetPasswordSchema'
 import { resetPasswordSchema } from '../schemas/auth/resetPasswordSchema'
+import type { SignupType } from '../schemas/auth/signupSchema'
 import { signupSchema } from '../schemas/auth/signupSchema'
 import * as authServices from '../services/authService'
 import * as googleOAuthService from '../services/googleOAuthService'
@@ -42,6 +51,7 @@ import type {
     ServerUserType,
     UserType
 } from '../types/data/UserType'
+import { validateAndExtract } from '../utils/controllerHelpers'
 import logger from '../utils/logger'
 
 // region Login and Signup
@@ -53,8 +63,9 @@ export const login = async (
         email,
         password,
         remember
-    } = ValidationError.catchValidationErrors(
-        loginSchema.safeParse(req.body)
+    } = validateAndExtract<LoginType>(
+        loginSchema,
+        req.body
     )
 
     const token = await authServices.login(
@@ -97,10 +108,10 @@ export const signup = async (
     req: Request,
     res: Response
 ) => {
-    const userData =
-        ValidationError.catchValidationErrors(
-            signupSchema.safeParse(req.body)
-        )
+    const userData = validateAndExtract<SignupType>(
+        signupSchema,
+        req.body
+    )
 
     const newUserCreated: ServerUserType =
         await authServices.signup({
@@ -191,12 +202,10 @@ export const forgotPassword = async (
     req: Request,
     res: Response
 ) => {
-    const { email } =
-        ValidationError.catchValidationErrors(
-            forgotPasswordSchema.safeParse(
-                { email: req.params.email }
-            )
-        )
+    const { email } = validateAndExtract<ForgotPasswordType>(
+        forgotPasswordSchema,
+        { email: req.params.email }
+    )
 
     const otpCode = await sendForgotPasswordOTP(email)
 
@@ -213,10 +222,10 @@ export const confirmEmail = async (
     req: Request,
     res: Response
 ) => {
-    const { OTP, email } =
-        ValidationError.catchValidationErrors(
-            confirmEmailSchema.safeParse(req.body)
-        )
+    const { OTP, email } = validateAndExtract<ConfirmEmailType>(
+        confirmEmailSchema,
+        req.body
+    )
 
     const user: ServerUserType | null =
         await authServices.getUser(
@@ -229,12 +238,19 @@ export const confirmEmail = async (
 
     if (
         !verifyOTP(
-            user.resetPasswordOTP!,
-            user.resetPasswordExpiration!,
+            user.confirmEmailOTP!,
+            user.confirmEmailExpiration!,
             OTP
         )
-    )
+    ) {
+        await recordFailedConfirmEmailAttempt(
+            user.id,
+            user.confirmEmailAttempts
+        )
         throw errorFactory.validation.otpError()
+    }
+
+    await removeConfirmEmailOTP(user.id)
 
     successResponse<{
         user: UserType
@@ -254,8 +270,9 @@ export const resetPassword = async (
         email,
         newPassword,
         userOTP
-    } = ValidationError.catchValidationErrors(
-        resetPasswordSchema.safeParse(req.body)
+    } = validateAndExtract<ResetPasswordType>(
+        resetPasswordSchema,
+        req.body
     )
 
     const user: ServerUserType | null =
@@ -279,8 +296,13 @@ export const resetPassword = async (
             user.resetPasswordExpiration!,
             userOTP
         )
-    )
+    ) {
+        await recordFailedResetPasswordAttempt(
+            user.id,
+            user.resetPasswordAttempts
+        )
         throw errorFactory.auth.resetPassword()
+    }
 
     const updatedUser =
         await authServices.resetPassword(
@@ -290,7 +312,7 @@ export const resetPassword = async (
 
     removeResetPasswordOTP(user.id).catch(
         (err) => {
-            console.error(
+            logger.error(
                 'Failed to clear OTP:',
                 err
             )
@@ -316,8 +338,9 @@ export const changeEmail = async (
     const {
         newEmail,
         password
-    } = ValidationError.catchValidationErrors(
-        changeEmailSchema.safeParse(req.body)
+    } = validateAndExtract<ChangeEmailType>(
+        changeEmailSchema,
+        req.body
     )
 
     const user = await authServices.getUser('id', userId!)
@@ -354,10 +377,10 @@ export const confirmEmailChange = async (
     res: Response
 ) => {
     const { userId } = req
-    const { OTP } =
-        ValidationError.catchValidationErrors(
-            confirmEmailChangeSchema.safeParse(req.body)
-        )
+    const { OTP } = validateAndExtract<ConfirmEmailChangeType>(
+        confirmEmailChangeSchema,
+        req.body
+    )
 
     const user = await authServices.getUser('id', userId!)
     if (!user)
@@ -452,8 +475,6 @@ export const googleCallback = async (
 ) => {
     const { code, state } = req.query
     const storedState = req.cookies?.oauth_state
-
-    logger.info(`[OAuth callback] cookies=${JSON.stringify(Object.keys(req.cookies ?? {}))} storedState=${storedState ? 'present' : 'MISSING'} queryState=${state ? 'present' : 'MISSING'} match=${storedState === state}`)
 
     const storedRedirect = req.cookies?.oauth_redirect
     res.clearCookie('oauth_state')

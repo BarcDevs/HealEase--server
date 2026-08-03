@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { confirmEmailSchema } from '../../schemas/auth/confirmEmailSchema'
 import { forgotPasswordSchema } from '../../schemas/auth/forgotPasswordSchema'
 import { loginSchema } from '../../schemas/auth/loginSchema'
@@ -32,7 +31,7 @@ describe('Auth Schemas', () => {
                 })
 
                 expect(result.error).toBeUndefined()
-                expect(result.data.remember).toBe(true)
+                expect(result.data!.remember).toBe(true)
             }
         )
 
@@ -138,7 +137,7 @@ describe('Auth Schemas', () => {
             })
 
             expect(result.error).toBeUndefined()
-            expect(result.data.username).toBe('johndoe')
+            expect(result.data!.username).toBe('johndoe')
         })
 
         it('should allow underscore in username', () => {
@@ -151,7 +150,7 @@ describe('Auth Schemas', () => {
             })
 
             expect(result.error).toBeUndefined()
-            expect(result.data.username).toBe('john_doe')
+            expect(result.data!.username).toBe('john_doe')
         })
 
         it('should reject username with special characters', () => {

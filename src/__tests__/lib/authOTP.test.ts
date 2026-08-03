@@ -1,6 +1,8 @@
-// @ts-nocheck
 import {
     generateOTP,
+    recordFailedConfirmEmailAttempt,
+    recordFailedResetPasswordAttempt,
+    removeConfirmEmailOTP,
     removeEmailChangeOTP,
     removeResetPasswordOTP,
     sendConfirmEmailOTP,
@@ -23,14 +25,23 @@ jest.mock('../../utils/emailTemplates', () => ({
 const mockSetUserOTP = authModel.setUserOTP as jest.Mock
 const mockSetEmailChangeOTP =
     authModel.setEmailChangeOTP as jest.Mock
+const mockSetConfirmEmailOTP =
+    authModel.setConfirmEmailOTP as jest.Mock
 const mockGetUserByEmail =
     authModel.getUserByEmail as jest.Mock
+const mockIncrementResetPasswordAttempts =
+    authModel.incrementResetPasswordAttempts as jest.Mock
+const mockIncrementConfirmEmailAttempts =
+    authModel.incrementConfirmEmailAttempts as jest.Mock
 const mockSendEmail = sendEmail as jest.Mock
 
 beforeEach(() => {
     jest.clearAllMocks()
     mockSetUserOTP.mockResolvedValue(undefined)
     mockSetEmailChangeOTP.mockResolvedValue(undefined)
+    mockSetConfirmEmailOTP.mockResolvedValue(undefined)
+    mockIncrementResetPasswordAttempts.mockResolvedValue(undefined)
+    mockIncrementConfirmEmailAttempts.mockResolvedValue(undefined)
     mockSendEmail.mockResolvedValue(undefined)
 })
 
@@ -113,16 +124,83 @@ describe('authOTP', () => {
 
     // ==================== removeResetPasswordOTP ====================
     describe('removeResetPasswordOTP', () => {
-        it('should call setUserOTP with null values', async () => {
+        it('should call setUserOTP with null values and reset attempts', async () => {
             await removeResetPasswordOTP('user-123')
 
             expect(mockSetUserOTP).toHaveBeenCalledWith(
                 'user-123',
                 {
                     resetPasswordOTP: null,
-                    resetPasswordExpiration: null
+                    resetPasswordExpiration: null,
+                    resetPasswordAttempts: 0
                 }
             )
+        })
+    })
+
+    // ==================== recordFailedResetPasswordAttempt ====================
+    describe('recordFailedResetPasswordAttempt', () => {
+        it('increments the attempt counter when below the max', async () => {
+            await recordFailedResetPasswordAttempt('user-123', 2)
+
+            expect(mockIncrementResetPasswordAttempts)
+                .toHaveBeenCalledWith('user-123')
+            expect(mockSetUserOTP).not.toHaveBeenCalled()
+        })
+
+        it('invalidates the OTP once the max attempts is reached', async () => {
+            await recordFailedResetPasswordAttempt('user-123', 4)
+
+            expect(mockSetUserOTP).toHaveBeenCalledWith(
+                'user-123',
+                {
+                    resetPasswordOTP: null,
+                    resetPasswordExpiration: null,
+                    resetPasswordAttempts: 0
+                }
+            )
+            expect(mockIncrementResetPasswordAttempts).not.toHaveBeenCalled()
+        })
+    })
+
+    // ==================== removeConfirmEmailOTP ====================
+    describe('removeConfirmEmailOTP', () => {
+        it('should call setConfirmEmailOTP with null values and reset attempts', async () => {
+            await removeConfirmEmailOTP('user-123')
+
+            expect(mockSetConfirmEmailOTP).toHaveBeenCalledWith(
+                'user-123',
+                {
+                    confirmEmailOTP: null,
+                    confirmEmailExpiration: null,
+                    confirmEmailAttempts: 0
+                }
+            )
+        })
+    })
+
+    // ==================== recordFailedConfirmEmailAttempt ====================
+    describe('recordFailedConfirmEmailAttempt', () => {
+        it('increments the attempt counter when below the max', async () => {
+            await recordFailedConfirmEmailAttempt('user-123', 2)
+
+            expect(mockIncrementConfirmEmailAttempts)
+                .toHaveBeenCalledWith('user-123')
+            expect(mockSetConfirmEmailOTP).not.toHaveBeenCalled()
+        })
+
+        it('invalidates the OTP once the max attempts is reached', async () => {
+            await recordFailedConfirmEmailAttempt('user-123', 4)
+
+            expect(mockSetConfirmEmailOTP).toHaveBeenCalledWith(
+                'user-123',
+                {
+                    confirmEmailOTP: null,
+                    confirmEmailExpiration: null,
+                    confirmEmailAttempts: 0
+                }
+            )
+            expect(mockIncrementConfirmEmailAttempts).not.toHaveBeenCalled()
         })
     })
 
@@ -243,6 +321,23 @@ describe('authOTP', () => {
             expect(typeof result).toBe('number')
             expect(result as number).toBeGreaterThanOrEqual(100000)
         })
+
+        it(
+            'should call setConfirmEmailOTP with otp and expiration',
+            async () => {
+                mockGetUserByEmail.mockResolvedValue(createMockUser())
+
+                const result = await sendConfirmEmailOTP('test@test.com')
+
+                expect(mockSetConfirmEmailOTP).toHaveBeenCalledWith(
+                    'test-user-id-123',
+                    expect.objectContaining({
+                        confirmEmailOTP: result,
+                        confirmEmailExpiration: expect.any(Date)
+                    })
+                )
+            }
+        )
 
         it('should call sendEmail with the user email', async () => {
             mockGetUserByEmail.mockResolvedValue(createMockUser())

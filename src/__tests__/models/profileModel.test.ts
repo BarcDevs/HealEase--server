@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as profileModel from '../../models/profileModel'
 import { prismaMock } from '../setup/jestSetup'
 
@@ -14,7 +13,7 @@ const mockProfile = {
 describe('ProfileModel', () => {
     describe('getProfileByUserId', () => {
         it('returns profile when found', async () => {
-            prismaMock.profile.findUnique.mockResolvedValue(mockProfile)
+            prismaMock.profile.findUnique.mockResolvedValue(mockProfile as never)
 
             const result = await profileModel.getProfileByUserId('user-id')
 
@@ -36,7 +35,7 @@ describe('ProfileModel', () => {
     describe('updateProfile', () => {
         it('calls profile.update with userId and provided data', async () => {
             const updated = { ...mockProfile, bio: 'new bio' }
-            prismaMock.profile.update.mockResolvedValue(updated)
+            prismaMock.profile.update.mockResolvedValue(updated as never)
 
             const result = await profileModel.updateProfile('user-id', {
                 bio: 'new bio'

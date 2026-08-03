@@ -5,3 +5,5 @@ import { tagNameField } from '../utils/fields'
 export const unknownTagSchema = z.object({
     tagName: tagNameField
 })
+
+export type UnknownTagType = z.infer<typeof unknownTagSchema>

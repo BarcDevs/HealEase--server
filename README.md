@@ -570,7 +570,8 @@ Every push to `development` auto-deploys `Pulse--server-staging`, isolated from 
 | Database | Neon branch `staging` (copy-on-write snapshot of `main` taken at branch creation — does not live-sync, drifts independently) |
 | CORS | `ORIGIN` set to the staging client URL only — prod client origin gets no CORS headers |
 | Google OAuth | Separate Authorized JS origin + redirect URI (`/api/{version}/auth/google/callback` on the staging URL) |
-| `NODE_ENV` | `production` (Render's default for Node web services) — **do not change.** `webpack.config.ts` uses `NODE_ENV` directly as webpack's `mode`, which only accepts `production`/`development`/`none`. Setting `staging` breaks the build. |
+| `NODE_ENV` | `production` (Render's default for Node web services) — **do not change.** Build uses `tsc`, which doesn't read `NODE_ENV`, but other tooling in the pipeline expects `production`/`development`/`test` only — setting `staging` may break assumptions elsewhere. |
+| `APP_ENV` | `staging` — overrides the app's internal `env` config value without touching `NODE_ENV`. Set this on the staging Render service only. |
 
 Frontend staging build: see [client README](https://github.com/BarcDevs/Pulse--client#staging-environment).
 

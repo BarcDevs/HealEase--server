@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     buildFallbackInsight,
     buildProgressInsight
@@ -25,17 +24,17 @@ const baseParams = {
 describe('buildProgressInsight', () => {
     it('computes positive moodDelta', () => {
         const result = buildProgressInsight(baseParams)
-        expect(result.metadata.moodDelta).toBe(1)
+        expect(result.metadata!.moodDelta).toBe(1)
     })
 
     it('computes negative painDelta', () => {
         const result = buildProgressInsight(baseParams)
-        expect(result.metadata.painDelta).toBe(-1)
+        expect(result.metadata!.painDelta).toBe(-1)
     })
 
     it('takes activityConsistency from current metrics', () => {
         const result = buildProgressInsight(baseParams)
-        expect(result.metadata.activityConsistency).toBe(0.8)
+        expect(result.metadata!.activityConsistency).toBe(0.8)
     })
 
     it('returns correct summary and trend', () => {
@@ -70,9 +69,9 @@ describe('buildFallbackInsight', () => {
 
     it('returns zero deltas', () => {
         const result = buildFallbackInsight(start, end, prevStart, prevEnd)
-        expect(result.metadata.moodDelta).toBe(0)
-        expect(result.metadata.painDelta).toBe(0)
-        expect(result.metadata.activityConsistency).toBe(0)
+        expect(result.metadata!.moodDelta).toBe(0)
+        expect(result.metadata!.painDelta).toBe(0)
+        expect(result.metadata!.activityConsistency).toBe(0)
     })
 
     it('returns empty highlights', () => {

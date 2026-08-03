@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Prisma } from '../../../prisma/generated/prisma/client'
 import * as dateHelpers from '../../lib/checkInDateHelpers'
 import * as checkInStats from '../../lib/checkInStats'
@@ -38,20 +37,21 @@ const mockCheckIn = (overrides = {}) => ({
     checkInDate: CHECK_IN_DATE,
     createdAt: new Date(),
     updatedAt: new Date(),
+    insights: [],
     ...overrides
 })
 
 const mockProfileContext = () =>
     jest.spyOn(checkInModel, 'getProfileContext')
-        .mockResolvedValue({ id: PROFILE_ID, timezone: TIMEZONE })
+        .mockResolvedValue({ id: PROFILE_ID, timezone: TIMEZONE } as never)
 
 describe('CheckInService', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        jest.spyOn(dateHelpers, 'resolveCheckInDate').mockReturnValue(CHECK_IN_DATE)
+        jest.spyOn(dateHelpers, 'resolveCheckInDate').mockReturnValue(CHECK_IN_DATE as never)
         jest.spyOn(dateHelpers, 'resolveTimestampInUserTimeZone').mockReturnValue(new Date())
-        jest.spyOn(insightService, 'generateInsightSafely').mockResolvedValue(undefined)
-        jest.spyOn(recommendationsService, 'generateRecommendationsSafely').mockResolvedValue(undefined)
+        jest.spyOn(insightService, 'generateInsightSafely').mockResolvedValue(undefined as never)
+        jest.spyOn(recommendationsService, 'generateRecommendationsSafely').mockResolvedValue(undefined as never)
     })
 
     // ==================== model error propagation ====================
@@ -76,7 +76,7 @@ describe('CheckInService', () => {
 
         it('createCheckIn propagates updateUserLastCheckIn error', async () => {
             mockProfileContext()
-            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null)
+            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null as never)
             jest.spyOn(checkInModel, 'createCheckIn').mockResolvedValue(mockCheckIn())
             jest.spyOn(checkInModel, 'updateUserLastCheckIn')
                 .mockRejectedValue(new Error('DB error'))
@@ -108,7 +108,7 @@ describe('CheckInService', () => {
     // ==================== getCheckIns ====================
     describe('getCheckIns', () => {
         it('fetches profileId and delegates to model', async () => {
-            jest.spyOn(checkInModel, 'getProfileIdForUser').mockResolvedValue(PROFILE_ID)
+            jest.spyOn(checkInModel, 'getProfileIdForUser').mockResolvedValue(PROFILE_ID as never)
             jest.spyOn(checkInModel, 'getCheckIns').mockResolvedValue([mockCheckIn()])
 
             const result = await getCheckIns(USER_ID, { limit: 10 })
@@ -119,7 +119,7 @@ describe('CheckInService', () => {
         })
 
         it('passes undefined limit when no query provided', async () => {
-            jest.spyOn(checkInModel, 'getProfileIdForUser').mockResolvedValue(PROFILE_ID)
+            jest.spyOn(checkInModel, 'getProfileIdForUser').mockResolvedValue(PROFILE_ID as never)
             jest.spyOn(checkInModel, 'getCheckIns').mockResolvedValue([])
 
             await getCheckIns(USER_ID)
@@ -139,11 +139,11 @@ describe('CheckInService', () => {
 
         it('creates new check-in when none exists today', async () => {
             mockProfileContext()
-            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValueOnce(null)
+            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValueOnce(null as never)
             const created = mockCheckIn()
-            jest.spyOn(checkInModel, 'createCheckIn').mockResolvedValue(created)
-            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined)
-            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValueOnce(created)
+            jest.spyOn(checkInModel, 'createCheckIn').mockResolvedValue(created as never)
+            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined as never)
+            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValueOnce(created as never)
 
             const result = await createCheckIn(newCheckInData)
 
@@ -155,9 +155,9 @@ describe('CheckInService', () => {
             mockProfileContext()
             const existing = mockCheckIn()
             jest.spyOn(checkInModel, 'findTodayCheckIn')
-                .mockResolvedValueOnce(existing)
-                .mockResolvedValueOnce(existing)
-            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined)
+                .mockResolvedValueOnce(existing as never)
+                .mockResolvedValueOnce(existing as never)
+            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined as never)
 
             const result = await createCheckIn(newCheckInData)
 
@@ -168,9 +168,9 @@ describe('CheckInService', () => {
 
         it('triggers insight and recommendations generation', async () => {
             mockProfileContext()
-            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null)
+            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null as never)
             jest.spyOn(checkInModel, 'createCheckIn').mockResolvedValue(mockCheckIn())
-            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined)
+            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined as never)
             jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(mockCheckIn())
 
             await createCheckIn(newCheckInData)
@@ -187,10 +187,10 @@ describe('CheckInService', () => {
                 clientVersion: '5.0'
             })
             jest.spyOn(checkInModel, 'findTodayCheckIn')
-                .mockResolvedValueOnce(null)
-                .mockResolvedValue(existing)
+                .mockResolvedValueOnce(null as never)
+                .mockResolvedValue(existing as never)
             jest.spyOn(checkInModel, 'createCheckIn').mockRejectedValue(p2002Error)
-            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined)
+            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined as never)
 
             const result = await createCheckIn(newCheckInData)
 
@@ -200,7 +200,7 @@ describe('CheckInService', () => {
 
         it('rethrows non-P2002 errors', async () => {
             mockProfileContext()
-            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null)
+            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null as never)
             jest.spyOn(checkInModel, 'createCheckIn').mockRejectedValue(new Error('DB failure'))
 
             await expect(createCheckIn(newCheckInData)).rejects.toThrow('DB failure')
@@ -213,7 +213,7 @@ describe('CheckInService', () => {
 
         it('throws not found when no check-in exists today', async () => {
             mockProfileContext()
-            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null)
+            jest.spyOn(checkInModel, 'findTodayCheckIn').mockResolvedValue(null as never)
 
             await expect(updateCheckIn(updateData)).rejects.toThrow(/check-in/)
         })
@@ -223,10 +223,10 @@ describe('CheckInService', () => {
             const existing = mockCheckIn()
             const updated = mockCheckIn({ moodScore: 8 })
             jest.spyOn(checkInModel, 'findTodayCheckIn')
-                .mockResolvedValueOnce(existing)
-                .mockResolvedValueOnce(updated)
-            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined)
-            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined)
+                .mockResolvedValueOnce(existing as never)
+                .mockResolvedValueOnce(updated as never)
+            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined as never)
+            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined as never)
 
             const result = await updateCheckIn(updateData)
 
@@ -237,10 +237,10 @@ describe('CheckInService', () => {
             mockProfileContext()
             const existing = mockCheckIn()
             jest.spyOn(checkInModel, 'findTodayCheckIn')
-                .mockResolvedValueOnce(existing)
-                .mockResolvedValueOnce(existing)
-            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined)
-            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined)
+                .mockResolvedValueOnce(existing as never)
+                .mockResolvedValueOnce(existing as never)
+            jest.spyOn(checkInModel, 'updateCheckIn').mockResolvedValue(undefined as never)
+            jest.spyOn(checkInModel, 'updateUserLastCheckIn').mockResolvedValue(undefined as never)
 
             await updateCheckIn(updateData)
 
@@ -253,14 +253,14 @@ describe('CheckInService', () => {
         it('returns aggregated stats from check-ins', async () => {
             const checkIns = [mockCheckIn()]
             mockProfileContext()
-            jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue(checkIns)
-            jest.spyOn(checkInStats, 'calculateAverageMood').mockReturnValue(7)
-            jest.spyOn(checkInStats, 'calculateAveragePain').mockReturnValue(3)
+            jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue(checkIns as never)
+            jest.spyOn(checkInStats, 'calculateAverageMood').mockReturnValue(7 as never)
+            jest.spyOn(checkInStats, 'calculateAveragePain').mockReturnValue(3 as never)
             jest.spyOn(checkInStats, 'calculateTopActivities').mockReturnValue(['walking'])
             jest.spyOn(checkInStats, 'calculateStreaks').mockReturnValue({
                 currentStreak: 5,
                 longestStreak: 10
-            })
+            } as never)
 
             const result = await getCheckInStats(USER_ID)
 
@@ -274,13 +274,13 @@ describe('CheckInService', () => {
         it('returns 0 for totalCheckIns when no check-ins', async () => {
             mockProfileContext()
             jest.spyOn(checkInModel, 'getCheckInsForStats').mockResolvedValue([])
-            jest.spyOn(checkInStats, 'calculateAverageMood').mockReturnValue(0)
-            jest.spyOn(checkInStats, 'calculateAveragePain').mockReturnValue(0)
+            jest.spyOn(checkInStats, 'calculateAverageMood').mockReturnValue(0 as never)
+            jest.spyOn(checkInStats, 'calculateAveragePain').mockReturnValue(0 as never)
             jest.spyOn(checkInStats, 'calculateTopActivities').mockReturnValue([])
             jest.spyOn(checkInStats, 'calculateStreaks').mockReturnValue({
                 currentStreak: 0,
                 longestStreak: 0
-            })
+            } as never)
 
             const result = await getCheckInStats(USER_ID)
 

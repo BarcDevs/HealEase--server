@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { PeriodMetrics } from '../../../lib/progressInsights/metricAggregator'
 import {
     classifyTrend,

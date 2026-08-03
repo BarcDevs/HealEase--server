@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { postQueryBuilder } from '../../../models/queries/postQuery'
 
 describe('postQueryBuilder', () => {

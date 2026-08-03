@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as InsightDecision from '../../lib/aiInsight/decision/InsightDecision'
 import * as insightsPrompts from '../../lib/aiInsight/prompts/insightsPrompts'
 import * as aiInsightValidator from '../../lib/aiInsight/validation/aiInsightValidator'
@@ -22,7 +21,7 @@ jest.mock('../../services/feedback/interventionOrchestrator')
 jest.mock('../../locales', () => ({
     getMessages: jest.fn().mockReturnValue({
         insights: { titles: { BAD_DAY_SUPPORT: 'Support' } }
-    })
+    } as never)
 }))
 jest.mock('../../utils/logger', () => ({
     __esModule: true,
@@ -43,6 +42,7 @@ const makeCheckIn = (overrides = {}) => ({
     checkInDate: new Date('2026-06-04'),
     createdAt: new Date(),
     updatedAt: new Date(),
+    insights: [],
     ...overrides
 })
 
@@ -51,14 +51,14 @@ const mockDecision = { type: 'motivational', reason: 'streak', metadata: {} }
 describe('InsightGenerationService', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        jest.spyOn(checkInModel, 'getProfileIdForUser').mockResolvedValue(PROFILE_ID)
+        jest.spyOn(checkInModel, 'getProfileIdForUser').mockResolvedValue(PROFILE_ID as never)
         jest.spyOn(authModel, 'getUserTimezone').mockResolvedValue('UTC')
         jest.spyOn(authModel, 'getUserLanguage').mockResolvedValue('en')
-        jest.spyOn(InsightDecision, 'decideInsightType').mockReturnValue(mockDecision)
-        jest.spyOn(aiInsightModel, 'createInsight').mockResolvedValue(undefined)
+        jest.spyOn(InsightDecision, 'decideInsightType').mockReturnValue(mockDecision as never)
+        jest.spyOn(aiInsightModel, 'createInsight').mockResolvedValue(undefined as never)
         jest.spyOn(aiInsightModel, 'getInsightsByUserId').mockResolvedValue([])
-        jest.spyOn(interventionOrchestrator, 'generateInterventionInsight').mockResolvedValue(null)
-        jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(false)
+        jest.spyOn(interventionOrchestrator, 'generateInterventionInsight').mockResolvedValue(null as never)
+        jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(false as never)
     })
 
     describe('generateInsightForCheckIn', () => {
@@ -75,7 +75,7 @@ describe('InsightGenerationService', () => {
             jest.spyOn(aiInsightGeneratorService, 'generateInsight').mockResolvedValue({
                 title: 'Great job!',
                 content: 'You are doing well.'
-            })
+            } as never)
 
             await generateInsightForCheckIn(USER_ID, CHECK_IN_ID)
 
@@ -112,8 +112,8 @@ describe('InsightGenerationService', () => {
             jest.spyOn(aiInsightGeneratorService, 'generateInsight').mockResolvedValue({
                 title: 'T',
                 content: 'C'
-            })
-            jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(true)
+            } as never)
+            jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(true as never)
 
             await generateInsightForCheckIn(USER_ID, CHECK_IN_ID)
 
@@ -122,18 +122,18 @@ describe('InsightGenerationService', () => {
 
         it('generates intervention insight when not first check-in and intervention returned', async () => {
             const checkIns = [makeCheckIn(), makeCheckIn({ id: 'prev-id' })]
-            jest.spyOn(checkInModel, 'getCheckIns').mockResolvedValue(checkIns)
+            jest.spyOn(checkInModel, 'getCheckIns').mockResolvedValue(checkIns as never)
             jest.spyOn(aiInsightGeneratorService, 'generateInsight').mockResolvedValue({
                 title: 'T',
                 content: 'C'
-            })
-            jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(false)
+            } as never)
+            jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(false as never)
             jest.spyOn(interventionOrchestrator, 'generateInterventionInsight').mockResolvedValue({
                 message: 'You are supported.',
                 priority: 'high',
                 aiEnhanced: true,
                 metadata: { mode: 'FULL', primaryReason: 'mood_drop', fallbackUsed: false }
-            })
+            } as never)
 
             await generateInsightForCheckIn(USER_ID, CHECK_IN_ID)
 
@@ -151,9 +151,9 @@ describe('InsightGenerationService', () => {
             jest.spyOn(aiInsightGeneratorService, 'generateInsight').mockResolvedValue({
                 title: 'T',
                 content: 'C'
-            })
-            jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(false)
-            jest.spyOn(interventionOrchestrator, 'generateInterventionInsight').mockResolvedValue(null)
+            } as never)
+            jest.spyOn(feedbackHelpers, 'isFirstCheckIn').mockReturnValue(false as never)
+            jest.spyOn(interventionOrchestrator, 'generateInterventionInsight').mockResolvedValue(null as never)
 
             await generateInsightForCheckIn(USER_ID, CHECK_IN_ID)
 

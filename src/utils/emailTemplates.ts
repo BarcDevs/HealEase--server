@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import { appConfig } from '../config/app'
+import { brandConfig } from '../config/app'
 import { getMessages, resolveLanguage } from '../locales'
 
 let LOGO_URL = ''
@@ -77,11 +77,11 @@ const baseTemplate = (s: TemplateStrings, otp: number): string => `<!DOCTYPE htm
               <table cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
                 <tr>
                   <td style="vertical-align:middle;padding-${s.dir === 'rtl' ? 'left' : 'right'}:10px;">
-                    <img src="${LOGO_URL}" alt="${esc(appConfig.brandName)}" width="36" height="36"
+                    <img src="${LOGO_URL}" alt="${esc(brandConfig.brandName)}" width="36" height="36"
                       style="display:block;border-radius:8px;width:36px;height:36px;">
                   </td>
                   <td style="vertical-align:middle;">
-                    <span style="font-size:18px;font-weight:700;color:#FFFFFF;letter-spacing:-0.3px;">${esc(appConfig.brandName)}</span>
+                    <span style="font-size:18px;font-weight:700;color:#FFFFFF;letter-spacing:-0.3px;">${esc(brandConfig.brandName)}</span>
                   </td>
                 </tr>
               </table>
@@ -140,7 +140,7 @@ const buildStrings = (
     const resolved = resolveLanguage(lang)
     const msgs = getMessages(resolved)
     const isRtl = resolved === 'he'
-    const brandName = appConfig.brandName
+    const brandName = brandConfig.brandName
     return {
         dir: isRtl ? 'rtl' : 'ltr',
         lang: resolved,

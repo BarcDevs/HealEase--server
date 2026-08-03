@@ -2,6 +2,7 @@ import express, { type Express } from 'express'
 import path from 'path'
 
 import { env } from '../../config'
+import logger from '../utils/logger'
 
 const exposeProductionApp = (app: Express) => {
     if (env !== 'production') return
@@ -13,7 +14,7 @@ const exposeProductionApp = (app: Express) => {
         'client',
         'dist'
     )
-    console.info('serving build resources at', buildDir)
+    logger.info('serving build resources at', buildDir)
 
     app.use('/', express.static(buildDir))
 }

@@ -11,7 +11,7 @@ export const rateLimiter = rateLimit({
     skip: (req) => {
         // Exempt auth infrastructure endpoints from rate limiting
         return req.path === `/api/${serverConfig.apiVersion}/auth/me`
-            || req.path === `/api/${serverConfig.apiVersion}/auth/csrf`
+            || req.path === `/api/${serverConfig.apiVersion}/auth/refresh`
     }
 })
 
@@ -20,6 +20,18 @@ export const otpRateLimiter = rateLimit({
     limit: isDev ? 100 : 5,
     message:
         'Too many OTP requests from this IP, please try again after 15 minutes'
+})
+
+export const loginRateLimiter = rateLimit({
+    windowMs: 15 * minuteInMs,
+    limit: isDev ? 100 : 10,
+    message:
+        'Too many login attempts, please try again after 15 minutes',
+    keyGenerator: (req) => {
+        const ip = ipKeyGenerator(req.ip ?? '')
+        const email = req.body?.email ?? ''
+        return `${ip}:${email}`
+    }
 })
 
 export const sharePostRateLimiter = rateLimit({

@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as authController from '../../controllers/authController'
 import * as authOTP from '../../lib/authOTP'
 import * as authServices from '../../services/authService'
@@ -22,7 +23,10 @@ jest.mock('../../lib/authOTP', () => ({
     ...jest.requireActual('../../lib/authOTP'),
     sendForgotPasswordOTP: jest.fn(),
     sendConfirmEmailOTP: jest.fn(),
-    removeResetPasswordOTP: jest.fn()
+    removeResetPasswordOTP: jest.fn(),
+    recordFailedResetPasswordAttempt: jest.fn(),
+    removeConfirmEmailOTP: jest.fn(),
+    recordFailedConfirmEmailAttempt: jest.fn()
 }))
 
 const mockLogin = authServices.login as jest.MockedFunction<
@@ -67,7 +71,7 @@ describe('AuthController', () => {
                     expect.any(Object)
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(200)
+                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: 'user logged in!',
@@ -146,7 +150,7 @@ describe('AuthController', () => {
                 })
             )
             expect(res.status)
-                .toHaveBeenCalledWith(201)
+                .toHaveBeenCalledWith(HttpStatusCodes.CREATED)
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: 'user created!',
@@ -221,7 +225,7 @@ describe('AuthController', () => {
             expect(res.clearCookie)
                 .toHaveBeenCalledWith('accessToken')
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: 'user logged out!'
@@ -252,7 +256,7 @@ describe('AuthController', () => {
                     'test-user-id-123'
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(200)
+                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: 'user info!',
@@ -315,7 +319,7 @@ describe('AuthController', () => {
                     expect.any(Object)
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(200)
+                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: 'CSRF token generated!',
@@ -348,7 +352,7 @@ describe('AuthController', () => {
                 'test@test.com'
             )
             expect(res.status)
-                .toHaveBeenCalledWith(200)
+                .toHaveBeenCalledWith(HttpStatusCodes.OK)
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({
                     message: expect.stringContaining('OTP')
@@ -383,8 +387,8 @@ describe('AuthController', () => {
                     Date.now() + 1000 * 60 * 60
                 )
                 const mockUser = createMockUser({
-                    resetPasswordOTP: 123456,
-                    resetPasswordExpiration: futureDate
+                    confirmEmailOTP: 123456,
+                    confirmEmailExpiration: futureDate
                 })
                 ;(authServices.getUser as jest.Mock)
                     .mockResolvedValue(mockUser)
@@ -405,7 +409,7 @@ describe('AuthController', () => {
                     'test@test.com'
                 )
                 expect(res.status)
-                    .toHaveBeenCalledWith(201)
+                    .toHaveBeenCalledWith(HttpStatusCodes.CREATED)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: 'Your email is confirmed!'
@@ -419,8 +423,8 @@ describe('AuthController', () => {
                 Date.now() + 1000 * 60 * 60
             )
             const mockUser = createMockUser({
-                resetPasswordOTP: 123456,
-                resetPasswordExpiration: futureDate
+                confirmEmailOTP: 123456,
+                confirmEmailExpiration: futureDate
             })
             ;(authServices.getUser as jest.Mock)
                 .mockResolvedValue(mockUser)
@@ -444,8 +448,8 @@ describe('AuthController', () => {
                 Date.now() - 1000 * 60 * 60
             )
             const mockUser = createMockUser({
-                resetPasswordOTP: 123456,
-                resetPasswordExpiration: pastDate
+                confirmEmailOTP: 123456,
+                confirmEmailExpiration: pastDate
             })
             ;(authServices.getUser as jest.Mock)
                 .mockResolvedValue(mockUser)
@@ -503,7 +507,7 @@ describe('AuthController', () => {
                 expect(authOTP.removeResetPasswordOTP)
                     .toHaveBeenCalledWith(mockUser.id)
                 expect(res.status)
-                    .toHaveBeenCalledWith(200)
+                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: 'Password has changed successfully!'
@@ -557,7 +561,7 @@ describe('AuthController', () => {
                 await authController.resetPassword(req, res)
 
                 expect(res.status)
-                    .toHaveBeenCalledWith(200)
+                    .toHaveBeenCalledWith(HttpStatusCodes.OK)
                 expect(res.json).toHaveBeenCalledWith(
                     expect.objectContaining({
                         message: expect.stringContaining('If the email exists')

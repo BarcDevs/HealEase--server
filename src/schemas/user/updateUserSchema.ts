@@ -15,3 +15,5 @@ export const updateUserSchema = z.object({
         .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores')
         .optional()
 })
+
+export type UpdateUserType = z.infer<typeof updateUserSchema>

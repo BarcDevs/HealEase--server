@@ -1,6 +1,6 @@
-// @ts-nocheck
 import type { Request, Response } from 'express'
 
+import { HttpStatusCodes } from '../../constants/httpStatusCodes'
 import * as recoveryGoalController from '../../controllers/recoveryGoalController'
 import * as recoveryGoalService from '../../services/recoveryGoalService'
 import {
@@ -23,6 +23,8 @@ const mockGoalWithProgress = () => ({
     totalMilestones: 0,
     completedMilestones: 0
 })
+
+const asServiceResult = <T>(value: unknown) => value as T
 
 describe('RecoveryGoalController', () => {
     let res: Response
@@ -156,7 +158,7 @@ describe('RecoveryGoalController', () => {
 
         it('creates goal and returns 201', async () => {
             const goal = mockGoalWithProgress()
-            jest.spyOn(recoveryGoalService, 'createGoal').mockResolvedValue(goal)
+            jest.spyOn(recoveryGoalService, 'createGoal').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.createGoal>>>(goal))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -169,7 +171,7 @@ describe('RecoveryGoalController', () => {
                 USER_ID,
                 expect.objectContaining({ title: 'Sleep Better' })
             )
-            expect(res.status).toHaveBeenCalledWith(201)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.CREATED)
         })
     })
 
@@ -185,7 +187,7 @@ describe('RecoveryGoalController', () => {
 
         it('returns goals with optional status filter', async () => {
             const goals = [mockGoalWithProgress()]
-            jest.spyOn(recoveryGoalService, 'getUserGoals').mockResolvedValue(goals)
+            jest.spyOn(recoveryGoalService, 'getUserGoals').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.getUserGoals>>>(goals))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -202,7 +204,7 @@ describe('RecoveryGoalController', () => {
 
         it('returns all goals when no status filter', async () => {
             const goals = [mockGoalWithProgress()]
-            jest.spyOn(recoveryGoalService, 'getUserGoals').mockResolvedValue(goals)
+            jest.spyOn(recoveryGoalService, 'getUserGoals').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.getUserGoals>>>(goals))
 
             const req = createMockRequest({ userId: USER_ID }) as unknown as Request
 
@@ -237,7 +239,7 @@ describe('RecoveryGoalController', () => {
 
         it('returns goal by id', async () => {
             const goal = mockGoalWithProgress()
-            jest.spyOn(recoveryGoalService, 'getGoal').mockResolvedValue(goal)
+            jest.spyOn(recoveryGoalService, 'getGoal').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.getGoal>>>(goal))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -268,7 +270,7 @@ describe('RecoveryGoalController', () => {
 
         it('updates and returns goal', async () => {
             const goal = mockGoalWithProgress()
-            jest.spyOn(recoveryGoalService, 'updateGoal').mockResolvedValue(goal)
+            jest.spyOn(recoveryGoalService, 'updateGoal').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.updateGoal>>>(goal))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -351,7 +353,7 @@ describe('RecoveryGoalController', () => {
                     ])
                 })
             )
-            expect(res.status).toHaveBeenCalledWith(201)
+            expect(res.status).toHaveBeenCalledWith(HttpStatusCodes.CREATED)
         })
     })
 
@@ -461,7 +463,7 @@ describe('RecoveryGoalController', () => {
 
         it('completes goal and returns updated goal', async () => {
             const goal = mockGoalWithProgress()
-            jest.spyOn(recoveryGoalService, 'completeGoal').mockResolvedValue(goal)
+            jest.spyOn(recoveryGoalService, 'completeGoal').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.completeGoal>>>(goal))
 
             const req = createMockRequest({
                 userId: USER_ID,
@@ -489,7 +491,7 @@ describe('RecoveryGoalController', () => {
 
         it('returns stats with no filters', async () => {
             const stats = { totalGoals: 5, completedGoals: 2, completionRate: 40 }
-            jest.spyOn(recoveryGoalService, 'getStats').mockResolvedValue(stats)
+            jest.spyOn(recoveryGoalService, 'getStats').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.getStats>>>(stats))
 
             const req = createMockRequest({ userId: USER_ID }) as unknown as Request
 
@@ -506,7 +508,7 @@ describe('RecoveryGoalController', () => {
 
         it('parses fromDate and toDate from query', async () => {
             const stats = { totalGoals: 3, completedGoals: 1, completionRate: 33 }
-            jest.spyOn(recoveryGoalService, 'getStats').mockResolvedValue(stats)
+            jest.spyOn(recoveryGoalService, 'getStats').mockResolvedValue(asServiceResult<Awaited<ReturnType<typeof recoveryGoalService.getStats>>>(stats))
 
             const req = createMockRequest({
                 userId: USER_ID,

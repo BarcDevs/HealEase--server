@@ -14,3 +14,5 @@ export const newGoalSchema = z.object({
     targetDate: futureDateField.optional(),
     isPrimary: z.boolean().optional()
 })
+
+export type NewGoalType = z.infer<typeof newGoalSchema>

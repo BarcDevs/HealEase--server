@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getObservationTemplate } from '../../../lib/dailyObservation/observationTemplates'
 
 describe('getObservationTemplate', () => {

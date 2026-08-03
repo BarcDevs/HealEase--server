@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import type {
     NextFunction,
     Request,
@@ -12,17 +13,18 @@ export const loggerMiddleware = (
     next: NextFunction
 ) => {
     const start = Date.now()
+    req.requestId = crypto.randomUUID()
 
     res.on('finish', () => {
         const ms = Date.now() - start
-        const { method, path } = req
+        const { method, path, requestId } = req
         const status = res.statusCode
         const userId = req.userId ?? '-'
 
         logger.http(
             `${method} ${path}
              ${status} ${ms}ms
-             userId=${userId}`
+             userId=${userId} requestId=${requestId}`
         )
     })
 

@@ -2,7 +2,11 @@ import { randomInt } from 'crypto'
 import ms from 'ms'
 
 import { authConfig } from '../../config'
-import { appConfig } from '../config/app'
+import { brandConfig } from '../config/app'
+import {
+    MAX_CONFIRM_EMAIL_ATTEMPTS,
+    MAX_RESET_PASSWORD_ATTEMPTS
+} from '../constants/auth/authRules'
 import { getMessages } from '../locales'
 import * as authModel from '../models/authModel'
 import { sendEmail } from '../utils/emailSender'
@@ -44,9 +48,47 @@ export const removeResetPasswordOTP = async (
         userId,
         {
             resetPasswordOTP: null,
-            resetPasswordExpiration: null
+            resetPasswordExpiration: null,
+            resetPasswordAttempts: 0
         }
     )
+}
+
+export const recordFailedResetPasswordAttempt = async (
+    userId: string,
+    currentAttempts: number
+): Promise<void> => {
+    if (currentAttempts + 1 >= MAX_RESET_PASSWORD_ATTEMPTS) {
+        await removeResetPasswordOTP(userId)
+        return
+    }
+
+    await authModel.incrementResetPasswordAttempts(userId)
+}
+
+export const removeConfirmEmailOTP = async (
+    userId: string
+): Promise<void> => {
+    await authModel.setConfirmEmailOTP(
+        userId,
+        {
+            confirmEmailOTP: null,
+            confirmEmailExpiration: null,
+            confirmEmailAttempts: 0
+        }
+    )
+}
+
+export const recordFailedConfirmEmailAttempt = async (
+    userId: string,
+    currentAttempts: number
+): Promise<void> => {
+    if (currentAttempts + 1 >= MAX_CONFIRM_EMAIL_ATTEMPTS) {
+        await removeConfirmEmailOTP(userId)
+        return
+    }
+
+    await authModel.incrementConfirmEmailAttempts(userId)
 }
 
 export const removeEmailChangeOTP = async (
@@ -76,7 +118,8 @@ export const sendForgotPasswordOTP = async (
         user.id,
         {
             resetPasswordOTP: otp,
-            resetPasswordExpiration: expiration
+            resetPasswordExpiration: expiration,
+            resetPasswordAttempts: 0
         }
     )
 
@@ -84,8 +127,8 @@ export const sendForgotPasswordOTP = async (
     const messages = getMessages(lang).emails.resetPassword
     await sendEmail(
         email,
-        t(messages.subject, { brandName: appConfig.brandName }),
-        t(messages.body, { otp, brandName: appConfig.brandName }),
+        t(messages.subject, { brandName: brandConfig.brandName }),
+        t(messages.body, { otp, brandName: brandConfig.brandName }),
         resetPasswordTemplate(otp, lang)
     )
 
@@ -102,11 +145,12 @@ export const sendConfirmEmailOTP = async (
 
     const { otp, expiration } = generateOTP()
 
-    await authModel.setUserOTP(
+    await authModel.setConfirmEmailOTP(
         user.id,
         {
-            resetPasswordOTP: otp,
-            resetPasswordExpiration: expiration
+            confirmEmailOTP: otp,
+            confirmEmailExpiration: expiration,
+            confirmEmailAttempts: 0
         }
     )
 
@@ -114,8 +158,8 @@ export const sendConfirmEmailOTP = async (
     const messages = getMessages(lang).emails.confirmEmail
     await sendEmail(
         email,
-        t(messages.subject, { brandName: appConfig.brandName }),
-        t(messages.body, { otp, brandName: appConfig.brandName }),
+        t(messages.subject, { brandName: brandConfig.brandName }),
+        t(messages.body, { otp, brandName: brandConfig.brandName }),
         confirmEmailTemplate(otp, lang)
     )
 
@@ -138,8 +182,8 @@ export const sendEmailChangeOTP = async (
     const messages = getMessages(language).emails.changeEmail
     await sendEmail(
         newEmail,
-        t(messages.subject, { brandName: appConfig.brandName }),
-        t(messages.body, { otp, brandName: appConfig.brandName }),
+        t(messages.subject, { brandName: brandConfig.brandName }),
+        t(messages.body, { otp, brandName: brandConfig.brandName }),
         changeEmailTemplate(otp, language)
     )
 

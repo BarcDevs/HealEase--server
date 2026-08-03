@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Response } from 'express'
 
 import { isAdmin } from '../../middlewares/isAdmin'
@@ -21,7 +20,7 @@ jest.mock('../../errors/factory/ErrorFactory', () => ({
 describe('isAdmin Middleware', () => {
     it('throws unauthorized when no userId', async () => {
         const req = createMockRequest() as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
 
         await expect(isAdmin(req, res, next)).rejects.toThrow('Unauthorized')
@@ -29,7 +28,7 @@ describe('isAdmin Middleware', () => {
 
     it('throws forbidden when user not found in DB', async () => {
         const req = createMockRequest({ userId: 'user-id' }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
         prismaMock.user.findUnique.mockResolvedValue(null)
 
@@ -38,18 +37,18 @@ describe('isAdmin Middleware', () => {
 
     it('throws forbidden when user role is USER', async () => {
         const req = createMockRequest({ userId: 'user-id' }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
-        prismaMock.user.findUnique.mockResolvedValue({ role: 'USER' })
+        prismaMock.user.findUnique.mockResolvedValue({ role: 'USER' } as never)
 
         await expect(isAdmin(req, res, next)).rejects.toThrow('Forbidden')
     })
 
     it('calls next when user role is ADMIN', async () => {
         const req = createMockRequest({ userId: 'user-id' }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
-        prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN' })
+        prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN' } as never)
 
         await isAdmin(req, res, next)
 
@@ -58,9 +57,9 @@ describe('isAdmin Middleware', () => {
 
     it('queries DB with correct userId', async () => {
         const req = createMockRequest({ userId: 'specific-user-id' }) as any
-        const res = createMockResponse() as Response
+        const res = createMockResponse() as unknown as Response
         const next = createMockNext()
-        prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN' })
+        prismaMock.user.findUnique.mockResolvedValue({ role: 'ADMIN' } as never)
 
         await isAdmin(req, res, next)
 

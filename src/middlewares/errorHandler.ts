@@ -31,10 +31,19 @@ export const errorHandler = (
         return res.status(err.statusCode).json(response)
     }
 
-    type ErrorType = typeof err.message
-    const response: ResponseType<ErrorType> = {
+    const response: ResponseType<{
+        statusType: string
+        statusCode: number
+        error: string
+    }[]> = {
         message: 'Something went wrong',
-        error: isDev ? err.message : 'Internal server error'
+        error: [
+            {
+                statusType: 'Internal Server Error',
+                statusCode: HttpStatusCodes.INTERNAL_SERVER_ERROR,
+                error: isDev ? err.message : 'Internal server error'
+            }
+        ]
     }
 
     return res

@@ -8,3 +8,6 @@ export const newMilestoneSchema = z.object({
         .max(1000)
         .optional()
 })
+
+export type NewMilestoneType
+    = z.infer<typeof newMilestoneSchema>

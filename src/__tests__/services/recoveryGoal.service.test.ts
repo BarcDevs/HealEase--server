@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     GoalStatus,
     MilestoneStatus
@@ -40,7 +39,7 @@ const MILESTONE_ID = 'milestone-id-123'
 
 const mockGetProfileId = () =>
     jest.spyOn(RecoveryGoalModel, 'getProfileIdForUser')
-        .mockResolvedValue(PROFILE_ID)
+        .mockResolvedValue(PROFILE_ID as never)
 
 describe('RecoveryGoalService', () => {
     beforeEach(() => jest.clearAllMocks())
@@ -73,7 +72,7 @@ describe('RecoveryGoalService', () => {
             jest.spyOn(RecoveryGoalModel, 'getGoalsByProfileId')
                 .mockResolvedValue([])
             jest.spyOn(RecoveryGoalModel, 'createGoal')
-                .mockResolvedValue(mockGoal)
+                .mockResolvedValue(mockGoal as never)
 
             const result = await createGoal(USER_ID, {
                 title: 'Sleep better',
@@ -90,9 +89,9 @@ describe('RecoveryGoalService', () => {
             jest.spyOn(RecoveryGoalModel, 'getGoalsByProfileId')
                 .mockResolvedValue([])
             jest.spyOn(RecoveryGoalModel, 'createGoal')
-                .mockResolvedValue(mockGoal)
+                .mockResolvedValue(mockGoal as never)
             const setPrimary = jest.spyOn(RecoveryGoalModel, 'setPrimaryGoal')
-                .mockResolvedValue(undefined)
+                .mockResolvedValue(undefined as never)
 
             await createGoal(USER_ID, {
                 title: 'Primary',
@@ -112,7 +111,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when goal does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(getGoal(GOAL_ID, USER_ID)).rejects.toThrow(/Goal/)
         })
@@ -124,8 +123,8 @@ describe('RecoveryGoalService', () => {
                 createMockMilestone({ status: MilestoneStatus.COMPLETED }),
                 createMockMilestone({ status: MilestoneStatus.ACTIVE })
             ]
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(mockGoal)
-            jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue(milestones)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(mockGoal as never)
+            jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue(milestones as never)
 
             const result = await getGoal(GOAL_ID, USER_ID)
 
@@ -155,7 +154,7 @@ describe('RecoveryGoalService', () => {
             mockGetProfileId()
             const mockGoal = createMockRecoveryGoal()
             jest.spyOn(RecoveryGoalModel, 'getGoalsByProfileId').mockResolvedValue([mockGoal])
-            jest.spyOn(RecoveryGoalModel, 'countMilestonesByGoalId').mockResolvedValue(2)
+            jest.spyOn(RecoveryGoalModel, 'countMilestonesByGoalId').mockResolvedValue(2 as never)
             jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue([
                 createMockMilestone({ status: MilestoneStatus.COMPLETED }),
                 createMockMilestone({ status: MilestoneStatus.ACTIVE })
@@ -170,7 +169,7 @@ describe('RecoveryGoalService', () => {
         it('returns progress 0 for goals with no milestones', async () => {
             mockGetProfileId()
             jest.spyOn(RecoveryGoalModel, 'getGoalsByProfileId').mockResolvedValue([createMockRecoveryGoal()])
-            jest.spyOn(RecoveryGoalModel, 'countMilestonesByGoalId').mockResolvedValue(0)
+            jest.spyOn(RecoveryGoalModel, 'countMilestonesByGoalId').mockResolvedValue(0 as never)
 
             const result = await getUserGoals(USER_ID)
 
@@ -187,7 +186,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when goal does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(updateGoal(GOAL_ID, USER_ID, {})).rejects.toThrow(/Goal/)
         })
@@ -218,8 +217,8 @@ describe('RecoveryGoalService', () => {
             mockGetProfileId()
             const mockGoal = createMockRecoveryGoal({ status: GoalStatus.ACTIVE })
             const updatedGoal = createMockRecoveryGoal({ status: GoalStatus.PAUSED })
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(mockGoal)
-            const updateSpy = jest.spyOn(RecoveryGoalModel, 'updateGoal').mockResolvedValue(updatedGoal)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(mockGoal as never)
+            const updateSpy = jest.spyOn(RecoveryGoalModel, 'updateGoal').mockResolvedValue(updatedGoal as never)
             jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue([])
 
             await updateGoal(GOAL_ID, USER_ID, { status: GoalStatus.PAUSED })
@@ -239,7 +238,7 @@ describe('RecoveryGoalService', () => {
                 createMockRecoveryGoal({ status: GoalStatus.ABANDONED })
             )
             jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue([])
-            const lockSpy = jest.spyOn(RecoveryGoalModel, 'lockNonCompletedMilestones').mockResolvedValue(undefined)
+            const lockSpy = jest.spyOn(RecoveryGoalModel, 'lockNonCompletedMilestones').mockResolvedValue(undefined as never)
 
             await updateGoal(GOAL_ID, USER_ID, { status: GoalStatus.ABANDONED })
 
@@ -249,8 +248,8 @@ describe('RecoveryGoalService', () => {
         it('returns goal with computed progress after update', async () => {
             mockGetProfileId()
             const mockGoal = createMockRecoveryGoal({ status: GoalStatus.ACTIVE })
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(mockGoal)
-            jest.spyOn(RecoveryGoalModel, 'updateGoal').mockResolvedValue(mockGoal)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(mockGoal as never)
+            jest.spyOn(RecoveryGoalModel, 'updateGoal').mockResolvedValue(mockGoal as never)
             jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue([
                 createMockMilestone({ status: MilestoneStatus.COMPLETED })
             ])
@@ -269,7 +268,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when goal does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(deleteGoal(GOAL_ID, USER_ID)).rejects.toThrow(/Goal/)
         })
@@ -277,7 +276,7 @@ describe('RecoveryGoalService', () => {
         it('deletes the goal', async () => {
             mockGetProfileId()
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
-            const deleteSpy = jest.spyOn(RecoveryGoalModel, 'deleteGoal').mockResolvedValue(undefined)
+            const deleteSpy = jest.spyOn(RecoveryGoalModel, 'deleteGoal').mockResolvedValue(undefined as never)
 
             await deleteGoal(GOAL_ID, USER_ID)
 
@@ -289,7 +288,7 @@ describe('RecoveryGoalService', () => {
     describe('getMaxMilestoneOrder', () => {
         it('throws not found when goal does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(getMaxMilestoneOrder(GOAL_ID, USER_ID)).rejects.toThrow(/Goal/)
         })
@@ -297,7 +296,7 @@ describe('RecoveryGoalService', () => {
         it('returns maxOrder + 1', async () => {
             mockGetProfileId()
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
-            jest.spyOn(RecoveryGoalModel, 'getMaxMilestoneOrder').mockResolvedValue(3)
+            jest.spyOn(RecoveryGoalModel, 'getMaxMilestoneOrder').mockResolvedValue(3 as never)
 
             const result = await getMaxMilestoneOrder(GOAL_ID, USER_ID)
 
@@ -307,7 +306,7 @@ describe('RecoveryGoalService', () => {
         it('returns 1 when no milestones exist (null maxOrder)', async () => {
             mockGetProfileId()
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
-            jest.spyOn(RecoveryGoalModel, 'getMaxMilestoneOrder').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getMaxMilestoneOrder').mockResolvedValue(null as never)
 
             const result = await getMaxMilestoneOrder(GOAL_ID, USER_ID)
 
@@ -329,7 +328,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when goal does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(
                 createMilestones(GOAL_ID, USER_ID, milestoneData)
@@ -351,7 +350,7 @@ describe('RecoveryGoalService', () => {
             mockGetProfileId()
             const rawMilestone = createMockMilestone()
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
-            jest.spyOn(RecoveryGoalModel, 'countMilestonesByGoalId').mockResolvedValue(0)
+            jest.spyOn(RecoveryGoalModel, 'countMilestonesByGoalId').mockResolvedValue(0 as never)
             jest.spyOn(RecoveryGoalModel, 'createMilestonesInBatch').mockResolvedValue([rawMilestone])
 
             const result = await createMilestones(GOAL_ID, USER_ID, milestoneData)
@@ -369,7 +368,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when milestone does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getMilestoneById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getMilestoneById').mockResolvedValue(null as never)
 
             await expect(
                 updateMilestone(MILESTONE_ID, USER_ID, {})
@@ -382,7 +381,7 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone(),
                 goalId: GOAL_ID,
                 goal: { profileId: 'different-profile-id' }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
 
             await expect(
@@ -396,7 +395,7 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone({ status: MilestoneStatus.COMPLETED }),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
 
             await expect(
@@ -410,7 +409,7 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone({ status: MilestoneStatus.LOCKED }),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
 
             await expect(
@@ -425,9 +424,9 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone(),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
-            jest.spyOn(RecoveryGoalModel, 'updateMilestone').mockResolvedValue(updatedMilestone)
+            jest.spyOn(RecoveryGoalModel, 'updateMilestone').mockResolvedValue(updatedMilestone as never)
 
             const result = await updateMilestone(MILESTONE_ID, USER_ID, { title: 'Updated' })
 
@@ -445,7 +444,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when milestone does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getMilestoneById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getMilestoneById').mockResolvedValue(null as never)
 
             await expect(
                 completeMilestone(MILESTONE_ID, GOAL_ID, USER_ID)
@@ -458,8 +457,8 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone(),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            } as never)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(
                 completeMilestone(MILESTONE_ID, GOAL_ID, USER_ID)
@@ -472,10 +471,10 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone(),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
             const completeSpy = jest.spyOn(RecoveryGoalModel, 'completeMilestoneAndAdvance')
-                .mockResolvedValue(undefined)
+                .mockResolvedValue(undefined as never)
 
             await completeMilestone(MILESTONE_ID, GOAL_ID, USER_ID)
 
@@ -491,7 +490,7 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone({ status: MilestoneStatus.COMPLETED }),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
 
             await expect(
@@ -505,7 +504,7 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone({ status: MilestoneStatus.LOCKED }),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
 
             await expect(
@@ -519,9 +518,9 @@ describe('RecoveryGoalService', () => {
                 ...createMockMilestone({ status: MilestoneStatus.ACTIVE }),
                 goalId: GOAL_ID,
                 goal: { profileId: PROFILE_ID }
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(createMockRecoveryGoal())
-            const deleteSpy = jest.spyOn(RecoveryGoalModel, 'deleteMilestone').mockResolvedValue(undefined)
+            const deleteSpy = jest.spyOn(RecoveryGoalModel, 'deleteMilestone').mockResolvedValue(undefined as never)
 
             await deleteMilestone(MILESTONE_ID, USER_ID)
 
@@ -537,7 +536,7 @@ describe('RecoveryGoalService', () => {
 
         it('throws not found when goal does not exist', async () => {
             mockGetProfileId()
-            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null)
+            jest.spyOn(RecoveryGoalModel, 'getGoalById').mockResolvedValue(null as never)
 
             await expect(completeGoal(GOAL_ID, USER_ID)).rejects.toThrow(/Goal/)
         })
@@ -577,7 +576,7 @@ describe('RecoveryGoalService', () => {
             jest.spyOn(RecoveryGoalModel, 'getMilestonesByGoalId').mockResolvedValue([
                 createMockMilestone({ status: MilestoneStatus.COMPLETED })
             ])
-            jest.spyOn(RecoveryGoalModel, 'updateGoal').mockResolvedValue(completedGoal)
+            jest.spyOn(RecoveryGoalModel, 'updateGoal').mockResolvedValue(completedGoal as never)
 
             const result = await completeGoal(GOAL_ID, USER_ID)
 
@@ -600,16 +599,16 @@ describe('RecoveryGoalService', () => {
                 completed: 2,
                 paused: 0,
                 abandoned: 0
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getMilestonesStats').mockResolvedValue({
                 totalCreated: 10,
                 active: 3,
                 completed: 7,
                 locked: 0
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getCompletedDatesForStreak').mockResolvedValue([new Date()])
             jest.spyOn(authModel, 'getUserTimezone').mockResolvedValue('UTC')
-            jest.spyOn(streakCalc, 'calculateCurrentStreak').mockReturnValue(3)
+            jest.spyOn(streakCalc, 'calculateCurrentStreak').mockReturnValue(3 as never)
 
             const result = await getStats(USER_ID)
 
@@ -626,16 +625,16 @@ describe('RecoveryGoalService', () => {
                 completed: 0,
                 paused: 0,
                 abandoned: 0
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getMilestonesStats').mockResolvedValue({
                 totalCreated: 0,
                 active: 0,
                 completed: 0,
                 locked: 0
-            })
+            } as never)
             jest.spyOn(RecoveryGoalModel, 'getCompletedDatesForStreak').mockResolvedValue([])
-            jest.spyOn(authModel, 'getUserTimezone').mockResolvedValue(null)
-            jest.spyOn(streakCalc, 'calculateCurrentStreak').mockReturnValue(0)
+            jest.spyOn(authModel, 'getUserTimezone').mockResolvedValue(null as never)
+            jest.spyOn(streakCalc, 'calculateCurrentStreak').mockReturnValue(0 as never)
 
             const result = await getStats(USER_ID)
 

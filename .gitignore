@@ -15,6 +15,7 @@ prisma/*.db-journal
 # logger
 logs
 test-output.*
+eval-output/
 
 # production
 build

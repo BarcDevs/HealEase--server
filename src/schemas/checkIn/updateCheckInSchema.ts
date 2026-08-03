@@ -13,3 +13,6 @@ export const updateCheckInSchema = z
         obj => Object.values(obj).some(v => v !== undefined),
         'At least one field must be provided'
     )
+
+export type UpdateCheckInType
+    = z.infer<typeof updateCheckInSchema>

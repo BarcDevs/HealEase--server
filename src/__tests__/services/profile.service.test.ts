@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as profileHelpers from '../../lib/profileHelpers'
 import * as forumModel from '../../models/forumModel'
 import * as profileModel from '../../models/profileModel'
@@ -36,8 +35,8 @@ describe('ProfileService', () => {
         it('returns merged profile and interactions', async () => {
             const profile = mockProfile()
             const interactions = { savedPosts: [], likedPosts: [] }
-            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(profile)
-            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue(interactions)
+            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(profile as never)
+            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue(interactions as never)
 
             const result = await getProfile(USER_ID)
 
@@ -46,8 +45,8 @@ describe('ProfileService', () => {
         })
 
         it('calls ensureProfileExists with userId', async () => {
-            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(mockProfile())
-            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue({})
+            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(mockProfile() as never)
+            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue({} as never)
 
             await getProfile(USER_ID)
 
@@ -56,8 +55,8 @@ describe('ProfileService', () => {
 
         it('calls getProfileInteractions with profileId and includePosts', async () => {
             const profile = mockProfile()
-            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(profile)
-            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue({})
+            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(profile as never)
+            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue({} as never)
 
             await getProfile(USER_ID, true)
 
@@ -66,8 +65,8 @@ describe('ProfileService', () => {
         })
 
         it('defaults includePosts to false', async () => {
-            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(mockProfile())
-            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue({})
+            jest.spyOn(profileHelpers, 'ensureProfileExists').mockResolvedValue(mockProfile() as never)
+            jest.spyOn(forumModel, 'getProfileInteractions').mockResolvedValue({} as never)
 
             await getProfile(USER_ID)
 
@@ -80,7 +79,7 @@ describe('ProfileService', () => {
     describe('updateProfile', () => {
         it('delegates to profileModel.updateProfile', async () => {
             const updatedProfile = mockProfile({ bio: 'Hello' })
-            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(updatedProfile)
+            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(updatedProfile as never)
 
             const result = await updateProfile(USER_ID, { bio: 'Hello' })
 
@@ -92,7 +91,7 @@ describe('ProfileService', () => {
         })
 
         it('converts dateOfBirth string to Date object', async () => {
-            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(mockProfile())
+            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(mockProfile() as never)
 
             await updateProfile(USER_ID, { dateOfBirth: '1990-05-15' })
 
@@ -103,7 +102,7 @@ describe('ProfileService', () => {
         })
 
         it('omits dateOfBirth when not provided', async () => {
-            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(mockProfile())
+            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(mockProfile() as never)
 
             await updateProfile(USER_ID, { bio: 'Test' })
 
@@ -112,7 +111,7 @@ describe('ProfileService', () => {
         })
 
         it('passes healthInterests and activityPreferences through', async () => {
-            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(mockProfile())
+            jest.spyOn(profileModel, 'updateProfile').mockResolvedValue(mockProfile() as never)
 
             await updateProfile(USER_ID, {
                 healthInterests: ['mental-health'],
@@ -133,7 +132,7 @@ describe('ProfileService', () => {
     describe('getAvailableHealthInterests', () => {
         it('delegates to profileModel', async () => {
             const interests = [{ id: '1', slug: 'mental-health', name: 'Mental Health' }]
-            jest.spyOn(profileModel, 'getAvailableHealthInterests').mockResolvedValue(interests)
+            jest.spyOn(profileModel, 'getAvailableHealthInterests').mockResolvedValue(interests as never)
 
             const result = await getAvailableHealthInterests()
 
@@ -145,7 +144,7 @@ describe('ProfileService', () => {
     describe('getAvailableActivityPreferences', () => {
         it('delegates to profileModel', async () => {
             const prefs = [{ id: '1', slug: 'yoga', name: 'Yoga' }]
-            jest.spyOn(profileModel, 'getAvailableActivityPreferences').mockResolvedValue(prefs)
+            jest.spyOn(profileModel, 'getAvailableActivityPreferences').mockResolvedValue(prefs as never)
 
             const result = await getAvailableActivityPreferences()
 
