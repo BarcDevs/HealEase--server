@@ -42,7 +42,7 @@ Recovery tracking API with AI-powered behavioral insights and community features
 | Authentication | JWT + bcrypt |
 | AI | Google Gemini API |
 | Monitoring | Sentry |
-| Deployment | Render |
+| Deployment | AWS EC2 + RDS (production), Render (staging) |
 
 ---
 
@@ -538,23 +538,28 @@ curl -X POST http://localhost:3000/api/{version}/check-in \
 
 ## Deployment
 
-Hosted on **Render**. Configuration:
+**Production** runs on **AWS EC2 + RDS** (eu-central-1), via Docker — not Render.
+Full infra details, redeploy steps, secrets layout, and build-time gotchas specific to
+this stack: see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-| Property | Value |
-|---|---|
-| Build command | `npm install && npx prisma generate && npm run build` |
-| Start command | `npm start` |
+Live at [pulserehab.app](https://pulserehab.app) (client not yet deployed — root path
+currently just hits this server directly; will be repointed to the client once that
+ships).
 
 ### Required Environment Variables
 
 ```
 NODE_ENV
 PORT
+SERVER_API_VERSION
+ORIGIN
 DATABASE_URL
 JWT_SECRET
-GEMINI_API_KEY
-SENTRY_DSN
+ANTHROPIC_API_KEY / GOOGLE_AI_API_KEY / GOOGLE_FREE_AI_API_KEY / OPENAI_API_KEY
 ```
+
+`DATABASE_URL` needs `?uselibpqcompat=true&sslmode=require` appended — RDS enforces
+SSL by default, and omitting it fails with a misleading Prisma "denied access" error.
 
 ---
 
