@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { PASSWORD_FORMAT } from './passwordFormat'
 
 export const changeEmailSchema = z.object({
-    newEmail: z.string('New email is required').email(),
+    newEmail: z.email('New email is required'),
     password: z
         .string('Password is required')
         .regex(
@@ -11,3 +11,5 @@ export const changeEmailSchema = z.object({
             'Password must be at least 8 characters and contain letters and numbers'
         )
 })
+
+export type ChangeEmailType = z.infer<typeof changeEmailSchema>

@@ -3,8 +3,7 @@ import { z } from 'zod'
 import { PASSWORD_FORMAT } from './passwordFormat'
 
 export const loginSchema = z.object({
-    email: z.string('Email is required')
-        .email(),
+    email: z.email('Email is required'),
     password: z.string('Password is required')
         .min(8, 'Password must be at least 8 characters')
         .regex(
@@ -13,3 +12,5 @@ export const loginSchema = z.object({
         ),
     remember: z.boolean().default(false)
 })
+
+export type LoginType = z.infer<typeof loginSchema>
