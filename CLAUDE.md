@@ -26,6 +26,9 @@ Architecture: MVC — Controller → Service → Model → Database.
 ## File Structure
 See `docs/STRUCTURE.md` for the full directory layout and subdirectory rules.
 
+## Docs Sync
+New feature added → update server PRD, server README, AND client README same time, every time.
+
 ## AI Eval Sync
 Any change to AI provider logic, prompts, insight types, or generation config
 (`src/services/aiProviders/`, `src/lib/aiInsight/`, `aiInsightGeneratorService.ts`,
