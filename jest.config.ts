@@ -3,6 +3,9 @@ export default {
     transform: {
         '^.+\\.ts$': 'ts-jest'
     },
+    moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.[tj]s$': '$1'
+    },
     transformIgnorePatterns: [
         'node_modules/(?!(@exodus|html-encoding-sniffer|jsdom)/)'
     ],
