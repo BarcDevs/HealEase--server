@@ -37,19 +37,20 @@ scenarios cover the current insight types, prompts match `insightsPrompts.ts`,
 model ids match config defaults. Update the eval scripts in the same change if
 they've drifted — don't let them silently test stale prompts/models.
 
-## AWS EC2 Migration — Pre-Deploy Checklist
-Before deploying off Render to AWS EC2, resolve these items deferred in
-`docs/review/07-fix-plan.md` (blocked on this migration, not actionable under Render):
-- ~~REVIEW #4 — pick one bundler~~ Done: `tsc` is the only bundler now (Dockerfile builder
-  stage already used it). Removed webpack toolchain, `start:prod`/`prod` scripts, and
-  `webpack.config.ts` — all were Render-only leftovers.
-- ~~DECIDE #5 / REVIEW #3 — prisma CLI dependency placement~~ Done: moved `prisma` to
-  `devDependencies` (`@prisma/client`/`@prisma/adapter-pg` stay in `dependencies` — the
-  runtime needs those, not the CLI). `npm run release` (`prisma migrate deploy`) now
-  runs from the Dockerfile's `builder` target (full devDependencies) as a one-off step
-  before rolling out the `runner` image — see comment above `CMD` in the Dockerfile.
-  Verified: runner image has no `prisma` CLI in `node_modules/.bin`, builder stage
-  builds clean.
+## AWS Deployment
+Server runs on EC2 + RDS (eu-central-1), replacing Render. Full details, including
+infra IDs, redeploy steps, and secrets layout: see `docs/DEPLOYMENT.md`.
+
+Two build-time gotchas specific to this stack, worth knowing before touching
+`tsconfig.json`, `prisma/schema.prisma`, or the Dockerfile:
+- Prisma's `prisma-client` generator defaults to an ESM/TS-native output that requires
+  sibling `.ts` files at runtime — needs `moduleFormat = "cjs"` on the generator, plus
+  `rewriteRelativeImportExtensions` in `tsconfig.json` so tsc rewrites those `.ts`
+  imports to `.js` on emit. Jest also needs `moduleNameMapper` to strip the same
+  extensions (`jest.config.ts`, `jest.integration.config.ts`) — its resolver doesn't
+  follow explicit `.ts`/`.js` specifiers the way tsc does.
+- RDS enforces SSL by default — `DATABASE_URL` needs `?uselibpqcompat=true&sslmode=require`
+  appended, or connections fail with a misleading "denied access" error from Prisma.
 
 ## Project Roadmap
 [Pulse Roadmap](https://www.notion.so/Pulse-Development-Timeline-3129e15469d28100be18df6e1ce0a984?source=copy_link)
