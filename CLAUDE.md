@@ -43,11 +43,13 @@ Before deploying off Render to AWS EC2, resolve these items deferred in
 - ~~REVIEW #4 — pick one bundler~~ Done: `tsc` is the only bundler now (Dockerfile builder
   stage already used it). Removed webpack toolchain, `start:prod`/`prod` scripts, and
   `webpack.config.ts` — all were Render-only leftovers.
-- DECIDE #5 / REVIEW #3 — decide whether `prisma` (CLI) can move from `dependencies` to
-  `devDependencies`. Depends on which image runs `npm run release`
-  (`prisma migrate deploy`) in the EC2 pipeline — only safe if that step runs from an
-  image that still has full `devDependencies`. Not yet decided: EC2 deploy pipeline
-  (how `release` gets invoked — CI step, SSH command, ECS/EB task, etc.) isn't built yet.
+- ~~DECIDE #5 / REVIEW #3 — prisma CLI dependency placement~~ Done: moved `prisma` to
+  `devDependencies` (`@prisma/client`/`@prisma/adapter-pg` stay in `dependencies` — the
+  runtime needs those, not the CLI). `npm run release` (`prisma migrate deploy`) now
+  runs from the Dockerfile's `builder` target (full devDependencies) as a one-off step
+  before rolling out the `runner` image — see comment above `CMD` in the Dockerfile.
+  Verified: runner image has no `prisma` CLI in `node_modules/.bin`, builder stage
+  builds clean.
 
 ## Project Roadmap
 [Pulse Roadmap](https://www.notion.so/Pulse-Development-Timeline-3129e15469d28100be18df6e1ce0a984?source=copy_link)

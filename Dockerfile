@@ -50,8 +50,11 @@ WORKDIR /app/dist
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:${PORT}/api/status || exit 1
 # Migrations are NOT run here — running `prisma migrate deploy` on every
-# container start races across replicas. Run `npm run release` (repo root,
-# schema at /app/prisma/schema.prisma) as a one-off pre-deploy step instead —
-# e.g. a Render "Pre-Deploy Command", a k8s Job/initContainer, or a manual
-# step before rolling out new containers.
+# container start races across replicas, and the `prisma` CLI is a
+# devDependency (deps-prod installs --omit=dev, so this image doesn't have
+# it). Run `npm run release` as a one-off step from the `builder` stage
+# instead (has full devDependencies) — e.g.
+#   docker build --target builder -t app:migrate .
+#   docker run --rm --env-file .env app:migrate npm run release
+# before rolling out this image.
 CMD ["node", "src/app.js"]
