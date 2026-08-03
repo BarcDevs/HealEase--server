@@ -24,12 +24,13 @@ CMD ["npm", "run", "start:dev"]
 
 # ---- Build: compile TypeScript → dist/
 # rootDir=. means config/*.ts compiles to dist/config/*.js (config pkg finds them via CWD)
+# prisma/generated is in tsconfig's include, so tsc compiles the generated
+# client's .ts source (moduleFormat=cjs) straight into dist/prisma/generated —
+# no separate copy step needed.
 FROM deps AS builder
 RUN npx prisma generate --schema=prisma/schema.prisma
 COPY . .
 RUN npx tsc --project tsconfig.json
-# Prisma imports resolve relative to file: dist/src/... → dist/prisma/generated
-RUN cp -r prisma/generated dist/prisma/
 
 # ---- Production runner
 FROM node:20-bullseye-slim AS runner
