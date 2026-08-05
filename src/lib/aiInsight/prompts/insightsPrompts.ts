@@ -6,6 +6,7 @@ import type { InsightType } from '../../../types/insight'
 import {
     calculateAverageMood,
     extractRecentActivities,
+    extractRecentNotes,
     formatMoodTrend,
     formatStreakLine,
     getLatestMood,
@@ -36,6 +37,7 @@ export const buildPromptForMoodDropAlert = (
 ): string => {
     const recentMoods = formatMoodTrend(moodTrend)
     const activities = extractRecentActivities(checkIns)
+    const notes = extractRecentNotes(checkIns)
 
     return injectBrandName(`
 You are a recovery support assistant for {{brandName}}.
@@ -46,6 +48,7 @@ Context:
 - The user's mood has decreased across their latest 3 check-ins
 - Recent mood trend: ${recentMoods}
 - Recent activities mentioned: ${activities || 'not available'}
+- Recent notes from the user: ${notes || 'not available'}
 
 Write a short insight for the user.
 
@@ -57,6 +60,8 @@ Requirements:
 - Do not diagnose, do not use medical language, and do not sound like a crisis warning
 - Avoid generic filler like "take it one day at a time" unless clearly relevant
 - Make it feel human, calm, and specific to a recovery journey
+- Do not show your reasoning, drafts, alternatives, or revisions
+- Output ONLY the final message text, with nothing before or after it
 
 Output only the final message text.
 `).trim()
@@ -88,6 +93,8 @@ Requirements:
 - Keep the tone warm, grounded, and respectful
 - Avoid hype, clichés, and over-the-top praise
 - Do not sound generic
+- Do not show your reasoning, drafts, alternatives, or revisions
+- Output ONLY the final message text, with nothing before or after it
 
 Output only the final message text.
 `).trim()
@@ -101,6 +108,7 @@ export const buildPromptForWeeklySummary = (
 ): string => {
     const avgMood = calculateAverageMood(checkIns)
     const topActivities = getTopActivities(checkIns)
+    const notes = extractRecentNotes(checkIns)
     const displayStreak = currentStreak ?? 1
     const streakLabel = `${displayStreak} day${displayStreak > 1 ? 's' : ''}`
 
@@ -114,6 +122,7 @@ Context:
 - Average mood: ${avgMood}
 - Current streak: ${streakLabel}
 - Most common activities: ${topActivities || 'not enough activity data'}
+- Notes from the user this week: ${notes || 'not available'}
 
 Write a weekly reflection for the user.
 
@@ -125,6 +134,8 @@ Requirements:
 - Keep the tone supportive, calm, and non-judgmental
 - Do not diagnose or make medical claims
 - Avoid generic phrasing that could apply to anyone
+- Do not show your reasoning, drafts, alternatives, or revisions
+- Output ONLY the final message text, with nothing before or after it
 
 Output only the final message text.
 `).trim()
