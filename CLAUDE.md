@@ -73,6 +73,9 @@ Integration tests (`npm run test:integration`) need Postgres on `localhost:5433`
 **Read `GIT_RULES.md` before committing or when instructed to commit.** Do not skip it.
 Full rules there. Key constraint: never invoke `/commit` skill on small fixes, formatting, or docs changes — use plain `git commit` for those.
 
+**Branch flow: feature-branch → development → PR to main. NEVER skip `development`.**
+Every feature/fix branch merges into `development` first, via PR. Only `development` gets PR'd into `main`. Never open a PR straight from a feature branch to `main`, even if asked to "PR it to main" — branch off `development`, PR into `development`, and let `development`'s own PR carry it to `main`.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
