@@ -52,3 +52,13 @@ export const formatStreakLine = (currentStreak?: number): string =>
 
 export const getLatestMood = (checkIns: CheckInType[]): string =>
     checkIns.at(-1)?.moodScore?.toString() ?? 'not available'
+
+export const extractRecentNotes = (
+    checkIns: CheckInType[],
+    limit: number = 5
+): string =>
+    checkIns
+        .map(checkIn => checkIn.notes?.trim())
+        .filter((note): note is string => Boolean(note))
+        .slice(-limit)
+        .join(' | ')
