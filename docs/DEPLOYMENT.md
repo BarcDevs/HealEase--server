@@ -13,8 +13,10 @@ Server runs on **EC2 + RDS** in `eu-central-1` (Frankfurt), replacing Render. Cl
 | Domain | `pulserehab.app` (Cloudflare DNS, proxied, SSL mode: Flexible) → EC2 public IP. Client will take over the root path once deployed; API already lives under `/api/v2` so no path-routing conflict yet. |
 | EC2 security group | `sg-0c263224f1d77df26` — SSH (22) restricted to operator's IP only, HTTP/HTTPS (80/443) open |
 | RDS security group | `sg-0d6e9cdd1a065d584` — Postgres (5432) restricted to the EC2 security group only, no public CIDR |
-| IAM role (EC2) | `pulse-ec2-role` / instance profile `pulse-ec2-instance-profile` — scoped to `secretsmanager:GetSecretValue` on exactly the secrets below, nothing broader |
+| IAM role (EC2) | `pulse-ec2-role` / instance profile `pulse-ec2-instance-profile` — `secretsmanager:GetSecretValue` on exactly the secrets below, `AmazonSSMManagedInstanceCore` (for SSM Run Command), and ECR pull scoped to `pulse-server-app` only |
+| IAM role (GitHub Actions) | `pulse-server-gh-deploy-role` — assumable only via OIDC by `repo:BarcDevs/HealEase--server:ref:refs/heads/main`; scoped to ECR push on `pulse-server-app` and `ssm:SendCommand`/status reads on the one EC2 instance. No static AWS keys in GitHub. |
 | CloudTrail | `pulse-trail`, multi-region, logging to `pulse-cloudtrail-logs-110015905368` (log file validation on) |
+| ECR | `pulse-server-app` — image scanning on push, AES256 encryption |
 
 ## Secrets (AWS Secrets Manager, eu-central-1)
 
@@ -42,40 +44,43 @@ Omitting the query params fails with a misleading Prisma error
 (`User was denied access on the database`) — the real cause is `pg` rejecting the
 plaintext connection, not a permissions problem.
 
-## Redeploy steps (manual, no CI/CD pipeline yet)
+## Redeploy — automated (CI/CD)
 
-1. Merge the target branch into `main` (CI-gated: `aws-deploy` → `development` → `main`,
-   each hop needs green checks before merging — see `GIT_RULES.md`).
-2. SSH in: `ssh -i ~/.ssh/pulse-ec2-key.pem ec2-user@35.157.40.177`
-3. Pull and rebuild:
+`.github/workflows/deploy.yml` runs automatically on every successful `CI` run on
+`main`. It:
+
+1. Builds the `runner` and `builder` (migrate) Docker targets and pushes both to ECR
+   (`pulse-server-app`, tagged `runner-<sha>` / `migrate-<sha>` and `-latest`).
+2. Authenticates to AWS via GitHub's OIDC provider — assumes
+   `pulse-server-gh-deploy-role`, scoped to `repo:BarcDevs/HealEase--server:ref:refs/heads/main`
+   only, no long-lived AWS keys stored in GitHub.
+3. Triggers `scripts/deploy/ec2-redeploy.sh` on the EC2 box via **SSM Run Command**
+   (no SSH port exposure, no key material in CI). The script refuses to run any
+   migration containing a `DROP`/`RENAME` (destructive changes ship manually under
+   a maintenance window — expand/contract only for auto-deploy), then runs
+   migrations from the `migrate` image, starts the new `runner` image as a
+   candidate on a staging port, gates it on **`/api/ready`** (a real DB query —
+   `/api/status` alone returns 200 even with a broken `DATABASE_URL`), and only
+   then swaps it into production. If the swapped-in container fails its own
+   health check, the previous container is restored automatically.
+4. The workflow polls the SSM command status and fails the job (with stderr surfaced)
+   if the redeploy or health check fails.
+5. A final step curls `https://pulserehab.app/api/status` through Cloudflare as an
+   end-to-end check.
+
+So: merge to `main` (through the usual CI-gated `aws-deploy` → `development` → `main`
+hops — see `GIT_RULES.md`) and the redeploy happens automatically. Nothing to do by hand.
+
+### Manual redeploy (fallback, e.g. CI/CD itself is broken)
+
+1. SSH in: `ssh -i ~/.ssh/pulse-ec2-key.pem ec2-user@35.157.40.177`
+2. Pull the latest pushed images and run the same script CI uses:
    ```bash
-   cd app && git pull origin main
-   sudo docker build --target runner -t pulse-app .
+   sudo bash /tmp/redeploy.sh <image-tag>   # or fetch scripts/deploy/ec2-redeploy.sh and run it directly
    ```
-4. If the schema changed, run migrations first from the `builder` stage (has full
-   devDependencies — `prisma` CLI is a devDependency, not in the runner image):
-   ```bash
-   sudo docker build --target builder -t pulse-migrate .
-   sudo docker run --rm -e DATABASE_URL="<url-with-sslmode>" pulse-migrate npm run release
-   ```
-5. Restart the container:
-   ```bash
-   sudo docker rm -f pulse-app
-   sudo docker run -d --name pulse-app --restart=always -p 80:8080 \
-     -e NODE_ENV=production \
-     -e SERVER_API_VERSION=v2 \
-     -e ORIGIN=https://pulserehab.app \
-     -e DATABASE_URL="<url-with-sslmode>" \
-     -e JWT_SECRET="<from-secrets-manager>" \
-     -e ANTHROPIC_API_KEY="<from-secrets-manager>" \
-     -e GOOGLE_AI_API_KEY="<from-secrets-manager>" \
-     -e GOOGLE_FREE_AI_API_KEY="<from-secrets-manager>" \
-     -e OPENAI_API_KEY="<from-secrets-manager>" \
-     pulse-app
-   ```
-   All env values should be pulled live from Secrets Manager (the instance role can do
-   this — see the pattern used in step-by-step deploy history), not hardcoded.
-6. Verify: `curl https://pulserehab.app/api/status` and a real DB-backed route (health
+   (Needs a tag that was already pushed to ECR — use `latest` if unsure, or build and
+   push manually with `docker build --target runner|builder` + `docker push`.)
+3. Verify: `curl https://pulserehab.app/api/status` and a real DB-backed route (health
    checks alone don't catch DB/SSL misconfiguration — confirmed the hard way).
 
 ## Known build-time gotchas
@@ -106,10 +111,9 @@ plaintext connection, not a permissions problem.
 
 ## Not yet done
 
-- Client deploy (S3 + CloudFront) — root path on `pulserehab.app` currently just hits
-  this server's Express app; will need to be repointed once the client ships.
-- CI/CD automation — redeploy is currently a manual SSH + `git pull` + `docker build`
-  sequence (see above). No auto-deploy-on-merge yet.
+- Client deploy path-routing on `pulserehab.app` — client is EC2-deployed separately
+  (Next.js SSR); root path still needs to be handed over from this server's Express
+  app once that's wired at the DNS/proxy layer.
 - `staging.pulserehab.app` — not yet configured.
 - AWS Activate / startup credits — domain and AWS account are both recent, worth
   applying once there's a concrete product description to submit.

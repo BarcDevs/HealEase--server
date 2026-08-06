@@ -1,6 +1,7 @@
 import type { Express } from 'express'
 
 jest.mock('../../controllers/serverController', () => ({
+    getServerReadiness: jest.fn(),
     getServerStatus: jest.fn()
 }))
 jest.mock('../../controllers/swaggerController', () => ({

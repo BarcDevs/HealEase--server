@@ -11,6 +11,7 @@ import {
 } from '../../config'
 import { version } from '../../package.json'
 import { HttpStatusCodes } from '../constants/httpStatusCodes'
+import { isDatabaseReady } from '../services/serverService'
 
 export const getServerStatus = (
     _req: Request,
@@ -29,4 +30,15 @@ export const getServerStatus = (
                 }
             })
         })
+}
+
+export const getServerReadiness = async (
+    _req: Request,
+    res: Response
+) => {
+    const databaseReady = await isDatabaseReady()
+
+    res
+        .status(databaseReady ? HttpStatusCodes.OK : HttpStatusCodes.SERVICE_UNAVAILABLE)
+        .json({ database: databaseReady ? 'connected' : 'unavailable' })
 }

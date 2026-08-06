@@ -60,6 +60,8 @@ Requirements:
 - Do not diagnose, do not use medical language, and do not sound like a crisis warning
 - Avoid generic filler like "take it one day at a time" unless clearly relevant
 - Make it feel human, calm, and specific to a recovery journey
+- Do not show your reasoning, drafts, alternatives, or revisions
+- Output ONLY the final message text, with nothing before or after it
 
 Output only the final message text.
 `).trim()
@@ -91,6 +93,8 @@ Requirements:
 - Keep the tone warm, grounded, and respectful
 - Avoid hype, clichés, and over-the-top praise
 - Do not sound generic
+- Do not show your reasoning, drafts, alternatives, or revisions
+- Output ONLY the final message text, with nothing before or after it
 
 Output only the final message text.
 `).trim()
@@ -130,6 +134,8 @@ Requirements:
 - Keep the tone supportive, calm, and non-judgmental
 - Do not diagnose or make medical claims
 - Avoid generic phrasing that could apply to anyone
+- Do not show your reasoning, drafts, alternatives, or revisions
+- Output ONLY the final message text, with nothing before or after it
 
 Output only the final message text.
 `).trim()
