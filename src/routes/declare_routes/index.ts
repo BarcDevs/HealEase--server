@@ -2,7 +2,10 @@ import type { Express } from 'express'
 import swaggerUi from 'swagger-ui-express'
 
 import { env, serverConfig } from '../../../config'
-import { getServerStatus } from '../../controllers/serverController'
+import {
+    getServerReadiness,
+    getServerStatus
+} from '../../controllers/serverController'
 import { swagger } from '../../controllers/swaggerController'
 import { errorFactory } from '../../errors/factory/ErrorFactory'
 import { errorHandler } from '../../middlewares/errorHandler'
@@ -29,6 +32,20 @@ const baseRoute = (route: string) =>
 
 export const declareRoutes = (app: Express) => {
     app.get('/api/status', getServerStatus)
+
+    /**
+     * @swagger
+     * /api/ready:
+     *   get:
+     *     summary: Readiness probe — confirms the app can reach the database
+     *     tags: [Server]
+     *     responses:
+     *       200:
+     *         description: Database reachable
+     *       503:
+     *         description: Database unreachable
+     */
+    app.get('/api/ready', getServerReadiness)
 
     if (env !== 'production') {
         app.use(
