@@ -51,12 +51,21 @@ OPENAI_API_KEY=$(aws secretsmanager get-secret-value --region "$REGION" --secret
 # them, applied manually under a maintenance window. Auto-deploy refuses them
 # outright — the previous container can't be rolled back to a schema that no
 # longer exists once a drop/rename has run.
-PENDING_SQL=$(docker run --rm "$ECR/$REPO:migrate-$IMAGE_TAG" \
-    sh -c 'cat prisma/migrations/*/migration.sql 2>/dev/null' || true)
-if echo "$PENDING_SQL" | grep -qiE 'DROP (COLUMN|TABLE)|RENAME (COLUMN|TABLE)'; then
-    echo "Destructive migration (DROP/RENAME) detected in this image — refusing automated deploy. Apply manually under a maintenance window." >&2
-    exit 1
-fi
+# Only PENDING migrations are checked — years-old already-applied ones (which
+# legitimately contain DROP/RENAME from past releases) must not block every
+# future deploy forever.
+MIGRATE_STATUS=$(docker run --rm -e DATABASE_URL="$DATABASE_URL" "$ECR/$REPO:migrate-$IMAGE_TAG" \
+    npx prisma migrate status --schema=prisma/schema.prisma 2>&1 || true)
+echo "$MIGRATE_STATUS"
+PENDING_NAMES=$(echo "$MIGRATE_STATUS" | sed -n '/have not yet been applied/,/^$/p' | grep -oE '^[0-9]{8,}_?[A-Za-z0-9_]*$' || true)
+
+for name in $PENDING_NAMES; do
+    SQL=$(docker run --rm "$ECR/$REPO:migrate-$IMAGE_TAG" sh -c "cat prisma/migrations/$name/migration.sql 2>/dev/null" || true)
+    if echo "$SQL" | grep -qiE 'DROP (COLUMN|TABLE)|RENAME (COLUMN|TABLE)'; then
+        echo "Destructive migration ($name) detected — refusing automated deploy. Apply manually under a maintenance window." >&2
+        exit 1
+    fi
+done
 
 echo "Running migrations..."
 docker run --rm -e DATABASE_URL="$DATABASE_URL" "$ECR/$REPO:migrate-$IMAGE_TAG" npm run release
