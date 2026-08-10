@@ -22,6 +22,7 @@ export const getServerStatus = (
         .json({
             message: `Server is running! use /api/${serverConfig.apiVersion}/ for api requests`,
             version,
+            uptimeSeconds: Math.floor(process.uptime()),
             ...(isDev && {
                 config: {
                     CORS_Origin: serverConfig.origin,
