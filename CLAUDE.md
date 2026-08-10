@@ -23,6 +23,13 @@ Architecture: MVC — Controller → Service → Model → Database.
 **Learn from mistakes:** Save feedback memory on any correction or confirmed non-obvious choice. User should never repeat the same correction. Check memory before similar work.
 **Goal-driven:** Define success criteria before starting. For multi-step tasks, state a plan: `1. [step] → verify: [check]`. Loop until verified.
 
+## Repo-Visible Feedback & Decisions Log
+Alongside auto-memory (cross-session, not repo-visible), this repo tracks two logs any collaborator/agent can read:
+- `feedbacks/feedbacks.md` — corrections or confirmed preferences given to Claude during sessions (Claude's mistakes, user corrections to Claude's behavior/claims). Not app-generated user feedback.
+- `decisions/decisions.md` — architecture/technical decisions made during sessions, with reasoning (problem, decision, why over alternatives, how to apply).
+Append newest entries at the bottom, dated. When a log file grows large, split it into `feedbacks/<subject>.md` / `decisions/<subject>.md` by topic and leave an index in the root file.
+**Read both at the start of every new session** (or the subject-split index files if already split) — they are load-bearing context, same tier as this file.
+
 ## File Structure
 See `docs/STRUCTURE.md` for the full directory layout and subdirectory rules.
 
