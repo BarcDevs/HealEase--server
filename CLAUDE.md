@@ -30,6 +30,7 @@ Alongside auto-memory (cross-session, not repo-visible), this repo tracks two lo
 Append newest entries at the bottom, dated. When a log file grows large, split it into `feedbacks/<subject>.md` / `decisions/<subject>.md` by topic and leave an index in the root file.
 **Read both at the start of every new session** (or the subject-split index files if already split) — they are load-bearing context, same tier as this file.
 **Write immediately, same turn as the correction/decision.** Any user correction, confirmed non-obvious choice, or technical decision → log it right then, don't wait for user to ask "did you save that." Missing one is a bug.
+**Update the existing entry, don't duplicate.** If a new decision revises or tunes an existing logged decision (e.g. changing a threshold that decision introduced), append a dated follow-up note inside that same entry — don't restate the whole decision in a new entry lower in the file. Keep each decision's full context in one place.
 
 ## File Structure
 See `docs/STRUCTURE.md` for the full directory layout and subdirectory rules.

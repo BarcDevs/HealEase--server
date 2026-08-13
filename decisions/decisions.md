@@ -9,7 +9,7 @@ Architecture/technical decisions made during sessions in this repo, with reasoni
 **Problem:** `contextBuilder.ts` builds AI intervention context from the last 7 check-in records (`checkInModel.getCheckIns(profileId, 7)`), ordered by `checkInDate desc`. If a user has a reporting gap (e.g. 3 weeks of silence), those 7 records can span a much longer real time window than 7 days. `determineTrendDirection` computed mood/pain deltas across that window with no gap awareness, so the AI could describe a "trend" that's actually two disconnected time periods — factually derived from real data, but temporally misleading.
 
 **Decision:** Don't change the fetch (still `take: 7`, no date-range query, no extra DB round-trip). Instead, derive the gap from `checkInDate` values already in hand:
-- Added `FEEDBACK_DETECTION.TREND.GAP_DAYS_THRESHOLD = 10` (`src/constants/feedback/detection.ts`).
+- Added `FEEDBACK_DETECTION.TREND.GAP_DAYS_THRESHOLD` (`src/constants/feedback/detection.ts`).
 - Added `gapDays` to `InterventionContext.trend` (`src/types/feedback.ts`), computed as the largest gap between consecutive check-ins in the window (`contextBuilder.ts: calculateMaxGapDays`).
 - If `gapDays >= GAP_DAYS_THRESHOLD`, `determineTrendDirection` forces `'stable'` instead of computing a delta.
 - `aiRenderer.ts` prompt includes an explicit note when the gap exceeds threshold, instructing the AI not to imply a continuous trend.
@@ -20,7 +20,7 @@ Architecture/technical decisions made during sessions in this repo, with reasoni
 
 Implementation uses the existing `dayInMs` from `src/constants/time.ts` for the ms→days conversion (caught in review — first pass hardcoded `1000 * 60 * 60 * 24` instead of checking for an existing time-constants file).
 
-`GAP_DAYS_THRESHOLD` changed 10 → 7: symmetric with the 7-check-in fetch window, simpler to reason about ("gap exceeding one check-in cycle voids the trend").
+**Follow-up (2026-08-12):** `GAP_DAYS_THRESHOLD` started at 10, dropped to **7** — too large relative to the 7-check-in fetch window; symmetric with it is simpler to reason about ("gap exceeding one check-in cycle voids the trend").
 
 **TODO (future):** expose `trend`/`gapDays` to the client response — currently computed but discarded after prompt-building, only the AI's free-text output reaches the user. Positive ('up') trends are already fed into the AI prompt today, just not surfaced as structured data. **TODO (future):** split intervention feedback into two distinct messages (trend-change feedback + supportive feedback) instead of one blended AI response.
 
