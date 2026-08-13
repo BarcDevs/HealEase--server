@@ -24,3 +24,11 @@
   replace Jaccard in `scorePost`. pgvector confirmed viable on current RDS instance;
   embedding model and vector DB approach already picked. See `decisions/decisions.md`
   (2026-08-11 and 2026-08-12 entries) for full reasoning, scope, and model choice.
+
+## BUGS
+
+- **Google OAuth login broken since the AWS deploy.** Something regressed during/after
+  the Render→AWS migration — needs investigation (likely candidates: Authorized JS
+  origin/redirect URI still pointing at the old Render URL instead of
+  `pulserehab.app`/the client's EC2 domain, or a secret not carried over to Secrets
+  Manager). Not yet root-caused.
