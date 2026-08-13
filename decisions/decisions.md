@@ -65,3 +65,15 @@ Implementation uses the existing `dayInMs` from `src/constants/time.ts` for the 
 **Why this approach over alternatives:** `text-embedding-3-large` and Pinecone were the main alternatives considered — both rejected as over-spec/over-cost for current post volume, not because they're wrong in principle. Qdrant over Pinecone/Weaviate specifically because native filter+vector queries avoid adding a second scoring pass in application code.
 
 **How to apply:** Length caps are live now (independent of RAG timing). The model/vector-DB choices are the plan to execute when the RAG work is actually picked up — no code for embeddings exists yet, only the scoring bug and this plan (see 2026-08-11 entry).
+
+---
+
+## 2026-08-13 — Single EC2 instance has no automated recovery (flagged as CRITICAL TODO)
+
+**Problem:** Surfaced during architecture-interview prep, not from a production incident. Production deploy targets one fixed EC2 instance (`i-0df518d8572bfcfd6`), addressed by instance ID via SSM Run Command in `ec2-redeploy.sh`. The blue/green swap logic protects against a *bad deploy*, but there's no protection if the EC2 instance itself dies (hardware fault, host maintenance, etc.) — no Auto Scaling Group, no automated replacement. Recovery today means someone notices and fixes it by hand.
+
+**Decision:** Move to an Auto Scaling Group with `min=1/max=1/desired=1`. This is not deferred for cost reasons — an ASG at desired=1 costs exactly the same as the standalone EC2 instance today, AWS doesn't charge for the ASG control plane itself. It's deferred because the current deploy pipeline assumes a static instance ID and a static IP, both of which break under ASG-managed replacement.
+
+**Why this approach over alternatives:** A full multi-instance + Application Load Balancer setup was considered and rejected as premature — it solves a scaling problem we don't have yet, on top of the recovery problem we do have. `min=1/max=1` gets automated recovery (the actual gap) without taking on load-balancing complexity that isn't needed at current traffic.
+
+**How to apply:** When picked up — (1) update `ec2-redeploy.sh`/the GitHub Actions workflow to target the ASG rather than a fixed instance ID for SSM Run Command, (2) handle the IP change on instance replacement: either re-associate a fixed Elastic IP to the new instance on launch, or move to a health-check-based DNS update in Cloudflare. Tracked as CRITICAL in `TODO.md`.
