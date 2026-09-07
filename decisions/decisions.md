@@ -96,3 +96,19 @@ Evaluated three options for the underlying IP-stability problem:
 **Why this approach over alternatives:** Elastic IP is the direct fix (removes the need for anything to "stay in sync" at all) at negligible cost; Route53 was considered and rejected as redundant given Cloudflare is already the DNS layer in use.
 
 **How to apply:** Add the Elastic IP only when the ASG work from the original 2026-08-13 entry is actually implemented — no cost or benefit to adding it while still on a single manually-managed instance. Tracked alongside the ASG item in `TODO.md`.
+
+---
+
+## 2026-09-07 — Root-caused and fixed Google OAuth login regression from AWS migration
+
+**Problem:** Google OAuth login broken since Render→AWS migration. Root cause: `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`/`GOOGLE_REDIRECT_URI` were never carried over to AWS Secrets Manager during the migration — `scripts/deploy/ec2-redeploy.sh` only fetched 6 secrets (DB creds, JWT, Anthropic/Google-AI/OpenAI keys), so the prod container ran with no Google OAuth env vars at all.
+
+**Decision:**
+- Created `pulse/app/GOOGLE_CLIENT_ID` and `pulse/app/GOOGLE_CLIENT_SECRET` in Secrets Manager (eu-central-1); added both ARNs to the `pulse-secret-read` IAM policy on `pulse-ec2-role`.
+- `GOOGLE_REDIRECT_URI` is not a secret (public callback URL) — set directly as `googleOAuth.redirectUri` in `config/production.ts` (`https://pulserehab.app/api/v1/auth/google/callback`) instead of Secrets Manager, avoiding an unnecessary secret + IAM grant for non-sensitive config.
+- Updated `ec2-redeploy.sh` to fetch the two new secrets and pass them as container env vars.
+- Updated `docs/DEPLOYMENT.md` secrets table to match.
+
+**Why this approach over alternatives:** Keeping `GOOGLE_REDIRECT_URI` out of Secrets Manager follows the existing pattern in this repo of only storing values that are actually sensitive (see `redirectUri` already being plain env-var-driven pre-migration) — matches user's explicit call mid-session.
+
+**How to apply:** Still needed — verify `https://pulserehab.app/api/v1/auth/google/callback` is added to the Authorized redirect URIs list on the Google Cloud Console OAuth client (AWS-side CLI has no access to that). Old/previous OAuth client secret left untouched (not disabled) since it may still be in use by a preview server the user doesn't have access to — confirm before rotating.

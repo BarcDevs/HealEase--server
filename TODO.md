@@ -40,11 +40,12 @@
 
 ## BUGS
 
-- **Google OAuth login broken since the AWS deploy.** Something regressed during/after
-  the Render→AWS migration — needs investigation (likely candidates: Authorized JS
-  origin/redirect URI still pointing at the old Render URL instead of
-  `pulserehab.app`/the client's EC2 domain, or a secret not carried over to Secrets
-  Manager). Not yet root-caused.
+- ~~Google OAuth login broken since the AWS deploy.~~ Root cause: `GOOGLE_CLIENT_ID`/
+  `GOOGLE_CLIENT_SECRET` never migrated to Secrets Manager, so prod container had no
+  Google OAuth env vars. Fixed 2026-09-07 — see `decisions/decisions.md`. One manual
+  step remains: confirm `https://pulserehab.app/api/v1/auth/google/callback` is in the
+  Authorized redirect URIs list on the Google Cloud Console OAuth client (not
+  CLI-reachable).
 
 * create a monitor agent for production to catch any unexpected errors and fix them, 
   then create a PR and notify dev, while also recording it in a doc, and checking - 

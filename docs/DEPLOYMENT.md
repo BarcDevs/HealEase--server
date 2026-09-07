@@ -28,6 +28,11 @@ Server runs on **EC2 + RDS** in `eu-central-1` (Frankfurt), replacing Render. Cl
 | `pulse/app/GOOGLE_AI_API_KEY` | Raw key |
 | `pulse/app/GOOGLE_FREE_AI_API_KEY` | Raw key |
 | `pulse/app/OPENAI_API_KEY` | Raw key |
+| `pulse/app/GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `pulse/app/GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+
+`GOOGLE_REDIRECT_URI` is not a secret — set directly in `config/production.ts`
+(`https://pulserehab.app/api/v1/auth/google/callback`).
 
 The EC2 instance role can read all of these directly — no keys live in `.env` files
 or shell history on the box itself.

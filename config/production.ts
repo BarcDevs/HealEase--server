@@ -18,5 +18,8 @@ export default {
     ai: {
         provider: 'anthropic',
         fallbackOrder: 'anthropic,google-pro,openai'
+    },
+    googleOAuth: {
+        redirectUri: 'https://pulserehab.app/api/v1/auth/google/callback'
     }
 }
