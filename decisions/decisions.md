@@ -99,7 +99,7 @@ Evaluated three options for the underlying IP-stability problem:
 
 ---
 
-## 2026-09-07 — Root-caused and fixed Google OAuth login regression from AWS migration
+## 2026-09-07 — Root-caused Google OAuth login regression from AWS migration (fix implemented, not yet verified)
 
 **Problem:** Google OAuth login broken since Render→AWS migration. Root cause: `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`/`GOOGLE_REDIRECT_URI` were never carried over to AWS Secrets Manager during the migration — `scripts/deploy/ec2-redeploy.sh` only fetched 6 secrets (DB creds, JWT, Anthropic/Google-AI/OpenAI keys), so the prod container ran with no Google OAuth env vars at all.
 
@@ -111,4 +111,4 @@ Evaluated three options for the underlying IP-stability problem:
 
 **Why this approach over alternatives:** Keeping `GOOGLE_REDIRECT_URI` out of Secrets Manager follows the existing pattern in this repo of only storing values that are actually sensitive (see `redirectUri` already being plain env-var-driven pre-migration) — matches user's explicit call mid-session.
 
-**How to apply:** Still needed — verify `https://pulserehab.app/api/v1/auth/google/callback` is added to the Authorized redirect URIs list on the Google Cloud Console OAuth client (AWS-side CLI has no access to that). Old/previous OAuth client secret left untouched (not disabled) since it may still be in use by a preview server the user doesn't have access to — confirm before rotating.
+**How to apply:** Not yet verified — nothing deployed or tested end-to-end. Still needed: (1) verify `https://pulserehab.app/api/v1/auth/google/callback` is added to the Authorized redirect URIs list on the Google Cloud Console OAuth client (AWS-side CLI has no access to that); (2) merge the PR, deploy, and actually run the login flow against prod to confirm it works — the analysis pinpointing the missing secrets is solid, but that alone doesn't prove the fix works. Old/previous OAuth client secret left untouched (not disabled) since it may still be in use by a preview server the user doesn't have access to — confirm before rotating.

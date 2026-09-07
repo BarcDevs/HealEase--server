@@ -40,12 +40,16 @@
 
 ## BUGS
 
-- ~~Google OAuth login broken since the AWS deploy.~~ Root cause: `GOOGLE_CLIENT_ID`/
-  `GOOGLE_CLIENT_SECRET` never migrated to Secrets Manager, so prod container had no
-  Google OAuth env vars. Fixed 2026-09-07 — see `decisions/decisions.md`. One manual
-  step remains: confirm `https://pulserehab.app/api/v1/auth/google/callback` is in the
-  Authorized redirect URIs list on the Google Cloud Console OAuth client (not
-  CLI-reachable).
+- **Google OAuth login broken since the AWS deploy — fix implemented, NOT yet verified.**
+  Root cause: `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` never migrated to Secrets
+  Manager, so prod container had no Google OAuth env vars. Secrets created, IAM
+  updated, `ec2-redeploy.sh` + `config/production.ts` patched, PR not yet merged/
+  deployed. Still needed before calling this resolved:
+  1. Confirm `https://pulserehab.app/api/v1/auth/google/callback` is in the
+     Authorized redirect URIs list on the Google Cloud Console OAuth client
+     (not CLI-reachable).
+  2. Merge PR, let it deploy, then actually run the login flow against prod
+     and confirm it succeeds end-to-end.
 
 * create a monitor agent for production to catch any unexpected errors and fix them, 
   then create a PR and notify dev, while also recording it in a doc, and checking - 
