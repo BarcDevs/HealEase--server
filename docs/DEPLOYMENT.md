@@ -31,8 +31,11 @@ Server runs on **EC2 + RDS** in `eu-central-1` (Frankfurt), replacing Render. Cl
 | `pulse/app/GOOGLE_CLIENT_ID` | Google OAuth client ID |
 | `pulse/app/GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 
-`GOOGLE_REDIRECT_URI` is not a secret — set directly in `config/production.ts`
-(`https://pulserehab.app/api/v1/auth/google/callback`).
+`GOOGLE_REDIRECT_URI` is not a secret — passed as a plain (non-Secrets-Manager) env
+var in `ec2-redeploy.sh`'s `RUN_ARGS` (`https://pulserehab.app/api/v1/auth/google/callback`),
+not hardcoded in `config/production.ts`. Both AWS prod and the Render staging
+instance run `NODE_ENV=production` and share `config/production.ts` — hardcoding
+one URL there would break whichever environment didn't match it.
 
 The EC2 instance role can read all of these directly — no keys live in `.env` files
 or shell history on the box itself.
