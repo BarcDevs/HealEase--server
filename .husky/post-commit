@@ -1,0 +1,57 @@
+#!/usr/bin/env sh
+# Auto-bumps package.json version per commit type (see GIT_RULES.md):
+#   feat        -> minor bump, patch reset to 0
+#   fix/rfc/docs/style/test/chore -> patch bump
+# Major is never bumped automatically — real major bumps stay manual.
+# SKIP_VERSION_BUMP guards against re-triggering itself on the amend below
+# (git still runs post-commit on --amend even with --no-verify).
+# Not run mid-rebase/cherry-pick/merge — amending there is invalid.
+
+if [ -n "$SKIP_VERSION_BUMP" ]; then
+    exit 0
+fi
+
+if [ -d "$(git rev-parse --git-dir)/rebase-merge" ] || \
+   [ -d "$(git rev-parse --git-dir)/rebase-apply" ] || \
+   [ -f "$(git rev-parse --git-dir)/CHERRY_PICK_HEAD" ] || \
+   [ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]; then
+    exit 0
+fi
+
+msg=$(git log -1 --pretty=%s)
+type=$(printf '%s' "$msg" | sed -nE 's/^([a-zA-Z]+)(!)?(\(.+\))?:.*/\1\2/p')
+
+case "$type" in
+    feat|feat!) bump=minor ;;
+    fix|rfc|docs|style|test|chore) bump=patch ;;
+    *) exit 0 ;;
+esac
+
+if [ ! -f package.json ]; then
+    exit 0
+fi
+
+version=$(node -p "require('./package.json').version")
+major=$(printf '%s' "$version" | cut -d. -f1)
+minor=$(printf '%s' "$version" | cut -d. -f2)
+patch=$(printf '%s' "$version" | cut -d. -f3)
+
+if [ "$bump" = "minor" ]; then
+    minor=$((minor + 1))
+    patch=0
+else
+    patch=$((patch + 1))
+fi
+
+new_version="$major.$minor.$patch"
+
+node -e "
+const fs = require('fs');
+const p = require('./package.json');
+p.version = '$new_version';
+fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');
+"
+
+git add package.json
+SKIP_VERSION_BUMP=1 git commit --amend --no-edit --no-verify > /dev/null
+echo "post-commit: bumped version to $new_version ($bump, from '$type' commit)"
